@@ -19,6 +19,7 @@ specifiers:
   eslint-plugin-prettier: ^4.0.0
   jest: ^27.5.1
   pg: ^8.7.3
+  pnpm: ^6.32.6
   prettier: ^2.6.2
   reflect-metadata: ^0.1.13
   rimraf: ^3.0.2
@@ -39,6 +40,7 @@ dependencies:
   '@nestjs/platform-express': 8.4.4_a78378ec5f3cecc3c353ed91b578f3e6
   '@nestjs/typeorm': 8.0.3_ea7e02d3d3a40be7f45db2b10cb2e70e
   pg: 8.7.3
+  pnpm: 6.32.6
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   rxjs: 7.5.5
@@ -4217,6 +4219,12 @@ packages:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
     dev: true
+
+  /pnpm/6.32.6:
+    resolution: {integrity: sha512-ucrdCw3F/qjjzoR9+UtLXH1jkDqsbinz+hzSz54WQOOPt/F+9uxm8irrO/mdGkmsy844kAX6vsfS85gZLTg+yA==}
+    engines: {node: '>=12.17'}
+    hasBin: true
+    dev: false
 
   /postgres-array/2.0.0:
     resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
