@@ -17,6 +17,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
+    "test:v": "jest --verbose",
+    "test:vcov": "jest --verbose --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
@@ -34,6 +36,7 @@
     "webpack": "^5.72.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^6.1.2",
     "@nestjs/cli": "^8.2.5",
     "@nestjs/schematics": "^8.0.10",
     "@nestjs/testing": "^8.4.4",
