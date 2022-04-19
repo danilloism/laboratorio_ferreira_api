@@ -1,5 +1,5 @@
 import { IsString } from 'class-validator';
-import { Dto } from 'src/modules/shared/dtos/dto';
+import { Dto } from 'src/shared/dtos/dto';
 
 export class CriarUsuarioDto implements Dto {
   @IsString()

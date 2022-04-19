@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { EstoqueModule } from './modules/operacional/estoque/estoque.module';
 import { PrestacaoDeServicoModule } from './modules/operacional/prestacao-de-servico/prestacao-de-servico.module';
-import { SharedModule } from './modules/shared/shared.module';
 
 import { SistemaModule } from './modules/sistema/sistema.module';
 
@@ -12,7 +11,6 @@ import { SistemaModule } from './modules/sistema/sistema.module';
     EstoqueModule,
     PrestacaoDeServicoModule,
     SistemaModule,
-    SharedModule,
   ],
   controllers: [],
   providers: [],
