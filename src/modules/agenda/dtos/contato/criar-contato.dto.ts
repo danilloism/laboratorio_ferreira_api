@@ -1,4 +1,4 @@
-import { Dto } from 'src/modules/shared/dtos/dto';
+import { Dto } from 'src/shared/dtos/dto';
 import { CriarTelefoneDto } from '../../dtos/telefone/telefone.dto';
 import { CriarUsuarioDto } from '../usuario/criar-usuario.dto';
 import { IsBoolean, IsNotEmptyObject, IsString } from 'class-validator';

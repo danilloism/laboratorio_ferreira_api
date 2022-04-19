@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ContatoService } from '../../../agenda/services/contato/contato.service';
 import { CriarContatoDto } from '../../dtos/contato/criar-contato.dto';
-import { ResultDto } from '../../../shared/dtos/result.dto';
+import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { AtualizarContatoDto } from '../../dtos/contato/atualizar-contato.dto';
 
 @Controller('contatos')

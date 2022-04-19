@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AccountService } from '../../sistema/account/account.service';
-import { Role } from '../enums/role.enum';
-import { JwtPayload } from '../interfaces/jwt-payload.interface';
+import { AccountService } from '../../account/account.service';
+import { Role } from '../../../../shared/enums/role.enum';
+import { JwtPayload } from '../jwt/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {

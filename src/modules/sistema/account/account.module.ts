@@ -1,13 +1,13 @@
-import { Global, Module } from '@nestjs/common';
-import { SharedModule } from '../../shared/shared.module';
+import { forwardRef, Global, Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { AuthModule, AuthService, JwtAuthGuard } from '../auth';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 
-@Global()
 @Module({
-  imports: [SharedModule],
+  imports: [forwardRef(() => AuthModule)],
   controllers: [AccountController],
-  providers: [AccountService],
+  providers: [AccountService, JwtAuthGuard],
   exports: [AccountService],
 })
 export class AccountModule {}
