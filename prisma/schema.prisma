@@ -6,3 +6,106 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+//======//AGENDA//======//
+
+model Contato {
+  id          String  @id @default(uuid())
+  name        String
+  categoria   String
+  usaEspOdont Boolean @default(false) @map("usa_esp_odont")
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  usuario   Usuario?
+  telefones Telefone[]
+
+  @@map("contato")
+}
+
+model Telefone {
+  contato Contato @relation(fields: [contatoId], references: [id])
+
+  contatoId String @map("contato_id")
+  ddd       Int    @default(62)
+  numero    Int
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@id([ddd, numero])
+  @@map("telefone")
+}
+
+model Usuario {
+  contato Contato @relation(fields: [contatoId], references: [id])
+
+  contatoId String  @id @map("contato_id")
+  email     String  @unique
+  username  String? @unique
+  senha     String
+  roles     Role[]
+
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
+
+  @@map("usuario")
+}
+
+enum Role {
+  usuario
+  admin
+  colaborador
+}
+
+//======//OPERACIONAL//======//
+
+//==estoque==//
+
+model Produto {
+  id        String  @id @default(uuid())
+  nome      String  @unique
+  descricao String?
+  tipo      String
+
+  historicoValores ValorProduto[]
+  itemServicos     ItemServico[]
+
+  @@map("produto")
+}
+
+model ValorProduto {
+  produto Produto @relation(fields: [produtoId], references: [id])
+
+  id        String    @id @default(uuid())
+  produtoId String    @map("produto_id")
+  espOdont  Boolean   @map("esp_odont")
+  dtInicio  DateTime  @default(now()) @map("dt_inicio")
+  dtFim     DateTime? @map("dt_fim")
+
+  @@map("valor_produto")
+}
+
+//==prestação de serviços==//
+
+model Servico {
+  id String @id @default(uuid())
+
+  itensServico ItemServico[]
+
+  @@map("servico")
+}
+
+model ItemServico {
+  produto Produto @relation(fields: [produtoId], references: [id])
+  servico Servico @relation(fields: [servicoId], references: [id])
+
+  produtoId String @map("produto_id")
+  servicoId String @map("servico_id")
+
+  @@id([produtoId, servicoId])
+  @@map("item_servico")
+}
+
+//======//CAIXA//======//
