@@ -2,7 +2,7 @@
   "name": "laboratorio_ferreira_api",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Danillo Ilggner",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -88,5 +88,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "engines": {
+    "node": "^18.0.0"
   }
 }
