@@ -11,6 +11,7 @@ import {
 import { ContatoService } from '../../../agenda/services/contato/contato.service';
 import { CriarContatoDto } from '../../dtos/contato/criar-contato.dto';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
+import { Contato } from '@prisma/client';
 import { AtualizarContatoDto } from '../../dtos/contato/atualizar-contato.dto';
 
 @Controller('contatos')
@@ -34,7 +35,11 @@ export class ContatoController {
   @Put(':id')
   async put(@Body() model: AtualizarContatoDto, @Param('id') id: string) {
     const result = await this.service.put(id, model);
-    return new ResultDto(HttpStatus.OK); //TODO
+    return new ResultDto({
+      message: 'Contato atualizado com sucesso.',
+      success: true,
+      data: result,
+    }); //TODO
   }
 
   @Delete(':id')

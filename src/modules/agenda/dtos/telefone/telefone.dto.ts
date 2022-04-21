@@ -1,7 +1,6 @@
 import { IsBoolean, IsNumber, IsPhoneNumber } from 'class-validator';
-import { Dto } from 'src/shared/dtos/dto';
 
-export class CriarTelefoneDto implements Dto {
+export class CriarTelefoneDto {
   @IsPhoneNumber('BR')
   readonly numero: number;
 

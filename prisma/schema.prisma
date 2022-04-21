@@ -11,7 +11,7 @@ datasource db {
 
 model Contato {
   id          String  @id @default(uuid())
-  name        String
+  nome        String
   categoria   String
   usaEspOdont Boolean @default(false) @map("usa_esp_odont")
 
@@ -27,14 +27,15 @@ model Contato {
 model Telefone {
   contato Contato @relation(fields: [contatoId], references: [id])
 
-  contatoId String @map("contato_id")
-  ddd       Int    @default(62)
+  contatoId String  @map("contato_id")
+  ddd       Int     @default(62)
   numero    Int
+  whatsapp  Boolean @default(true)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
-  @@id([ddd, numero])
+  @@id([ddd, numero], name: "ddd_numero")
   @@map("telefone")
 }
 

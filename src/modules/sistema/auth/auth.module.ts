@@ -12,7 +12,7 @@ import { AccountModule } from '../account/account.module';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       signOptions: { expiresIn: 3600 },
-      secret: 'secretKey',
+      secret: process.env.JWT_SECRET,
     }),
     forwardRef(() => AccountModule),
   ],

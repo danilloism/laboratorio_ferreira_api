@@ -4,7 +4,7 @@ CREATE TYPE "Role" AS ENUM ('usuario', 'admin', 'colaborador');
 -- CreateTable
 CREATE TABLE "contato" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "nome" TEXT NOT NULL,
     "categoria" TEXT NOT NULL,
     "usa_esp_odont" BOOLEAN NOT NULL DEFAULT false,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -18,6 +18,7 @@ CREATE TABLE "telefone" (
     "contato_id" TEXT NOT NULL,
     "ddd" INTEGER NOT NULL DEFAULT 62,
     "numero" INTEGER NOT NULL,
+    "whatsapp" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizado_em" TIMESTAMP(3),
 

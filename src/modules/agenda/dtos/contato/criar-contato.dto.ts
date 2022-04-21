@@ -1,21 +1,12 @@
-import { Dto } from 'src/shared/dtos/dto';
-import { CriarTelefoneDto } from '../../dtos/telefone/telefone.dto';
-import { CriarUsuarioDto } from '../usuario/criar-usuario.dto';
-import { IsBoolean, IsNotEmptyObject, IsString } from 'class-validator';
+import { Contato, Telefone, Usuario } from '@prisma/client';
+import { IsNotEmpty, IsObject, isObject } from 'class-validator';
+// export interface CriarContatoDto {//   readonly contato: Contato;//   readonly telefones: Telefone[];// }
+export class CriarContatoDto {
+  @IsNotEmpty()
+  @IsObject()
+  readonly contato: Omit<Contato, 'id'>;
 
-export class CriarContatoDto implements Dto {
-  @IsString()
-  readonly nome: string;
-
-  @IsString()
-  readonly categoria: string;
-
-  @IsBoolean()
-  readonly usaEspOdont: boolean;
-
-  @IsNotEmptyObject({ nullable: false })
-  readonly telefones: CriarTelefoneDto[];
-
-  @IsNotEmptyObject({ nullable: true })
-  readonly usuario: CriarUsuarioDto;
+  @IsNotEmpty({ each: true })
+  @IsObject({ each: true })
+  readonly telefones: Telefone[];
 }
