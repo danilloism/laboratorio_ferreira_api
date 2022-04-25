@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, Request, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard, AuthService } from '../auth';
 
+@ApiTags('Usuários')
 @Controller('accounts')
 export class AccountController {
   constructor(private authService: AuthService) {}
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll(@Request() req) {
+  findAll(@Req() req) {
     console.log(req.user);
     return [];
   }

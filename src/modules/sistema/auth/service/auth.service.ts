@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AccountService } from '../../account/account.service';
+import { AccountService } from '../../usuario/account.service';
 import { Role } from '../../../../shared/enums/role.enum';
 import { JwtPayload } from '../jwt/jwt-payload.interface';
 
@@ -14,6 +14,7 @@ export class AuthService {
   async criarToken() {
     const usuario: JwtPayload = {
       email: 'danilloilggner@gmail.com',
+      username: 'danilloism',
       roles: [Role.COLABORADOR, Role.USUARIO],
     };
     const acessarToken = this.jwtService.sign(usuario);
