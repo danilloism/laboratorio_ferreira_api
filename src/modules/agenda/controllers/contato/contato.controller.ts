@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ContatoService } from '../../../agenda/services/contato/contato.service';
 import { CriarContatoDto } from '../../dtos/contato/criar-contato.dto';
@@ -46,4 +47,12 @@ export class ContatoController {
   async delete(@Param('id') id: string) {
     await this.service.delete(id);
   }
+
+  @Get(':id/telefones')
+  async findTelefonesById(@Param('id') id: string) {
+    return await this.service.findTelefones(id);
+  }
+
+  @Get()
+  findTelefones(@Query('ddd') ddd: number, @Query('numero') numero: number) {}
 }
