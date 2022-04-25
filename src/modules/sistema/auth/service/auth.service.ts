@@ -14,6 +14,7 @@ export class AuthService {
   async criarToken() {
     const usuario: JwtPayload = {
       email: 'danilloilggner@gmail.com',
+      username: 'danilloism',
       roles: [Role.COLABORADOR, Role.USUARIO],
     };
     const acessarToken = this.jwtService.sign(usuario);

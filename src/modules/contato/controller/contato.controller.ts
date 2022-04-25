@@ -10,11 +10,13 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ContatoService } from '../service/contato.service';
+import { ContatoService } from '../services/contato.service';
 import { CriarContatoDto } from '../dtos/contato/criar-contato.dto';
 import { ResultDto } from '../../../shared/dtos/result.dto';
 import { AtualizarContatoDto } from '../dtos/contato/atualizar-contato.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Contatos')
 @Controller('contatos')
 export class ContatoController {
   constructor(private readonly service: ContatoService) {}
@@ -34,20 +36,25 @@ export class ContatoController {
   }
 
   @Put(':id')
-  async put(@Body('nome') nome: string, @Param('id') id: string) {
-    const result = await this.service.put(id, nome).catch(err => {
-      const resultDto = new ResultDto({
-        message: 'Erro ao atualizar contato.',
-        success: false,
-        errors: err,
+  async put(
+    @Body() atualizarContatoDto: AtualizarContatoDto,
+    @Param('id') id: string,
+  ) {
+    const result = await this.service
+      .put(id, atualizarContatoDto)
+      .catch(err => {
+        const resultDto = new ResultDto({
+          message: 'Erro ao atualizar contato.',
+          success: false,
+          errors: err,
+        });
+        throw new HttpException(resultDto, HttpStatus.BAD_REQUEST);
       });
-      throw new HttpException(resultDto, HttpStatus.BAD_REQUEST);
-    });
     return new ResultDto({
       message: 'Contato atualizado com sucesso.',
       success: true,
       data: result,
-    }); //TODO
+    });
   }
 
   @Delete(':id')
@@ -59,7 +66,4 @@ export class ContatoController {
   async findTelefonesById(@Param('id') id: string) {
     return await this.service.findTelefones(id);
   }
-
-  @Get()
-  findTelefones(@Query('ddd') ddd: number, @Query('numero') numero: number) {}
 }

@@ -6,7 +6,6 @@ import { PrestacaoDeServicoModule } from './modules/operacional/prestacao-de-ser
 import { SistemaModule } from './modules/sistema/sistema.module';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
-import { WinstonModule } from 'nest-winston';
 
 @Module({
   imports: [

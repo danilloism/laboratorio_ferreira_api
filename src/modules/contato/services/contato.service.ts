@@ -44,10 +44,10 @@ export class ContatoService {
       },
     });
   }
-  async put(id: string, nome: string) {
+  async put(id: string, atualizarContatoDto: AtualizarContatoDto) {
     return await this.prisma.contato.update({
       where: { id: id },
-      data: { nome: nome },
+      data: { nome: atualizarContatoDto.nome },
     });
   }
   async delete(id: string) {}
@@ -55,14 +55,14 @@ export class ContatoService {
   async findTelefones(id: string): Promise<Telefone[]> {
     return await this.prisma.contato
       .findUnique({
-        where: { id: id || undefined },
+        where: { id: id },
       })
       .telefones();
   }
 
   async findUsuario(id: string): Promise<Usuario> {
     return await this.prisma.usuario.findUnique({
-      where: { contatoId: id || undefined },
+      where: { contatoId: id },
     });
   }
 

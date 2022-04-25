@@ -16,6 +16,7 @@ export class TelefoneDto {
   @ApiProperty({
     description: 'Confirmação se telefone é usado para WhatsApp.',
     default: true,
+    required: false,
   })
   @IsOptional()
   @IsBoolean()
@@ -25,6 +26,7 @@ export class TelefoneDto {
     default: 62,
     description: 'Código DDD do telefone.',
     example: 62,
+    required: false,
   })
   @IsOptional()
   @IsInt()
