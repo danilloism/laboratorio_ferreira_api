@@ -1,10 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CriarContatoDto } from '../../dtos/contato/criar-contato.dto';
-import { PrismaService } from '../../../sistema/prisma';
-import { Contato, Telefone, Usuario, Prisma } from '@prisma/client';
-import { ResultDto } from '../../../../shared/dtos/result.dto';
-import { ServiceHttpExceptionDto } from 'src/shared/dtos/service-http-exception.dto';
-import { AtualizarContatoDto } from '../../dtos/contato/atualizar-contato.dto';
+import { Injectable } from '@nestjs/common';
+import { CriarContatoDto } from '../dtos/contato/criar-contato.dto';
+import { PrismaService } from '../../sistema/prisma';
+import { Telefone, Usuario, Prisma } from '@prisma/client';
+import { AtualizarContatoDto } from '../dtos/contato/atualizar-contato.dto';
 
 @Injectable()
 export class ContatoService {
@@ -31,12 +29,12 @@ export class ContatoService {
       },
     });
   }
-  async post({ nome: nome, telefones }: CriarContatoDto) {
+  async post(criarContatoDto: CriarContatoDto) {
     return await this.prisma.contato.create({
       data: {
-        nome: nome,
+        nome: criarContatoDto.nome,
 
-        telefones: { create: telefones },
+        telefones: { create: criarContatoDto.telefones },
       },
       include: {
         telefones: { select: { ddd: true, numero: true, whatsapp: true } },
@@ -46,16 +44,10 @@ export class ContatoService {
       },
     });
   }
-  async put(id: string, { nome: contato }: AtualizarContatoDto) {
+  async put(id: string, nome: string) {
     return await this.prisma.contato.update({
-      where: { id: id || undefined },
-      data: contato,
-      include: {
-        telefones: { select: { ddd: true, numero: true, whatsapp: true } },
-        usuario: {
-          select: { username: true, email: true, senha: true, roles: true },
-        },
-      },
+      where: { id: id },
+      data: { nome: nome },
     });
   }
   async delete(id: string) {}

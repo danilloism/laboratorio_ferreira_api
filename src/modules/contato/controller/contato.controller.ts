@@ -3,17 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   HttpStatus,
   Param,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
-import { ContatoService } from '../../../agenda/services/contato/contato.service';
-import { CriarContatoDto } from '../../dtos/contato/criar-contato.dto';
-import { ResultDto } from '../../../../shared/dtos/result.dto';
-import { Contato } from '@prisma/client';
-import { AtualizarContatoDto } from '../../dtos/contato/atualizar-contato.dto';
+import { ContatoService } from '../service/contato.service';
+import { CriarContatoDto } from '../dtos/contato/criar-contato.dto';
+import { ResultDto } from '../../../shared/dtos/result.dto';
+import { AtualizarContatoDto } from '../dtos/contato/atualizar-contato.dto';
 
 @Controller('contatos')
 export class ContatoController {
@@ -34,8 +34,15 @@ export class ContatoController {
   }
 
   @Put(':id')
-  async put(@Body() model: AtualizarContatoDto, @Param('id') id: string) {
-    const result = await this.service.put(id, model);
+  async put(@Body('nome') nome: string, @Param('id') id: string) {
+    const result = await this.service.put(id, nome).catch(err => {
+      const resultDto = new ResultDto({
+        message: 'Erro ao atualizar contato.',
+        success: false,
+        errors: err,
+      });
+      throw new HttpException(resultDto, HttpStatus.BAD_REQUEST);
+    });
     return new ResultDto({
       message: 'Contato atualizado com sucesso.',
       success: true,
