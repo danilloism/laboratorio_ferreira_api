@@ -67,7 +67,6 @@ dependencies:
   passport-jwt: 4.0.0
   passport-local: 1.0.0
   pnpm: 6.32.10
-  prisma: 3.12.0
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   rxjs: 7.5.5
@@ -93,6 +92,7 @@ devDependencies:
   express: 4.18.0
   jest: 27.5.1_ts-node@10.7.0
   prettier: 2.6.2
+  prisma: 3.12.0
   source-map-support: 0.5.21
   supertest: 6.2.2
   ts-jest: 27.1.4_9985e1834e803358b7be1e6ce5ca0eea
@@ -1067,7 +1067,7 @@ packages:
   /@prisma/engines/3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980:
     resolution: {integrity: sha512-zULjkN8yhzS7B3yeEz4aIym4E2w1ChrV12i14pht3ePFufvsAvBSoZ+tuXMvfSoNTgBS5E4bolRzLbMmbwkkMQ==}
     requiresBuild: true
-    dev: false
+    dev: true
 
   /@sinonjs/commons/1.8.3:
     resolution: {integrity: sha512-xkNcLAn/wZaX14RPlwizcKicDk9G3F8m2nU3L7Ukm5zBgTwiT0wsoFAHx9Jq56fJA1z/7uKGtCRu16sOUCLIHQ==}
@@ -1896,7 +1896,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001332
-      electron-to-chromium: 1.4.119
+      electron-to-chromium: 1.4.120
       escalade: 3.1.1
       node-releases: 2.0.3
       picocolors: 1.0.0
@@ -2401,8 +2401,8 @@ packages:
   /ee-first/1.1.1:
     resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
 
-  /electron-to-chromium/1.4.119:
-    resolution: {integrity: sha512-HPEmKy+d0xK8oCfEHc5t6wDsSAi1WmE3Ld08QrBjAPxaAzfuKP66VJ77lcTqxTt7GJmSE279s75mhW64Xh+4kw==}
+  /electron-to-chromium/1.4.120:
+    resolution: {integrity: sha512-H3ksXiGhoYVQCmoMT0JMN07kEDBzc6TSv1OSp7UUPxNiSvQl7NeQCyZiMZhLEmNJ89C5FnD4Eoe1ytZnMQxxaw==}
     dev: true
 
   /emittery/0.8.1:
@@ -4679,7 +4679,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@prisma/engines': 3.12.0-37.22b822189f46ef0dc5c5b503368d1bee01213980
-    dev: false
+    dev: true
 
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
