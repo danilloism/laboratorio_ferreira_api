@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
       - uses: actions/checkout@v2
@@ -20,10 +19,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+      - uses: akhileshns/heroku-deploy@3.12.12
+        with:
           buildpack: https://github.com/unfold/heroku-buildpack-pnpm
-          cache: 'npm'
-
-      - run: npm ci
+      - run: pnpm install --freeze-lockfile
       - run: npm run build --if-present
       - run: npm test
   deploy: ## <-- this is the new stuff
