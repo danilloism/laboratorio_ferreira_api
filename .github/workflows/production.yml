@@ -21,11 +21,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           buildpack: https://github.com/unfold/heroku-buildpack-pnpm
-          cache: 'pnpm'
+          cache: 'npm'
 
-      - run: pnpm install --freeze-lockfile
-      - run: pnpm run build --if-present
-      - run: pnpm test
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
   deploy: ## <-- this is the new stuff
     needs: build
     runs-on: ubuntu-latest
