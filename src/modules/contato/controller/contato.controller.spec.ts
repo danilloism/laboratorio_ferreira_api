@@ -10,11 +10,14 @@ describe('ContatoController', () => {
     post: jest.fn(),
     put: jest.fn(),
     delete: jest.fn(),
+    findTelefones: jest.fn(),
+    findUsuario: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ContatoController],
+      providers: [ContatoService],
     })
       .overrideProvider(ContatoService)
       .useValue(mockService)

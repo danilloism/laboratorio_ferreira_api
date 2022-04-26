@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Contato, PrismaService, Telefone } from 'src/modules/sistema/prisma';
+import { Contato, PrismaService, Telefone } from '../../sistema/prisma';
 import { TelefoneDto } from '../dtos/telefone/telefone.dto';
 
 @Injectable()

@@ -1,55 +1,72 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import TestUtil from '../../../shared/utils/test.util';
-// import { ContatoService } from './contato.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import { v1 as uuid_v1 } from 'uuid';
+import { ContatoService } from './contato.service';
+import { PrismaService } from '../../sistema/prisma';
+import faker from '@faker-js/faker';
 
-// describe('ContatoService', () => {
-//   let service: ContatoService;
-//   // let validContato: Contato;
+describe('ContatoService', () => {
+  let service: ContatoService;
+  let prisma: PrismaService;
+  const contatos = [
+    {
+      nome: faker.name.findName(),
+      id: uuid_v1(),
+      atualizadoEm: new Date(),
+      criadoEm: new Date(),
+    },
+    {
+      nome: faker.name.findName(),
+      id: uuid_v1(),
+      atualizadoEm: new Date(),
+      criadoEm: new Date(),
+    },
+    {
+      nome: faker.name.findName(),
+      id: uuid_v1(),
+      atualizadoEm: new Date(),
+      criadoEm: new Date(),
+    },
+    {
+      nome: faker.name.findName(),
+      id: uuid_v1(),
+      atualizadoEm: new Date(),
+      criadoEm: new Date(),
+    },
+  ] as const;
 
-//   const mockRepo = {
-//     find: jest.fn(),
-//     findOne: jest.fn(),
-//     save: jest.fn(),
-//     update: jest.fn(),
-//     delete: jest.fn(),
-//   };
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [ContatoService, PrismaService],
+    }).compile();
 
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [
-//         ContatoService,
-//         // { provide: getRepositoryToken(Contato), useValue: mockRepo },
-//       ],
-//     }).compile();
+    prisma = module.get<PrismaService>(PrismaService);
+    service = module.get<ContatoService>(ContatoService);
 
-//     mockRepo.find.mockReset();
-//     mockRepo.findOne.mockReset();
+    prisma.contato.findUnique = jest.fn().mockReturnValue(contatos[0]);
+    prisma.contato.findMany = jest.fn().mockReturnValue(contatos);
+    prisma.contato.create = jest.fn().mockReturnValue(contatos[0]);
+    prisma.contato.update = jest.fn().mockReturnValue(contatos[0]);
+  });
 
-//     service = module.get<ContatoService>(ContatoService);
-//     validContato = TestUtil.getValidContato();
-//   });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
-//   it('should be defined', () => {
-//     expect(service).toBeDefined();
-//   });
+  describe('getById', () => {
+    it('deve retornar um contato.', async () => {
+      const contato = await service.getById('id');
 
-//   describe('getById', () => {
-//     it('deve retornar um contato.', async () => {
-//       mockRepo.findOne.mockReturnValue(validContato);
-//       const contato = await service.getById(validContato.id);
+      expect(contato).toMatchObject(contatos[0]);
+      expect(prisma.contato.findUnique).toBeCalledTimes(1);
+    });
+  });
 
-//       expect(contato).toMatchObject(validContato);
-//       expect(mockRepo.findOne).toBeCalledTimes(1);
-//     });
-//   });
+  describe('get', () => {
+    it('deve retornar todos os contatos.', async () => {
+      const contatos = await service.get();
 
-//   describe('get', () => {
-//     it('deve retornar todos os contatos.', async () => {
-//       mockRepo.find.mockReturnValue([validContato, validContato, validContato]);
-//       const contatos = await service.get();
-
-//       expect(contatos).toHaveLength(3);
-//       expect(mockRepo.find).toBeCalledTimes(1);
-//     });
-//   });
-// });
+      expect(contatos).toHaveLength(4);
+      expect(prisma.contato.findMany).toBeCalledTimes(1);
+    });
+  });
+});

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-import { CriarUsuarioDto } from 'src/modules/sistema/usuario/dtos/criar-usuario.dto';
+import { CriarUsuarioDto } from '../../../sistema/usuario/dtos/criar-usuario.dto';
 import { TelefoneDto } from '../telefone/telefone.dto';
 export class CriarContatoDto {
   @ApiProperty({ example: 'Danillo Ilggner', description: 'Nome do contato.' })
