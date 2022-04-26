@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: akhileshns/heroku-deploy@3.12.12
+      - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           buildpack: https://github.com/unfold/heroku-buildpack-pnpm
       - run: pnpm install --freeze-lockfile
