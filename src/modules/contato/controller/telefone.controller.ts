@@ -1,4 +1,4 @@
-import { Controller, Get, Module } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { TelefoneService } from '../services/telefone.service';
 
 @Controller('telefones')

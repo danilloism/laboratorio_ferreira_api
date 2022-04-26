@@ -8,7 +8,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { ContatoService } from '../services/contato.service';
 import { CriarContatoDto } from '../dtos/contato/criar-contato.dto';

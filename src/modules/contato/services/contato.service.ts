@@ -50,7 +50,9 @@ export class ContatoService {
       data: { nome: atualizarContatoDto.nome },
     });
   }
-  async delete(id: string) {}
+  async delete(id: string) {
+    return null;
+  }
 
   async findTelefones(id: string): Promise<Telefone[]> {
     return await this.prisma.contato
@@ -66,5 +68,7 @@ export class ContatoService {
     });
   }
 
-  async createTelefone(contatoId: string) {}
+  async createTelefone(contatoId: string) {
+    return null;
+  }
 }
