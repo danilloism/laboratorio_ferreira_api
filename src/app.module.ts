@@ -1,19 +1,12 @@
 import { Logger, Module } from '@nestjs/common';
-import { ContatoModule } from './modules/contato/contato.module';
-import { EstoqueModule } from './modules/operacional/estoque/estoque.module';
-import { PrestacaoDeServicoModule } from './modules/operacional/prestacao-de-servico/prestacao-de-servico.module';
-
-import { SistemaModule } from './modules/sistema/sistema.module';
 import { APP_FILTER } from '@nestjs/core';
+import { AgendaModule } from './modules/agenda/agenda.module';
+import { OperacionalModule } from './modules/operacional/operacional.module';
+import { SistemaModule } from './modules/sistema/sistema.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 
 @Module({
-  imports: [
-    ContatoModule,
-    EstoqueModule,
-    PrestacaoDeServicoModule,
-    SistemaModule,
-  ],
+  imports: [SistemaModule, AgendaModule, OperacionalModule],
   controllers: [],
   providers: [Logger, { provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })
