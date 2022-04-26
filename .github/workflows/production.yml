@@ -22,13 +22,14 @@ jobs:
           node-version: '18'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build --if-present
-      - run: pnpm test
+      - run: pnpm prebuild
+      - run: pnpm build
+      - run: pnpm test:v
   deploy: ## <-- this is the new stuff
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           buildpack: https://github.com/unfold/heroku-buildpack-pnpm
