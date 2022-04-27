@@ -29,6 +29,7 @@ jobs:
         run: |
           pnpm install
           pnpm prebuild --if-present
+          npx prisma generate
           pnpm build --if-present
           pnpm test:v --if-present
 
