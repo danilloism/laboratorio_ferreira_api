@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - master
+env:
+  DATABASE_URL: ${{secrets.DATABASE_URL}}
   workflow_dispatch:
 
 jobs:
@@ -14,18 +16,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
+        with:
+          version: 6.32.10
       - name: Set up Node.js version
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-
-      - name: npm install, build, and test
+          cache: pnpm
+      - name: pnpm install, build, and test
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          pnpm install
+          pnpm prebuild --if-present
+          pnpm build --if-present
+          pnpm test:v --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
