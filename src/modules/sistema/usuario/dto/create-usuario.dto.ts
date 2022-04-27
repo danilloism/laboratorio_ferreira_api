@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsEmail,
   IsEnum,
+  IsNotEmpty,
   IsString,
   IsUUID,
   MaxLength,
@@ -44,5 +45,6 @@ export class CreateUsuarioDto {
     minimum: 1,
   })
   @IsEnum(Role, { each: true })
+  @IsNotEmpty({ each: true })
   readonly roles: Role[];
 }

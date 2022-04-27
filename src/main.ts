@@ -3,39 +3,9 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { PrismaService } from './modules/sistema/prisma';
-import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
-import { utilities as WinstonUtilities, WinstonModule } from 'nest-winston';
-import * as Winston from 'winston';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: WinstonModule.createLogger({
-      level: 'silly',
-      handleRejections: true,
-      handleExceptions: true,
-      format: Winston.format.combine(
-        Winston.format.cli({ all: true, level: true }),
-        Winston.format.timestamp({ format: 'DD/MM/YYYY hh:mm:ss.SSS A' }),
-        Winston.format.ms(),
-        Winston.format.align(),
-        WinstonUtilities.format.nestLike('Laboratório Ferreira API', {
-          prettyPrint: true,
-        }),
-        Winston.format.colorize({
-          colors: {
-            error: 'red',
-            warn: 'yellow',
-            http: 'orange',
-            info: 'blue',
-            verbose: 'purple',
-            debug: 'green',
-            silly: 'pink',
-          },
-        }),
-      ),
-      transports: [new Winston.transports.Console()],
-    }),
-  });
+  const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -45,7 +15,6 @@ async function bootstrap() {
       validationError: { target: true, value: true },
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Laboratório Ferreira API')
@@ -54,7 +23,9 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api-docs', app, document, {
+    customSiteTitle: 'Documentação da API RESTful do Laboratório Ferreira.',
+  });
 
   const prisma = app.get(PrismaService);
   prisma.enableShutdownHooks(app);

@@ -17,7 +17,7 @@ export class CreateContatoDto {
   @IsObject({ each: true })
   readonly telefones: TelefoneDto[];
 
-  @ApiProperty({ type: CreateUsuarioDto, required: false })
+  @ApiProperty({ type: CreateUsuarioDto })
   @IsOptional()
   @IsObject()
   readonly usuario?: CreateUsuarioDto;

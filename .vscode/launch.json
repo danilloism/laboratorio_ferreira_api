@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "attach",
-            "name": "Attach Debugger",
+            "name": "NestJS: Attach Debugger",
             "skipFiles": [
                 "<node_internals>/**"
             ],
@@ -29,6 +29,20 @@
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "NestJS: Launch Debugger",
+            "runtimeArgs": [
+                "--nolazy",
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/src/main.ts"
+            ],
+            "autoAttachChildProcesses": true
         }
     ]
 }

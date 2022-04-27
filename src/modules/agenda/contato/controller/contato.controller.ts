@@ -21,17 +21,41 @@ export class ContatoController {
   constructor(private readonly service: ContatoService) {}
   @Get()
   async get() {
-    return await this.service.get();
+    return await this.service.find();
   }
 
   @Get(':id')
   async getById(@Param('id') id: string) {
-    return await this.service.getById(id);
+    return await this.service.findOne(id);
   }
 
   @Post()
-  async post(@Body() model: CreateContatoDto) {
-    return await this.service.post(model);
+  async create(@Body() model: CreateContatoDto): Promise<ResultDto> {
+    const contato = await this.service.create(model).catch(err => {
+      const result = new ResultDto({
+        success: false,
+        message: 'Falha ao criar contato.',
+        errors: err,
+      });
+
+      throw new HttpException(result, HttpStatus.BAD_REQUEST);
+    });
+
+    if (!contato) {
+      throw new HttpException(
+        new ResultDto({
+          success: false,
+          message: 'Falha desconhecida ao criar contato.',
+        }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return new ResultDto({
+      success: true,
+      message: 'Contato criado com sucesso.',
+      data: contato,
+    });
   }
 
   @Put(':id')
@@ -40,7 +64,7 @@ export class ContatoController {
     @Param('id') id: string,
   ) {
     const result = await this.service
-      .put(id, atualizarContatoDto)
+      .updateNome(id, atualizarContatoDto)
       .catch(err => {
         const resultDto = new ResultDto({
           message: 'Erro ao atualizar contato.',
@@ -56,13 +80,8 @@ export class ContatoController {
     });
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: string) {
-    await this.service.delete(id);
-  }
-
   @Get(':id/telefones')
   async findTelefonesById(@Param('id') id: string) {
-    return await this.service.findTelefones(id);
+    return await this.service.getTelefones(id);
   }
 }

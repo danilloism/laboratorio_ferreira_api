@@ -2,39 +2,48 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpException,
   HttpStatus,
+  NotFoundException,
   Post,
-  Req,
   UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
-import { ResultDto } from 'src/shared/dtos/result.dto';
+import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { Role } from '../../usuario/enums/role.enum';
+import { IsPublic } from '../decorators/is-public.decorator';
 import { LoginDto } from '../dto/login.dto';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { AuthService } from '../service/auth.service';
 
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @IsPublic()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto) {
-    const usuario = await this.authService.authenticate(
-      loginDto.username || loginDto.email,
-      loginDto.senha,
-    );
+  async login(@Body() login: LoginDto) {
+    const usuario = await this.authService
+      .authenticate(login.username || login.email, login.senha)
+      .catch(err => {
+        const result = new ResultDto({
+          success: false,
+          message: 'Erro ao autenticar usuário.',
+          errors: err,
+        });
+
+        throw new NotFoundException(result);
+      });
 
     if (!usuario) {
       const result = new ResultDto({
         success: false,
         message: 'Usuário ou senha inválidos.',
       });
-      throw new UnauthorizedException(result);
+      throw new NotFoundException(result);
     }
 
     const token = await this.authService.createToken({
+      sub: usuario.contatoId,
       username: usuario.username,
       email: usuario.email,
       roles: usuario.roles as Role[],
@@ -43,7 +52,7 @@ export class AuthController {
     return new ResultDto({
       success: true,
       message: 'Token gerado com sucesso.',
-      data: { ...loginDto, senha: undefined, access_token: token },
+      data: { ...login, senha: undefined, access_token: token },
     });
   }
 }

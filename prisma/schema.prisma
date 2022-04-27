@@ -57,6 +57,15 @@ enum Role {
   usuario
   admin
   colaborador
+  desenvolvedor
+}
+
+enum Categoria {
+  dentista
+  fornecedor
+  paciente
+  colaborador
+  entregador
 }
 
 //======//OPERACIONAL//======//

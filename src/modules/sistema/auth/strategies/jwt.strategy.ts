@@ -7,20 +7,11 @@ import { AuthService } from '../service/auth.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
-    super(
-      {
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: process.env.JWT_SECRET,
-      },
-      function (jwtPayload, done) {
-        try {
-          const usuario = this.validar(jwtPayload);
-          return done(null, usuario);
-        } catch (err) {
-          return done(err, false);
-        }
-      },
-    );
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: true,
+      secretOrKey: process.env.JWT_SECRET,
+    });
   }
 
   async validate(payload: JwtPayload) {

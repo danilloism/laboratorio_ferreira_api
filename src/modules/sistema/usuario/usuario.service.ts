@@ -13,37 +13,30 @@ export class UsuarioService {
       senha: await bcrypt.hash(criarUsuarioDto.senha, process.env.SALT_KEY),
     };
 
-    const usuario = await this.prisma.usuario.create({ data });
-    return { ...usuario, senha: undefined };
+    return await this.prisma.usuario.create({ data });
   }
 
   async findByUsername(username: string): Promise<Usuario> {
-    const usuario = await this.prisma.usuario.findUnique({
+    return await this.prisma.usuario.findUnique({
       where: { username },
     });
-    return { ...usuario, senha: undefined };
   }
 
   async findByEmail(email: string): Promise<Usuario> {
-    const usuario = await this.prisma.usuario.findUnique({ where: { email } });
-    return { ...usuario, senha: undefined };
+    return await this.prisma.usuario.findUnique({
+      where: { email },
+    });
   }
 
-  async update(username: string, data: Usuario): Promise<Usuario> {
-    const result = await this.prisma.usuario.update({
-      where: { username },
+  async update(id: string, data: Usuario): Promise<Usuario> {
+    return this.prisma.usuario.update({
+      where: { contatoId: id },
       data: data,
     });
-
-    return { ...result, senha: undefined };
   }
 
   async findAll(): Promise<Usuario[]> {
-    const result = await this.prisma.usuario.findMany();
-    result.forEach(usuario => {
-      usuario.senha = undefined;
-    });
-    return result;
+    return await this.prisma.usuario.findMany();
   }
 
   //   async authenticate(username: string, senha: string): Promise<Contato> {

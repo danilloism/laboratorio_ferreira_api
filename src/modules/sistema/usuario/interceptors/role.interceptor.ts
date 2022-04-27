@@ -7,7 +7,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { ResultDto } from 'src/shared/dtos/result.dto';
+import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { JwtPayload } from '../../auth';
 import { Role } from '../enums/role.enum';
 
