@@ -27,7 +27,7 @@ jobs:
           cache: pnpm
       - name: pnpm install, build, and test
         run: |
-          pnpm install
+          pnpm install --prod
           pnpm prebuild --if-present
           npx prisma generate
           pnpm build --if-present
