@@ -50,7 +50,7 @@
     "swagger-ui-express": "^4.3.0",
     "uuid": "^8.3.2",
     "winston": "^3.7.2",
-    "jest": "^27.5.1",
+    "jest": "^27.5.1"
   },
   "devDependencies": {
     "@nestjs/schematics": "^8.0.10",
