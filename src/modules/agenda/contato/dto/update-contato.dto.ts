@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-import { AtualizarUsuarioDto } from '../../../sistema/usuario/dtos/atualizar-usuario.dto';
+import { UpdateUsuarioDto } from '../../../sistema/usuario/dto/update-usuario.dto';
 
-export class AtualizarContatoDto {
+export class UpdateContatoDto {
   @ApiProperty({
     example: 'Danillo Ilggner',
     description: 'Nome do contato.',
@@ -11,8 +11,8 @@ export class AtualizarContatoDto {
   @IsNotEmpty()
   readonly nome: string;
 
-  @ApiProperty({ type: AtualizarUsuarioDto })
+  @ApiProperty({ type: UpdateUsuarioDto })
   @IsOptional()
   @IsObject()
-  readonly usuario?: AtualizarContatoDto;
+  readonly usuario?: UpdateContatoDto;
 }

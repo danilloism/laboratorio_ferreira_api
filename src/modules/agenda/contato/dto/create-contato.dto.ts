@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-import { CriarUsuarioDto } from '../../../sistema/usuario/dtos/criar-usuario.dto';
+import { CreateUsuarioDto } from '../../../sistema/usuario/dto/create-usuario.dto';
 import { TelefoneDto } from '../../telefone/dto/telefone.dto';
-export class CriarContatoDto {
+export class CreateContatoDto {
   @ApiProperty({ example: 'Danillo Ilggner', description: 'Nome do contato.' })
   @IsString()
   readonly nome: string;
@@ -17,8 +17,8 @@ export class CriarContatoDto {
   @IsObject({ each: true })
   readonly telefones: TelefoneDto[];
 
-  @ApiProperty({ type: CriarUsuarioDto, required: false })
+  @ApiProperty({ type: CreateUsuarioDto, required: false })
   @IsOptional()
   @IsObject()
-  readonly usuario?: CriarUsuarioDto;
+  readonly usuario?: CreateUsuarioDto;
 }

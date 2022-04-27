@@ -1,21 +1,30 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard, AuthService } from '../auth';
+import { Role } from './enums/role.enum';
+import { RoleInterceptor } from './interceptors/role.interceptor';
+import { UsuarioService } from './usuario.service';
 
 @ApiTags('Usuários')
-@Controller('accounts')
+@Controller('usuarios')
 export class UsuarioController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usuarioService: UsuarioService,
+  ) {}
+
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll(@Req() req) {
-    console.log(req.user);
-    return [];
-  }
-
-  @Post()
-  async criarToken() {
-    return await this.authService.criarToken();
+  @UseInterceptors(new RoleInterceptor([Role.ADMIN]))
+  async findAll() {
+    return await this.usuarioService.findAll();
   }
 }

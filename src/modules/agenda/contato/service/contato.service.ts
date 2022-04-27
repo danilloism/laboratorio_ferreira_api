@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Telefone, Usuario } from '@prisma/client';
 import { PrismaService } from '../../../../modules/sistema/prisma';
-import { AtualizarContatoDto } from '../dto/atualizar-contato.dto';
-import { CriarContatoDto } from '../dto/criar-contato.dto';
+import { UpdateContatoDto } from '../dto/update-contato.dto';
+import { CreateContatoDto } from '../dto/create-contato.dto';
 
 @Injectable()
 export class ContatoService {
@@ -29,7 +29,7 @@ export class ContatoService {
       },
     });
   }
-  async post(criarContatoDto: CriarContatoDto) {
+  async post(criarContatoDto: CreateContatoDto) {
     return await this.prisma.contato.create({
       data: {
         nome: criarContatoDto.nome,
@@ -44,7 +44,7 @@ export class ContatoService {
       },
     });
   }
-  async put(id: string, atualizarContatoDto: AtualizarContatoDto) {
+  async put(id: string, atualizarContatoDto: UpdateContatoDto) {
     return await this.prisma.contato.update({
       where: { id: id },
       data: { nome: atualizarContatoDto.nome },

@@ -6,12 +6,13 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UsuarioModule } from '../usuario/usuario.module';
+import { AuthController } from './controller/auth.controller';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      signOptions: { expiresIn: 3600 },
+      signOptions: { expiresIn: '5d' },
       secret: process.env.JWT_SECRET,
     }),
     forwardRef(() => UsuarioModule),
@@ -19,5 +20,7 @@ import { UsuarioModule } from '../usuario/usuario.module';
   providers: [AuthService, JwtStrategy, JwtAuthGuard],
 
   exports: [JwtStrategy, PassportModule, AuthService, JwtAuthGuard],
+
+  controllers: [AuthController],
 })
 export class AuthModule {}

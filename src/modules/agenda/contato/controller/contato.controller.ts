@@ -7,14 +7,13 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put
+  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
-import { AtualizarContatoDto } from '../dto/atualizar-contato.dto';
-import { CriarContatoDto } from '../dto/criar-contato.dto';
+import { UpdateContatoDto } from '../dto/update-contato.dto';
+import { CreateContatoDto } from '../dto/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
-
 
 @ApiTags('Contatos')
 @Controller('contatos')
@@ -31,13 +30,13 @@ export class ContatoController {
   }
 
   @Post()
-  async post(@Body() model: CriarContatoDto) {
+  async post(@Body() model: CreateContatoDto) {
     return await this.service.post(model);
   }
 
   @Put(':id')
   async put(
-    @Body() atualizarContatoDto: AtualizarContatoDto,
+    @Body() atualizarContatoDto: UpdateContatoDto,
     @Param('id') id: string,
   ) {
     const result = await this.service

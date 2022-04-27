@@ -8,9 +8,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Role } from '../../../../shared/enums/role.enum';
+import { Role } from '../enums/role.enum';
 
-export class CriarUsuarioDto {
+export class CreateUsuarioDto {
   @ApiProperty()
   @IsUUID()
   readonly contatoId: string;
