@@ -42,7 +42,7 @@
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "pnpm": "^6.32.10",
+    "pnpm": "^6.32.11",
     "prisma": "^3.13.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

@@ -35,7 +35,7 @@ specifiers:
   passport-http-bearer: ^1.0.1
   passport-jwt: ^4.0.0
   passport-local: ^1.0.0
-  pnpm: ^6.32.10
+  pnpm: ^6.32.11
   prettier: ^2.6.2
   prisma: ^3.13.0
   reflect-metadata: ^0.1.13
@@ -71,7 +71,7 @@ dependencies:
   passport-http-bearer: 1.0.1
   passport-jwt: 4.0.0
   passport-local: 1.0.0
-  pnpm: 6.32.10
+  pnpm: 6.32.11
   prisma: 3.13.0
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
@@ -108,10 +108,11 @@ devDependencies:
 
 packages:
 
-  /@ampproject/remapping/2.1.2:
-    resolution: {integrity: sha512-hoyByceqwKirw7w3Z7gnIIZC3Wx3J484Y3L/cMpXFbr7d9ZQj2mODrirNzcJa+SM3UlpWXYvKV4RlRpFXlWgXg==}
+  /@ampproject/remapping/2.2.0:
+    resolution: {integrity: sha512-qRmjj8nj9qmLTQXXmaR1cck3UXSRMPrbsLJAasZpF+t3riI71BXed5ebIOYwQntykeZuhjsdweEc9BxH5Jc26w==}
     engines: {node: '>=6.0.0'}
     dependencies:
+      '@jridgewell/gen-mapping': 0.1.1
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
@@ -206,7 +207,7 @@ packages:
     resolution: {integrity: sha512-5ug+SfZCpDAkVp9SFIZAzlW18rlzsOcJGaetCjkySnrXXDUw9AR8cDUm1iByTmdWM6yxX6/zycaV76w3YTF2gw==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@ampproject/remapping': 2.1.2
+      '@ampproject/remapping': 2.2.0
       '@babel/code-frame': 7.16.7
       '@babel/generator': 7.17.9
       '@babel/helper-compilation-targets': 7.17.7_@babel+core@7.17.9
@@ -759,8 +760,21 @@ packages:
       chalk: 4.1.2
     dev: true
 
+  /@jridgewell/gen-mapping/0.1.1:
+    resolution: {integrity: sha512-sQXCasFk+U8lWYEe66WxRDOE9PjVz4vSM51fTu3Hw+ClTpUSQb718772vH3pyS5pShp6lvQM7SxgIDXXXmOX7w==}
+    engines: {node: '>=6.0.0'}
+    dependencies:
+      '@jridgewell/set-array': 1.1.0
+      '@jridgewell/sourcemap-codec': 1.4.11
+    dev: true
+
   /@jridgewell/resolve-uri/3.0.6:
     resolution: {integrity: sha512-R7xHtBSNm+9SyvpJkdQl+qrM3Hm2fea3Ef197M3mUug+v+yR+Rhfbs7PBtcBUVnIWJ4JcAdjvij+c8hXS9p5aw==}
+    engines: {node: '>=6.0.0'}
+    dev: true
+
+  /@jridgewell/set-array/1.1.0:
+    resolution: {integrity: sha512-SfJxIxNVYLTsKwzB3MoOQ1yxf4w/E6MdkvTgrgAt1bfxjSrLUoHMKrDOykwN14q65waezZIdqDneUIPh4/sKxg==}
     engines: {node: '>=6.0.0'}
     dev: true
 
@@ -4519,8 +4533,8 @@ packages:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
 
-  /pnpm/6.32.10:
-    resolution: {integrity: sha512-1+TscklAKWvI6iNY1cVfRsHY9h5dgarHF3zYfg+yVyaS270uvKlQKXBnaX6T6YGXNGWNXqWhDUS9EIzKCDs7Dw==}
+  /pnpm/6.32.11:
+    resolution: {integrity: sha512-KIb3ImAEGl03aJNy0pai7J0mWn52GJwRrUllxUZwibhLdUoeOuDjXhNSgRxxW9BH2gR91b3UadxzdAvhehmM8w==}
     engines: {node: '>=12.17'}
     hasBin: true
     dev: false
