@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../../usuario/usuario.service';
 import { JwtPayload } from '../payload/jwt-payload.interface';
 import * as bcrypt from 'bcrypt';
-import { Usuario } from '../../prisma';
+import { UsuarioWithRole } from '../../usuario/type/usuario-with-role.type';
 
 @Injectable()
 export class AuthService {
@@ -16,20 +16,23 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  async authenticate(emailOrUsername: string, senha: string): Promise<Usuario> {
+  async authenticate(
+    emailOrUsername: string,
+    senha: string,
+  ): Promise<UsuarioWithRole> {
     const usuario =
       (await this.usuarioService.findByEmail(emailOrUsername)) ||
       (await this.usuarioService.findByUsername(emailOrUsername));
 
     if (usuario) {
       const senhaValida = await bcrypt.compare(senha, usuario.senha);
+
+      const role = await this.usuarioService.getRole(usuario.contatoId);
+
       if (senhaValida) {
-        return { ...usuario, senha: undefined };
+        return { ...usuario, role, senha: null };
       }
     }
-
-    let emptyUsuario: Usuario;
-    return emptyUsuario;
   }
 
   async validateUsuario(payload: JwtPayload) {
