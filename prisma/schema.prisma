@@ -10,8 +10,9 @@ datasource db {
 //======//AGENDA//======//
 
 model Contato {
-  id   String @id @default(uuid())
-  nome String
+  id        String    @id @default(uuid())
+  nome      String
+  categoria Categoria
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -42,7 +43,7 @@ model Usuario {
   email       String  @unique
   username    String? @unique
   senha       String
-  roles       Role[]
+  role        Role
   usaEspOdont Boolean @default(false) @map("usa_esp_odont")
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
@@ -54,7 +55,6 @@ model Usuario {
 enum Role {
   usuario
   admin
-  colaborador
   desenvolvedor
 }
 
