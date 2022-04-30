@@ -10,11 +10,11 @@ import {
 export class TelefoneDto {
   @ApiProperty({
     description: 'Número do telefone com DDD.',
-    example: 62995305195,
+    example: '62995305195',
   })
   @IsNotEmpty()
   @IsPhoneNumber('BR')
-  readonly numero: number;
+  readonly numero: string;
 
   @ApiProperty({
     description: 'Confirmação se telefone é usado para WhatsApp.',
