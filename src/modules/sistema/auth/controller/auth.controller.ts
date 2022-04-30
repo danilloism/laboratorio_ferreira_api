@@ -7,7 +7,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
-import { Role } from '../../usuario/enums/role.enum';
+import { Categoria } from '../../../../shared/enums/categoria.enum';
 import { IsPublic } from '../decorators/is-public.decorator';
 import { LoginDto } from '../dto/login.dto';
 import { AuthService } from '../service/auth.service';
@@ -24,9 +24,9 @@ export class AuthController {
       .authenticate(login.username || login.email, login.senha)
       .catch(err => {
         const result = new ResultDto({
-          success: false,
-          message: 'Erro ao autenticar usuário.',
-          errors: err,
+          sucesso: false,
+          mensagem: 'Erro ao autenticar usuário.',
+          erro: err,
         });
 
         throw new NotFoundException(result);
@@ -34,8 +34,8 @@ export class AuthController {
 
     if (!usuario) {
       const result = new ResultDto({
-        success: false,
-        message: 'Usuário ou senha inválidos.',
+        sucesso: false,
+        mensagem: 'Usuário ou senha inválidos.',
       });
       throw new NotFoundException(result);
     }
@@ -44,13 +44,13 @@ export class AuthController {
       sub: usuario.contatoId,
       username: usuario.username,
       email: usuario.email,
-      role: usuario.role as Role,
+      role: usuario.role as Categoria,
     });
 
     return new ResultDto({
-      success: true,
-      message: 'Token gerado com sucesso.',
-      data: { ...login, senha: undefined, access_token: token },
+      sucesso: true,
+      mensagem: 'Token gerado com sucesso.',
+      dados: { access_token: token, ...login, senha: null },
     });
   }
 }
