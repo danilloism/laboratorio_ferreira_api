@@ -1,8 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('usuario', 'admin', 'desenvolvedor');
-
--- CreateEnum
-CREATE TYPE "Categoria" AS ENUM ('dentista', 'fornecedor', 'paciente', 'colaborador', 'entregador');
+CREATE TYPE "Categoria" AS ENUM ('dentista', 'fornecedor', 'paciente', 'colaborador', 'entregador', 'gerente', 'admin');
 
 -- CreateTable
 CREATE TABLE "contato" (
@@ -17,24 +14,13 @@ CREATE TABLE "contato" (
 );
 
 -- CreateTable
-CREATE TABLE "telefone_alternativo" (
-    "contato_id" TEXT NOT NULL,
-    "numero" TEXT NOT NULL,
-    "whatsapp" BOOLEAN NOT NULL DEFAULT true,
-    "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "atualizado_em" TIMESTAMP(3),
-
-    CONSTRAINT "telefone_alternativo_pkey" PRIMARY KEY ("numero")
-);
-
--- CreateTable
 CREATE TABLE "usuario" (
     "contato_id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT,
     "senha" TEXT NOT NULL,
-    "role" "Role" NOT NULL,
     "usa_esp_odont" BOOLEAN NOT NULL DEFAULT false,
+    "ativo" BOOLEAN NOT NULL DEFAULT true,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizado_em" TIMESTAMP(3),
 
@@ -78,6 +64,9 @@ CREATE TABLE "item_servico" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "contato_telefone_key" ON "contato"("telefone");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "usuario_email_key" ON "usuario"("email");
 
 -- CreateIndex
@@ -85,9 +74,6 @@ CREATE UNIQUE INDEX "usuario_username_key" ON "usuario"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "produto_nome_key" ON "produto"("nome");
-
--- AddForeignKey
-ALTER TABLE "telefone_alternativo" ADD CONSTRAINT "telefone_alternativo_contato_id_fkey" FOREIGN KEY ("contato_id") REFERENCES "contato"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "usuario" ADD CONSTRAINT "usuario_contato_id_fkey" FOREIGN KEY ("contato_id") REFERENCES "contato"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
