@@ -1,5 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Contato, Prisma, Telefone, Usuario } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Prisma, Telefone, Usuario } from '@prisma/client';
 import { PrismaService } from '../../../../modules/sistema/prisma';
 import { UpdateContatoDto } from '../dto/update-contato.dto';
 import { CreateContatoDto } from '../dto/create-contato.dto';

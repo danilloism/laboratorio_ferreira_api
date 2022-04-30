@@ -2,11 +2,9 @@ import {
   Body,
   Controller,
   HttpCode,
-  HttpException,
   HttpStatus,
   NotFoundException,
   Post,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { Role } from '../../usuario/enums/role.enum';

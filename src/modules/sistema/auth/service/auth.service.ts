@@ -1,11 +1,6 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../../usuario/usuario.service';
-import { Role } from '../../usuario/enums/role.enum';
 import { JwtPayload } from '../payload/jwt-payload.interface';
 import * as bcrypt from 'bcrypt';
 import { Usuario } from '../../prisma';

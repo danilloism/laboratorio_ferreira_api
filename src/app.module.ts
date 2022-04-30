@@ -1,5 +1,5 @@
 import { Logger, Module } from '@nestjs/common';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { OperacionalModule } from './modules/operacional/operacional.module';
 import { JwtAuthGuard } from './modules/sistema/auth';

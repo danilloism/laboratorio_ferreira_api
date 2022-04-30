@@ -4,6 +4,6 @@ import { ServicoController } from './servico.controller';
 
 @Module({
   controllers: [ServicoController],
-  providers: [ServicoService]
+  providers: [ServicoService],
 })
 export class ServicoModule {}

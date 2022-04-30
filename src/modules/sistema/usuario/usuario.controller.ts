@@ -1,7 +1,5 @@
 import { Controller, Get, UseInterceptors } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-
-import { AuthService } from '../auth';
 import { Role } from './enums/role.enum';
 import { RoleInterceptor } from './interceptors/role.interceptor';
 import { UsuarioService } from './usuario.service';

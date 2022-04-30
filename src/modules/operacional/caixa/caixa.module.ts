@@ -4,6 +4,6 @@ import { CaixaController } from './caixa.controller';
 
 @Module({
   controllers: [CaixaController],
-  providers: [CaixaService]
+  providers: [CaixaService],
 })
 export class CaixaModule {}

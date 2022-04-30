@@ -4,6 +4,6 @@ import { EstoqueController } from './estoque.controller';
 
 @Module({
   controllers: [EstoqueController],
-  providers: [EstoqueService]
+  providers: [EstoqueService],
 })
 export class EstoqueModule {}
