@@ -13,27 +13,14 @@ model Contato {
   id        String    @id @default(uuid())
   nome      String
   categoria Categoria
+  telefone  String    @unique
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
-  usuario   Usuario?
-  telefones Telefone[]
+  usuario Usuario?
 
   @@map("contato")
-}
-
-model Telefone {
-  contato Contato @relation(fields: [contatoId], references: [id])
-
-  contatoId String  @map("contato_id")
-  numero    String  @id
-  whatsapp  Boolean @default(true)
-
-  criadoEm     DateTime  @default(now()) @map("criado_em")
-  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
-
-  @@map("telefone")
 }
 
 model Usuario {
@@ -43,19 +30,13 @@ model Usuario {
   email       String  @unique
   username    String? @unique
   senha       String
-  role        Role
   usaEspOdont Boolean @default(false) @map("usa_esp_odont")
+  ativo       Boolean @default(true)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
   @@map("usuario")
-}
-
-enum Role {
-  usuario
-  admin
-  desenvolvedor
 }
 
 enum Categoria {
@@ -64,6 +45,8 @@ enum Categoria {
   paciente
   colaborador
   entregador
+  gerente
+  admin
 }
 
 //======//OPERACIONAL//======//
