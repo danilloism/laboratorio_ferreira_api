@@ -10,7 +10,7 @@ export class TelefoneService {
     return await this.prisma.telefone
       .findUnique({
         where: {
-          ddd_numero: { ddd: telefone.ddd || 62, numero: telefone.numero },
+          numero: telefone.numero,
         },
       })
       .contato();
@@ -18,7 +18,7 @@ export class TelefoneService {
 
   async update(telefone: TelefoneDto): Promise<Telefone> {
     return await this.prisma.telefone.update({
-      where: { ddd_numero: { ddd: telefone.ddd, numero: telefone.numero } },
+      where: { numero: telefone.numero },
       data: telefone,
     });
   }
@@ -26,7 +26,6 @@ export class TelefoneService {
   async create(telefone: TelefoneDto, contatoId: string) {
     return await this.prisma.telefone.create({
       data: {
-        ddd: telefone.ddd || 62,
         numero: telefone.numero,
         contato: { connect: { id: contatoId } },
       },

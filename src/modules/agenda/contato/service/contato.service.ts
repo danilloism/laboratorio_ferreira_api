@@ -4,6 +4,7 @@ import { PrismaService } from '../../../../modules/sistema/prisma';
 import { UpdateContatoDto } from '../dto/update-contato.dto';
 import { CreateContatoDto } from '../dto/create-contato.dto';
 import { UsuarioService } from 'src/modules/sistema/usuario/usuario.service';
+import { PasswordHelper } from 'src/shared/helpers/password.helper';
 
 @Injectable()
 export class ContatoService {
@@ -13,11 +14,11 @@ export class ContatoService {
   ) {}
   async findOne(id: string) {
     return await this.prismaService.contato.findUnique({
-      where: { id: id || undefined },
+      where: { id: id },
       include: {
-        telefones: { select: { ddd: true, numero: true, whatsapp: true } },
+        telefones: { select: { numero: true, whatsapp: true } },
         usuario: {
-          select: { username: true, email: true, senha: true, roles: true },
+          select: { username: true, email: true, senha: true, role: true },
         },
       },
     });
@@ -29,34 +30,41 @@ export class ContatoService {
     return await this.prismaService.contato.findMany({
       where: where || undefined,
       include: include || {
-        telefones: { select: { ddd: true, numero: true, whatsapp: true } },
+        telefones: { select: { numero: true, whatsapp: true } },
         usuario: {
-          select: { username: true, email: true, senha: true, roles: true },
+          select: { username: true, email: true, senha: true, role: true },
         },
       },
     });
   }
 
-  async create(data: CreateContatoDto) {
-    const contato = await this.prismaService.contato.create({
-      data: {
-        nome: data.nome,
-        telefones: { create: data.telefones },
-      },
-    });
+  async create({ nome, telefones, usuario, categoria }: CreateContatoDto) {
+    let senha: string;
+    if (usuario) {
+      senha = await PasswordHelper.encrypt(usuario.senha);
 
-    if (data.usuario) {
-      Object.assign(data.usuario, { ...data.usuario, contatoId: contato.id });
-      await this.usuarioService.create(data.usuario).catch(async err => {
-        await this.prismaService.contato
-          .delete({ where: { id: contato.id } })
-          .catch(err => {
-            throw err;
-          });
-        throw err;
-      });
+      Object.assign(usuario, { ...usuario, senha: senha });
     }
 
+    const contato = await this.prismaService.contato.create({
+      data: {
+        nome,
+        telefones: { create: telefones },
+        usuario: { create: usuario },
+        categoria,
+      },
+      include: {
+        telefones: { select: { numero: true, whatsapp: true } },
+        usuario: {
+          select: {
+            email: true,
+            username: true,
+            role: true,
+            usaEspOdont: true,
+          },
+        },
+      },
+    });
     return await this.prismaService.contato.findUnique({
       where: { id: contato.id },
       include: {
@@ -64,13 +72,12 @@ export class ContatoService {
           select: {
             email: true,
             username: true,
-            roles: true,
+            role: true,
             usaEspOdont: true,
           },
         },
         telefones: {
           select: {
-            ddd: true,
             numero: true,
             whatsapp: true,
           },

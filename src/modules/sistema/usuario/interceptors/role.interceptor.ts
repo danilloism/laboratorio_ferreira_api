@@ -20,14 +20,7 @@ export class RoleInterceptor implements NestInterceptor {
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const payload: JwtPayload = context.switchToHttp().getRequest().user;
-
-    let temRole = false;
-    payload.roles.forEach(role => {
-      if (this.roles.includes(role)) {
-        temRole = true;
-      }
-    });
-
+    const temRole = this.roles.includes(payload.role);
     if (!temRole) {
       throw new HttpException(
         new ResultDto({ success: false, message: 'Acesso não autorizado.' }),

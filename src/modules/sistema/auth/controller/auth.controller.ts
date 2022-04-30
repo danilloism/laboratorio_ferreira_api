@@ -44,7 +44,7 @@ export class AuthController {
       sub: usuario.contatoId,
       username: usuario.username,
       email: usuario.email,
-      roles: usuario.roles as Role[],
+      role: usuario.role as Role,
     });
 
     return new ResultDto({

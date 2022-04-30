@@ -1,7 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import { Role } from '@prisma/client';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { CreateUsuarioDto } from '../../../sistema/usuario/dto/create-usuario.dto';
 import { TelefoneDto } from '../../telefone/dto/telefone.dto';
+import { Categoria } from '../enum/categoria.enum';
 export class CreateContatoDto {
   @ApiProperty({ example: 'Danillo Ilggner', description: 'Nome do contato.' })
   @IsString()
@@ -10,15 +22,23 @@ export class CreateContatoDto {
   @ApiProperty({
     isArray: true,
     type: [TelefoneDto],
-    example: [{ ddd: 62, numero: 995305195, whatsapp: true }],
+    example: [
+      { numero: '62995305195', whatsapp: true },
+      { numero: '62994645264', whatsapp: true },
+    ],
     description: 'Lista de telefones do contato.',
   })
   @IsNotEmpty({ each: true })
-  @IsObject({ each: true })
+  @ValidateNested({ each: true })
+  @IsArray()
+  @Type(() => TelefoneDto)
   readonly telefones: TelefoneDto[];
 
   @ApiProperty({ type: CreateUsuarioDto })
   @IsOptional()
-  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateUsuarioDto)
   readonly usuario?: CreateUsuarioDto;
+
+  categoria: Categoria;
 }

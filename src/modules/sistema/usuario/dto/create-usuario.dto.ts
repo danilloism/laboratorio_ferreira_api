@@ -37,14 +37,11 @@ export class CreateUsuarioDto {
   @ApiProperty({
     enumName: 'Role',
     enum: Role,
-    isArray: true,
     name: 'role',
-    example: [Role.USUARIO, Role.COLABORADOR],
-    uniqueItems: true,
+    example: Role.USUARIO,
     type: Role,
-    minimum: 1,
   })
-  @IsEnum(Role, { each: true })
-  @IsNotEmpty({ each: true })
-  readonly roles: Role[];
+  @IsEnum(Role)
+  @IsNotEmpty()
+  readonly role: Role;
 }
