@@ -9,11 +9,11 @@ import {
 import { Observable } from 'rxjs';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { JwtPayload } from '../../auth';
-import { Role } from '../enums/role.enum';
+import { Categoria } from '../../../../shared/enums/categoria.enum';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {
-  constructor(public readonly roles: Role[]) {}
+  constructor(public readonly roles: Categoria[]) {}
 
   intercept(
     context: ExecutionContext,
@@ -23,7 +23,7 @@ export class RoleInterceptor implements NestInterceptor {
     const temRole = this.roles.includes(payload.role);
     if (!temRole) {
       throw new HttpException(
-        new ResultDto({ success: false, message: 'Acesso não autorizado.' }),
+        new ResultDto({ sucesso: false, mensagem: 'Acesso não autorizado.' }),
         HttpStatus.FORBIDDEN,
       );
     }

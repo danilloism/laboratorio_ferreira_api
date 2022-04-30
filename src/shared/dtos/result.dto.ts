@@ -1,18 +1,18 @@
 export class ResultDto {
   constructor(info: {
-    success: boolean;
-    message?: string;
-    data?: any;
-    errors?: any;
+    sucesso: boolean;
+    mensagem?: string;
+    dados?: any;
+    erro?: any;
   }) {
-    this.success = info.success;
-    this.message = info.message;
-    this.data = info.data;
-    this.errors = info.errors;
+    this.sucesso = info.sucesso;
+    this.mensagem = info.mensagem;
+    this.dados = info.dados;
+    this.erro = info.erro;
   }
 
-  readonly success: boolean;
-  readonly message?: string;
-  readonly data?: any;
-  readonly errors?: any;
+  readonly sucesso: boolean;
+  readonly mensagem?: string;
+  readonly dados?: any;
+  readonly erro?: any;
 }

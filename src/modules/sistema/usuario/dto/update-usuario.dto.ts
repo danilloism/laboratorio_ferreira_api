@@ -1,6 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
-import { Role } from '../enums/role.enum';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateUsuarioDto } from './create-usuario.dto';
-export class UpdateUsuarioDto extends PartialType(CreateUsuarioDto) {}
+
+export class UpdateUsuarioDto extends PartialType(
+  OmitType(CreateUsuarioDto, ['senha','contatoId'] as const),
+) {}

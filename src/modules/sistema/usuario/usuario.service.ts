@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PasswordHelper } from 'src/shared/helpers/password.helper';
-import { PrismaService, Usuario } from '../prisma';
+import { Usuario } from '@prisma/client';
+import { PasswordHelper } from '../../../shared/helpers/password.helper';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 
 @Injectable()
@@ -29,10 +30,16 @@ export class UsuarioService {
   }
 
   async update(id: string, data: Usuario): Promise<Usuario> {
-    return this.prisma.usuario.update({
+    return await this.prisma.usuario.update({
       where: { contatoId: id },
       data: data,
     });
+  }
+
+  async getRole(id: string) {
+    return await (
+      await this.prisma.contato.findUnique({ where: { id } })
+    ).categoria;
   }
 
   async findAll(): Promise<Usuario[]> {

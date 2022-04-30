@@ -1,8 +1,8 @@
-import { Role } from '../../usuario/enums/role.enum';
+import { Categoria } from '../../../../shared/enums/categoria.enum';
 
 export interface JwtPayload {
   sub: string;
   username?: string;
   email: string;
-  role: Role;
+  role: Categoria;
 }

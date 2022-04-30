@@ -1,7 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-import { UpdateUsuarioDto } from '../../../sistema/usuario/dto/update-usuario.dto';
+import { PartialType, PickType } from '@nestjs/swagger';
 import { CreateContatoDto } from './create-contato.dto';
 
-export class UpdateContatoDto extends PartialType(CreateContatoDto) {}
+export class UpdateContatoDto extends PartialType(
+  PickType(CreateContatoDto, ['nome', 'categoria', 'telefone'] as const),
+) {}
