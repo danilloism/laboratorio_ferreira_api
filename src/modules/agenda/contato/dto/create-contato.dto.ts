@@ -1,44 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  IsArray,
+  IsEnum,
   IsNotEmpty,
-  IsObject,
   IsOptional,
+  IsPhoneNumber,
   IsString,
+  Length,
   ValidateNested,
 } from 'class-validator';
+import { TelefoneHelper } from 'src/shared/helpers/telefone.helper';
 import { CreateUsuarioDto } from '../../../sistema/usuario/dto/create-usuario.dto';
-import { TelefoneDto } from '../../telefone/dto/telefone.dto';
 import { Categoria } from '../enum/categoria.enum';
 export class CreateContatoDto {
   @ApiProperty({ example: 'Danillo Ilggner', description: 'Nome do contato.' })
   @IsString()
   readonly nome: string;
 
-  @ApiProperty({
-    isArray: true,
-    type: [TelefoneDto],
-    example: [
-      { numero: '62995305195', whatsapp: true },
-      { numero: '62994645264', whatsapp: true },
-    ],
-    description: 'Lista de telefones do contato.',
-  })
-  @IsNotEmpty({ each: true })
-  @ValidateNested({ each: true })
-  @IsArray()
-  @Type(() => TelefoneDto)
-  readonly telefones: TelefoneDto[];
+  @IsNotEmpty()
+  @IsEnum(Categoria)
+  categoria: Categoria;
 
-  @ApiProperty({ type: CreateUsuarioDto })
+  @ApiProperty({
+    example: '62123456789',
+  })
+  @Length(11, 11, {
+    message:
+      'Tamanho da propriedade <telefone> deve ser exatamente 11 com DDD ocupando 2 espaços e o número ocupando os 9 restantes. ',
+  })
+  @IsNotEmpty({ message: 'Propriedade <telefone> deve conter algum valor.' })
+  @IsPhoneNumber('BR', {
+    message:
+      'Propriedade <telefone> inválida. Modelo válido: <ddd><numero>. Exemplo: 62123456789. Consulte a documentação para mais detalhes.',
+  })
+  @Transform(({ value }) => TelefoneHelper.format(value.toString()))
+  telefone?: string | number;
+
   @IsOptional()
   @ValidateNested()
   @Type(() => CreateUsuarioDto)
   readonly usuario?: CreateUsuarioDto;
-
-  categoria: Categoria;
 }
