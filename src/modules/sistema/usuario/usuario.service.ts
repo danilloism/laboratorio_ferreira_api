@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { PasswordHelper } from 'src/shared/helpers/password.helper';
 import { PrismaService, Usuario } from '../prisma';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsuarioService {
@@ -10,7 +10,7 @@ export class UsuarioService {
   async create(criarUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
     const data = {
       ...criarUsuarioDto,
-      senha: await bcrypt.hash(criarUsuarioDto.senha, process.env.SALT_KEY),
+      senha: await PasswordHelper.encrypt(criarUsuarioDto.senha),
     };
 
     return await this.prisma.usuario.create({ data });
