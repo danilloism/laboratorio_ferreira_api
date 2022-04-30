@@ -1,18 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { UpdateContatoDto } from '../dto/update-contato.dto';
 import { CreateContatoDto } from '../dto/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
+import { HttpExceptionHelper } from '../../../../shared/helpers/http-exception.helper';
 
 @ApiTags('Contatos')
 @Controller('contatos')
@@ -25,62 +17,41 @@ export class ContatoController {
 
   @Get(':id')
   async getById(@Param('id') id: string) {
-    return await this.service.findOne(id);
+    const contato = await this.service.findOne(id);
+
+    return contato ?? HttpExceptionHelper.throwNotFoundException();
   }
 
   @Post()
   async create(@Body() model: CreateContatoDto): Promise<ResultDto> {
     const contato = await this.service.create(model).catch(err => {
-      const result = new ResultDto({
-        success: false,
-        message: 'Falha ao criar contato.',
-        errors: err,
-      });
-
-      throw new HttpException(result, HttpStatus.BAD_REQUEST);
+      HttpExceptionHelper.throwHttpExceptionFromHttpException(err);
     });
 
-    if (!contato) {
-      throw new HttpException(
-        new ResultDto({
-          success: false,
-          message: 'Falha desconhecida ao criar contato.',
-        }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    return new ResultDto({
-      success: true,
-      message: 'Contato criado com sucesso.',
-      data: contato,
-    });
+    return contato
+      ? new ResultDto({
+          sucesso: true,
+          mensagem: 'Contato criado com sucesso.',
+          dados: contato,
+        })
+      : HttpExceptionHelper.throwBadRequestException();
   }
 
   @Put(':id')
   async put(
     @Body() atualizarContatoDto: UpdateContatoDto,
     @Param('id') id: string,
-  ) {
+  ): Promise<ResultDto> {
     const result = await this.service
-      .updateNome(id, atualizarContatoDto)
+      .update(id, atualizarContatoDto)
       .catch(err => {
-        const resultDto = new ResultDto({
-          message: 'Erro ao atualizar contato.',
-          success: false,
-          errors: err,
-        });
-        throw new HttpException(resultDto, HttpStatus.BAD_REQUEST);
+        HttpExceptionHelper.throwHttpExceptionFromHttpException(err);
       });
-    return new ResultDto({
-      message: 'Contato atualizado com sucesso.',
-      success: true,
-      data: result,
-    });
-  }
 
-  @Get(':id/telefones')
-  async findTelefonesById(@Param('id') id: string) {
-    return await this.service.getTelefones(id);
+    return new ResultDto({
+      mensagem: 'Contato atualizado com sucesso.',
+      sucesso: true,
+      dados: result,
+    });
   }
 }
