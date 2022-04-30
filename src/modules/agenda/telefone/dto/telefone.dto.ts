@@ -8,7 +8,10 @@ import {
 } from 'class-validator';
 
 export class TelefoneDto {
-  @ApiProperty({ description: 'Número do telefone.', example: 995305195 })
+  @ApiProperty({
+    description: 'Número do telefone com DDD.',
+    example: 62995305195,
+  })
   @IsNotEmpty()
   @IsPhoneNumber('BR')
   readonly numero: number;
@@ -21,14 +24,4 @@ export class TelefoneDto {
   @IsOptional()
   @IsBoolean()
   readonly whatsapp?: boolean;
-
-  @ApiProperty({
-    default: 62,
-    description: 'Código DDD do telefone.',
-    example: 62,
-    required: false,
-  })
-  @IsOptional()
-  @IsInt()
-  readonly ddd?: number;
 }
