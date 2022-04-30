@@ -1,104 +1,105 @@
-import { Injectable } from '@nestjs/common';
-import { Prisma, Telefone, Usuario } from '@prisma/client';
-import { PrismaService } from '../../../../modules/sistema/prisma';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { Prisma, Usuario } from '@prisma/client';
 import { UpdateContatoDto } from '../dto/update-contato.dto';
 import { CreateContatoDto } from '../dto/create-contato.dto';
-import { UsuarioService } from 'src/modules/sistema/usuario/usuario.service';
-import { PasswordHelper } from 'src/shared/helpers/password.helper';
+import { PasswordHelper } from '../../../../shared/helpers/password.helper';
+import type { PrismaException } from '../../../../shared/types/prisma-exception.type';
+import { PrismaService } from 'src/modules/sistema/prisma/prisma.service';
 
 @Injectable()
 export class ContatoService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly usuarioService: UsuarioService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
   async findOne(id: string) {
     return await this.prismaService.contato.findUnique({
       where: { id: id },
       include: {
-        telefones: { select: { numero: true, whatsapp: true } },
         usuario: {
-          select: { username: true, email: true, senha: true, role: true },
+          select: { username: true, email: true, senha: true },
         },
       },
     });
   }
+
   async find(
     where?: Prisma.ContatoWhereInput,
-    include?: Prisma.ContatoInclude,
+    include: Prisma.ContatoInclude = {
+      usuario: {
+        select: { username: true, email: true, senha: true },
+      },
+    },
   ) {
     return await this.prismaService.contato.findMany({
-      where: where || undefined,
-      include: include || {
-        telefones: { select: { numero: true, whatsapp: true } },
-        usuario: {
-          select: { username: true, email: true, senha: true, role: true },
-        },
-      },
+      where: where,
+      include: include,
     });
   }
 
-  async create({ nome, telefones, usuario, categoria }: CreateContatoDto) {
-    let senha: string;
+  async create({ nome, telefone, usuario, categoria }: CreateContatoDto) {
     if (usuario) {
-      senha = await PasswordHelper.encrypt(usuario.senha);
-
+      const senha = await PasswordHelper.encrypt(usuario.senha);
       Object.assign(usuario, { ...usuario, senha: senha });
     }
 
-    const contato = await this.prismaService.contato.create({
-      data: {
-        nome,
-        telefones: { create: telefones },
-        usuario: { create: usuario },
-        categoria,
-      },
-      include: {
-        telefones: { select: { numero: true, whatsapp: true } },
-        usuario: {
-          select: {
-            email: true,
-            username: true,
-            role: true,
-            usaEspOdont: true,
-          },
-        },
-      },
-    });
-    return await this.prismaService.contato.findUnique({
-      where: { id: contato.id },
-      include: {
-        usuario: {
-          select: {
-            email: true,
-            username: true,
-            role: true,
-            usaEspOdont: true,
-          },
-        },
-        telefones: {
-          select: {
-            numero: true,
-            whatsapp: true,
-          },
-        },
-      },
-    });
-  }
-
-  async updateNome(id: string, atualizarContatoDto: UpdateContatoDto) {
-    return await this.prismaService.contato.update({
-      where: { id: id },
-      data: { nome: atualizarContatoDto.nome },
-    });
-  }
-
-  async getTelefones(id: string): Promise<Telefone[]> {
     return await this.prismaService.contato
-      .findUnique({
-        where: { id: id },
+      .create({
+        data: {
+          nome,
+          telefone: telefone.toString(),
+          categoria,
+          usuario: { create: usuario },
+        },
+        include: {
+          usuario: usuario
+            ? {
+                select: {
+                  email: true,
+                  username: true,
+                  usaEspOdont: true,
+                },
+              }
+            : false,
+        },
       })
-      .telefones();
+      .catch(err => {
+        const erro: PrismaException = err;
+        const target = erro.meta['target'] ?? undefined;
+        if (target == 'numero') {
+          throw new UnprocessableEntityException(
+            'Telefone já está cadastrado e associado a um contato.',
+          );
+        } else if (target == 'username' || target == 'email') {
+          throw new UnprocessableEntityException(
+            'Credenciais de usuário (email ou username) já cadastradas e associadas a um contato.',
+          );
+        }
+
+        throw new InternalServerErrorException(
+          'Erro desconhecido ao tentar criar contato.',
+        );
+      });
+  }
+
+  async update(id: string, atualizarContatoDto: UpdateContatoDto) {
+    const valida = this.findOne(id);
+    if (!valida) {
+      throw new NotFoundException('Id informado não existe.');
+    }
+
+    return await this.prismaService.contato
+      .update({
+        where: { id },
+        data: atualizarContatoDto,
+      })
+      .catch(() => {
+        throw new InternalServerErrorException(
+          'Erro desconhecido ao tentar atualizar contato.',
+        );
+      });
   }
 
   async getUsuario(id: string): Promise<Usuario> {
