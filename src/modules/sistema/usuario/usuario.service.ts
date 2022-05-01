@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Usuario } from '@prisma/client';
-import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
+import { HttpExceptionHelper } from '../../../shared/helpers/http-exception.helper';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
