@@ -30,11 +30,7 @@ async function bootstrap() {
   const document =
     process.env.NODE_ENV == 'development'
       ? SwaggerModule.createDocument(app, config)
-      : JSON.parse(
-          fs
-            .readFileSync(join(__dirname, '..', 'doc', 'app.doc.json'))
-            .toString(),
-        );
+      : JSON.parse(fs.readFileSync('./doc/api.doc.json').toString());
   SwaggerModule.setup('api-docs', app, document, {
     customSiteTitle: 'Documentação da API RESTful do Laboratório Ferreira.',
   });
@@ -47,10 +43,7 @@ async function bootstrap() {
     logger.log('Servidor iniciado');
 
     if (process.env.NODE_ENV == 'development') {
-      fs.writeFileSync(
-        join(__dirname, '..', 'doc', 'api.doc.json'),
-        JSON.stringify(document),
-      );
+      fs.writeFileSync('./doc/api.doc.json', JSON.stringify(document));
     }
   });
 }
