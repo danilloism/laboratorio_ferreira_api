@@ -46,10 +46,10 @@ export class UsuarioService {
 
   async getRoles(id: string) {
     const contato = await this.prisma.contato.findUnique({ where: { id } });
-    if (!contato) {
-      HttpExceptionHelper.throwNotFoundException();
-    }
-    return contato.categorias;
+
+    return contato
+      ? contato.categorias
+      : HttpExceptionHelper.throwNotFoundException();
   }
 
   async findAll(): Promise<Usuario[]> {
