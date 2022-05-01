@@ -23,18 +23,17 @@ jobs:
         with:
           node-version: '18'
           cache: 'pnpm'
-      - run: rm nest-cli.json
-      - run: mv nest-cli.development.json nest-cli.json
       - run: pnpm install --frozen-lockfile
       - run: npx prisma generate
       - run: pnpm prebuild
       - run: pnpm build
-      - run: pnpm lint
       - run: pnpm test:v
   deploy: ## <-- this is the new stuff
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - run: rm nest-cli.json
+      - run: mv nest-cli.development.json nest-cli.json
       - uses: actions/checkout@v3
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
