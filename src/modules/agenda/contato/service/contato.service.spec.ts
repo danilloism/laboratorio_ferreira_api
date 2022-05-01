@@ -54,7 +54,7 @@ describe('ContatoService', () => {
 
   describe('getById', () => {
     it('deve retornar um contato.', async () => {
-      const contato = await service.findOne('id');
+      const contato = await service.findById('id');
 
       expect(contato).toMatchObject(contatos[0]);
       expect(prisma.contato.findUnique).toBeCalledTimes(1);

@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -14,6 +15,7 @@ import { CreateContatoDto } from '../dto/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
 import { HttpExceptionHelper } from '../../../../shared/helpers/http-exception.helper';
 import { DentistaEspOdontRoleInterceptor } from '../../../sistema/shared/interceptor/dentista-esp-odont-role.interceptor';
+import { TelefoneHelper } from 'src/shared/helpers/telefone.helper';
 
 @ApiTags('Contatos')
 @Controller('contatos')
@@ -22,13 +24,18 @@ export class ContatoController {
   constructor(private readonly service: ContatoService) {}
 
   @Get()
-  async get() {
+  async get(@Query('telefone') telefone?: string) {
+    if (telefone) {
+      const contato = await this.service.findByTelefone(telefone);
+      return contato ?? HttpExceptionHelper.throwNotFoundException();
+    }
+
     return await this.service.find();
   }
 
   @Get(':id')
   async getById(@Param('id') id: string) {
-    const contato = await this.service.findOne(id);
+    const contato = await this.service.findById(id);
 
     return contato ?? HttpExceptionHelper.throwNotFoundException();
   }

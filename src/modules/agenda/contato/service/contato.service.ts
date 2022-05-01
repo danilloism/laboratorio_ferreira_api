@@ -14,13 +14,22 @@ import { PrismaService } from '../../../sistema/prisma/prisma.service';
 @Injectable()
 export class ContatoService {
   constructor(private readonly prismaService: PrismaService) {}
-  async findOne(id: string) {
+  async findById(id: string) {
     return await this.prismaService.contato.findUnique({
-      where: { id: id },
+      where: { id },
       include: {
         usuario: {
-          select: { username: true, email: true, senha: true },
+          select: { username: true, email: true },
         },
+      },
+    });
+  }
+
+  async findByTelefone(telefone: string) {
+    return await this.prismaService.contato.findUnique({
+      where: { telefone },
+      include: {
+        usuario: { select: { username: true, email: true } },
       },
     });
   }
@@ -49,7 +58,7 @@ export class ContatoService {
       .create({
         data: {
           nome,
-          telefone: telefone.toString(),
+          telefone,
           categorias,
           usuario: { create: usuario },
         },
@@ -80,7 +89,7 @@ export class ContatoService {
   }
 
   async update(id: string, atualizarContatoDto: UpdateContatoDto) {
-    const valida = this.findOne(id);
+    const valida = this.findById(id);
     if (!valida) {
       throw new NotFoundException('Id informado não existe.');
     }

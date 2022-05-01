@@ -6,7 +6,6 @@
 
 ## Pra Terminar
 
-* Rota GET de contato para telefone
 * Rotas GET de usuario para cada campo unico (id,email,username)
 * Criar propriedade para saber data do ultimo login
 * Terminar rotas de usuario e autenticacao
