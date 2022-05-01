@@ -26,7 +26,10 @@ jobs:
         with:
           node-version: '16.x'
           cache: pnpm
+      - run: rm nest-cli.json
+      - run: mv nest-cli.development.json nest-cli.json
       - run: pnpm install --frozen-lockfile
+      - run: npx prisma generate
       - run: pnpm prebuild
       - run: pnpm build
       - run: pnpm lint
