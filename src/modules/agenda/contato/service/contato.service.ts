@@ -41,7 +41,7 @@ export class ContatoService {
 
   async create({ nome, telefone, usuario, categorias }: CreateContatoDto) {
     if (usuario) {
-      const senha = await PasswordHelper.encrypt(usuario.senha);
+      const senha = await new PasswordHelper(usuario.senha).encrypt();
       Object.assign(usuario, { ...usuario, senha: senha });
     }
 
@@ -67,11 +67,7 @@ export class ContatoService {
       .catch(err => {
         const erro: PrismaException = err;
         const target = erro.meta['target'] ?? undefined;
-        if (target == 'numero') {
-          throw new UnprocessableEntityException(
-            'Telefone já está cadastrado e associado a um contato.',
-          );
-        } else if (target == 'username' || target == 'email') {
+        if (target == 'username' || target == 'email') {
           throw new UnprocessableEntityException(
             'Credenciais de usuário (email ou username) já cadastradas e associadas a um contato.',
           );

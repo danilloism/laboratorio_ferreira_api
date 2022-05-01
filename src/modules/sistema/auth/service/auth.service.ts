@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../../usuario/usuario.service';
 import { JwtPayload } from '../payload/jwt-payload.interface';
-import * as bcrypt from 'bcrypt';
 import { UsuarioWithRoles } from '../../usuario/type/usuario-with-roles.type';
 import { Categoria } from '../../shared/enum/categoria.enum';
+import { PasswordHelper } from 'src/shared/helpers/password.helper';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +26,9 @@ export class AuthService {
       (await this.usuarioService.findByUsername(emailOrUsername));
 
     if (usuario) {
-      const senhaValida = await bcrypt.compare(senha, usuario.senha);
+      const senhaValida = await new PasswordHelper(senha).compare(
+        usuario.senha,
+      );
 
       const roles = await this.usuarioService.getRoles(usuario.contatoId);
 
