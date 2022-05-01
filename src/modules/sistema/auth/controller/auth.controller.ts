@@ -7,11 +7,13 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { IsPublic } from '../decorators/is-public.decorator';
 import { LoginDto } from '../dto/login.dto';
 import { AuthService } from '../service/auth.service';
 
+@ApiTags('Auth')
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
