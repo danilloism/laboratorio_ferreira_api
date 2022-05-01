@@ -1,6 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AccountService } from '../../usuario/account.service';
+import { UsuarioService } from '../../usuario/usuario.service';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
@@ -8,9 +8,9 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService, AccountService, JwtService],
+      providers: [AuthService, UsuarioService, JwtService],
     })
-      .overrideProvider(AccountService)
+      .overrideProvider(UsuarioService)
       .useValue({})
       .overrideProvider(JwtService)
       .useValue({})

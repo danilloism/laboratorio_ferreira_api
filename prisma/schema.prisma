@@ -10,42 +10,27 @@ datasource db {
 //======//AGENDA//======//
 
 model Contato {
-  id   String @id @default(uuid())
-  nome String
+  id         String      @id @default(uuid())
+  nome       String
+  categorias Categoria[]
+  telefone   String      @unique
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
-  usuario   Usuario?
-  telefones Telefone[]
+  usuario Usuario?
 
   @@map("contato")
-}
-
-model Telefone {
-  contato Contato @relation(fields: [contatoId], references: [id])
-
-  contatoId String  @map("contato_id")
-  ddd       Int     @default(62)
-  numero    Int
-  whatsapp  Boolean @default(true)
-
-  criadoEm     DateTime  @default(now()) @map("criado_em")
-  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
-
-  @@id([ddd, numero], name: "ddd_numero")
-  @@map("telefone")
 }
 
 model Usuario {
   contato Contato @relation(fields: [contatoId], references: [id])
 
-  contatoId   String  @id @map("contato_id")
-  email       String  @unique
-  username    String? @unique
-  senha       String
-  roles       Role[]
-  usaEspOdont Boolean @default(false) @map("usa_esp_odont")
+  contatoId String  @id @map("contato_id")
+  email     String  @unique
+  username  String? @unique
+  senha     String
+  ativo     Boolean @default(true)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -53,10 +38,14 @@ model Usuario {
   @@map("usuario")
 }
 
-enum Role {
-  usuario
-  admin
+enum Categoria {
+  dentista
+  fornecedor
+  cliente
   colaborador
+  entregador
+  gerente
+  admin
 }
 
 //======//OPERACIONAL//======//

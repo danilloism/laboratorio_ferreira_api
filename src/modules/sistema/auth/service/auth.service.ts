@@ -1,34 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AccountService } from '../../usuario/account.service';
-import { Role } from '../../../../shared/enums/role.enum';
-import { JwtPayload } from '../jwt/jwt-payload.interface';
+import { UsuarioService } from '../../usuario/usuario.service';
+import { JwtPayload } from '../payload/jwt-payload.interface';
+import { UsuarioWithRoles } from '../../usuario/type/usuario-with-roles.type';
+import { Categoria } from '../../shared/enum/categoria.enum';
+import { PasswordHelper } from '../../../../shared/helpers/password.helper';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly accountService: AccountService,
+    private readonly usuarioService: UsuarioService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async criarToken() {
-    const usuario: JwtPayload = {
-      email: 'danilloilggner@gmail.com',
-      username: 'danilloism',
-      roles: [Role.COLABORADOR, Role.USUARIO],
-    };
-    const acessarToken = this.jwtService.sign(usuario);
-    return {
-      expiresIn: 3600,
-      acessarToken,
-    };
+  async createToken(payload: JwtPayload) {
+    return this.jwtService.sign(payload);
   }
 
-  async validarUsuario(payload: JwtPayload) {
-    // return (
-    //   (await this.accountService.findByUsername(payload.username)) ||
-    //   (await this.accountService.findByEmail(payload.email))
-    // );
+  async authenticate(
+    emailOrUsername: string,
+    senha: string,
+  ): Promise<UsuarioWithRoles> {
+    const usuario =
+      (await this.usuarioService.findByEmail(emailOrUsername)) ||
+      (await this.usuarioService.findByUsername(emailOrUsername));
+
+    if (usuario) {
+      const senhaValida = await new PasswordHelper(senha).compare(
+        usuario.senha,
+      );
+
+      const roles = await this.usuarioService.getRoles(usuario.contatoId);
+
+      if (senhaValida) {
+        return { ...usuario, roles: roles as Categoria[], senha: null };
+      }
+    }
+  }
+
+  async validateUsuario(payload: JwtPayload) {
     return payload;
   }
 }

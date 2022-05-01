@@ -2,21 +2,22 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { PrismaService } from './modules/sistema/prisma';
-import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
+import { PrismaService } from './modules/sistema/prisma/prisma.service';
+import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(compression());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
       enableDebugMessages: true,
-      validationError: { target: true, value: true },
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Laboratório Ferreira API')
@@ -25,7 +26,9 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api-docs', app, document, {
+    customSiteTitle: 'Documentação da API RESTful do Laboratório Ferreira.',
+  });
 
   const prisma = app.get(PrismaService);
   prisma.enableShutdownHooks(app);
