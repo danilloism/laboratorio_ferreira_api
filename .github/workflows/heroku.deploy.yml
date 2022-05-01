@@ -29,31 +29,22 @@ jobs:
       - run: pnpm prebuild
       - run: pnpm build
       - run: pnpm test:v
-      - name: Zip prisma client
-        run: zip prismaclient.zip ./node_modules/.pnpm/@prisma+client@3.13.0_prisma@3.13.0/node_modules/@prisma/client -r
-      - name: Upload zip file
-        uses: actions/upload-artifact@v2
-        with:
-          name: prisma
-          path: prismaclient.zip
   deploy: ## <-- this is the new stuff
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: prisma
-
-      - name: Unzip artifact for deployment
-        run: unzip prismaclient.zip
-
-      - name: Delete zipped artifact
-        run: rm prismaclient.zip
-
       - uses: actions/checkout@v3
       - run: rm nest-cli.json
       - run: mv nest-cli.development.json nest-cli.json
+      - uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
+        with:
+          version: 7.0.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm prisma migrate deploy
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           buildpack: https://github.com/unfold/heroku-buildpack-pnpm
