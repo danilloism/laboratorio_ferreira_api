@@ -47,6 +47,7 @@ export class CreateContatoDto {
   @Transform(({ value }) => TelefoneHelper.format(value.toString()))
   readonly telefone?: string | number;
 
+  @ApiProperty({ type: CreateUsuarioDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => CreateUsuarioDto)
