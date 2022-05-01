@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: npx prisma migrate
+      - run: npx prisma generate
       - run: rm nest-cli.json
       - run: mv nest-cli.development.json nest-cli.json
       - uses: akhileshns/heroku-deploy@v3.12.12
