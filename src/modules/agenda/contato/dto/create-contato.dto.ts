@@ -14,7 +14,7 @@ import {
   Length,
   ValidateNested,
 } from 'class-validator';
-import { Categoria } from '../../../../shared/enums/categoria.enum';
+import { Categoria } from '../../../sistema/shared/enum/categoria.enum';
 import { TelefoneHelper } from '../../../../shared/helpers/telefone.helper';
 import { CreateUsuarioDto } from '../../../sistema/usuario/dto/create-usuario.dto';
 

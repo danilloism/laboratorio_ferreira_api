@@ -7,7 +7,6 @@ import {
   Post,
 } from '@nestjs/common';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
-import { Categoria } from '../../../../shared/enums/categoria.enum';
 import { IsPublic } from '../decorators/is-public.decorator';
 import { LoginDto } from '../dto/login.dto';
 import { AuthService } from '../service/auth.service';

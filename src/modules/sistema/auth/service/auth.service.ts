@@ -4,7 +4,7 @@ import { UsuarioService } from '../../usuario/usuario.service';
 import { JwtPayload } from '../payload/jwt-payload.interface';
 import * as bcrypt from 'bcrypt';
 import { UsuarioWithRoles } from '../../usuario/type/usuario-with-roles.type';
-import { Categoria } from 'src/shared/enums/categoria.enum';
+import { Categoria } from '../../shared/enum/categoria.enum';
 
 @Injectable()
 export class AuthService {

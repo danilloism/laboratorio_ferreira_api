@@ -1,5 +1,5 @@
 import { Usuario } from '@prisma/client';
-import { Categoria } from 'src/shared/enums/categoria.enum';
+import { Categoria } from '../../shared/enum/categoria.enum';
 
 export interface UsuarioWithRoles extends Usuario {
   roles: Categoria[];

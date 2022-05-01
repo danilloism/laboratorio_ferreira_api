@@ -9,7 +9,7 @@ import {
 import { Observable } from 'rxjs';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { JwtPayload } from '../../auth';
-import { Categoria } from '../../../../shared/enums/categoria.enum';
+import { Categoria } from '../enum/categoria.enum';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {

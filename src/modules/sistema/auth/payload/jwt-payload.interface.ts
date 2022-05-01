@@ -1,4 +1,4 @@
-import { Categoria } from '../../../../shared/enums/categoria.enum';
+import { Categoria } from '../../shared/enum/categoria.enum';
 
 export interface JwtPayload {
   sub: string;
