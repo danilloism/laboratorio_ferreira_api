@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -25,6 +25,7 @@ export class CreateContatoDto {
   @ApiProperty({ example: 'Danillo Silva' })
   readonly nome: string;
 
+  @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(7)
   @ArrayNotEmpty()
