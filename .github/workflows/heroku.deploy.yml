@@ -25,13 +25,32 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: npx prisma generate
+
       - run: pnpm prebuild
       - run: pnpm build
       - run: pnpm test:v
+      - name: Zip prisma client
+        run: zip prismaclient.zip ./node_modules/.pnpm/@prisma+client@3.13.0_prisma@3.13.0/node_modules/@prisma/client -r
+      - name: Upload zip file
+        uses: actions/upload-artifact@v3.12.12
+        with:
+          name: prisma
+          path: prismaclient.zip
   deploy: ## <-- this is the new stuff
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3.12.12
+        with:
+          name: prisma
+
+      - name: Unzip artifact for deployment
+        run: unzip prismaclient.zip
+
+      - name: Delete zipped artifact
+        run: rm prismaclient.zip
+
       - uses: actions/checkout@v3
       - run: rm nest-cli.json
       - run: mv nest-cli.development.json nest-cli.json
