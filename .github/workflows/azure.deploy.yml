@@ -10,6 +10,7 @@ on:
 
 env:
   DATABASE_URL: ${{secrets.DATABASE_URL}}
+  NODE_ENV: production
 
 jobs:
   build:
