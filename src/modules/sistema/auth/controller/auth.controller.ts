@@ -5,6 +5,7 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
+  Req,
 } from '@nestjs/common';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { IsPublic } from '../decorators/is-public.decorator';
@@ -50,6 +51,27 @@ export class AuthController {
       sucesso: true,
       mensagem: 'Token gerado com sucesso.',
       dados: { access_token: token, ...login, senha: null },
+    });
+  }
+
+  @Post('refresh')
+  async refreshToken(@Req() request) {
+    const payload = request.user;
+
+    const token = await this.authService.createToken({
+      sub: payload.sub,
+      email: payload.email,
+      roles: payload.roles,
+      username: payload.username,
+    });
+
+    return new ResultDto({
+      sucesso: true,
+      mensagem: 'Token atualizado com sucesso.',
+      dados: {
+        access_token: token,
+        login: { email: payload.email, username: payload.username },
+      },
     });
   }
 }
