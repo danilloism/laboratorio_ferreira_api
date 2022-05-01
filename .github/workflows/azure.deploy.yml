@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - labferreira
+name: Build/Deploy - Azure
 
 on:
   push:
@@ -29,8 +29,7 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
           pnpm prebuild
-          npx prisma generate
-          pnpm build
+          pnpm build --prod
           pnpm test:v
 
       - name: Zip artifact for deployment
@@ -54,12 +53,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: node-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
-      - name: Delete zipped artifact
-        run: rm release.zip
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
