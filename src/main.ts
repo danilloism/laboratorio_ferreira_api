@@ -38,9 +38,9 @@ async function bootstrap() {
   const prisma = app.get(PrismaService);
   prisma.enableShutdownHooks(app);
 
-  await app.listen(process.env.PORT || 3000, () => {
+  await app.listen(process.env.PORT || 10000, () => {
     const logger = new Logger('Servidor');
-    logger.log('Servidor iniciado');
+    logger.log(`Servidor iniciado na porta: ${app.getHttpServer()}`);
 
     if (process.env.NODE_ENV == 'development') {
       fs.writeFileSync('./doc/api.doc.json', JSON.stringify(document));
