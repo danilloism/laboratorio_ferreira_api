@@ -6,11 +6,11 @@ import { UsuarioService } from './usuario.service';
 
 @ApiTags('Usuários')
 @Controller('usuarios')
+@UseInterceptors(new RoleInterceptor(Categoria.ADMIN))
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
   @Get()
-  @UseInterceptors(new RoleInterceptor([Categoria.ADMIN]))
   async findAll() {
     return await this.usuarioService.findAll();
   }

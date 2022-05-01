@@ -3,7 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UsuarioService } from '../../usuario/usuario.service';
 import { JwtPayload } from '../payload/jwt-payload.interface';
 import * as bcrypt from 'bcrypt';
-import { UsuarioWithRole } from '../../usuario/type/usuario-with-role.type';
+import { UsuarioWithRoles } from '../../usuario/type/usuario-with-roles.type';
+import { Categoria } from 'src/shared/enums/categoria.enum';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
   async authenticate(
     emailOrUsername: string,
     senha: string,
-  ): Promise<UsuarioWithRole> {
+  ): Promise<UsuarioWithRoles> {
     const usuario =
       (await this.usuarioService.findByEmail(emailOrUsername)) ||
       (await this.usuarioService.findByUsername(emailOrUsername));
@@ -27,10 +28,10 @@ export class AuthService {
     if (usuario) {
       const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
-      const role = await this.usuarioService.getRole(usuario.contatoId);
+      const roles = await this.usuarioService.getRoles(usuario.contatoId);
 
       if (senhaValida) {
-        return { ...usuario, role, senha: null };
+        return { ...usuario, roles: roles as Categoria[], senha: null };
       }
     }
   }

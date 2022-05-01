@@ -9,7 +9,7 @@ import { UpdateContatoDto } from '../dto/update-contato.dto';
 import { CreateContatoDto } from '../dto/create-contato.dto';
 import { PasswordHelper } from '../../../../shared/helpers/password.helper';
 import type { PrismaException } from '../../../../shared/types/prisma-exception.type';
-import { PrismaService } from 'src/modules/sistema/prisma/prisma.service';
+import { PrismaService } from '../../../sistema/prisma/prisma.service';
 
 @Injectable()
 export class ContatoService {
@@ -29,7 +29,7 @@ export class ContatoService {
     where?: Prisma.ContatoWhereInput,
     include: Prisma.ContatoInclude = {
       usuario: {
-        select: { username: true, email: true, senha: true },
+        select: { username: true, email: true },
       },
     },
   ) {
@@ -39,7 +39,7 @@ export class ContatoService {
     });
   }
 
-  async create({ nome, telefone, usuario, categoria }: CreateContatoDto) {
+  async create({ nome, telefone, usuario, categorias }: CreateContatoDto) {
     if (usuario) {
       const senha = await PasswordHelper.encrypt(usuario.senha);
       Object.assign(usuario, { ...usuario, senha: senha });
@@ -50,7 +50,7 @@ export class ContatoService {
         data: {
           nome,
           telefone: telefone.toString(),
-          categoria,
+          categorias,
           usuario: { create: usuario },
         },
         include: {
@@ -59,7 +59,6 @@ export class ContatoService {
                 select: {
                   email: true,
                   username: true,
-                  usaEspOdont: true,
                 },
               }
             : false,

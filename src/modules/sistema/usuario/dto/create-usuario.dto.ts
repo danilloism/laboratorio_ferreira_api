@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import {
-  IsBoolean,
   IsEmail,
   IsOptional,
   IsString,
@@ -10,15 +10,12 @@ import {
 } from 'class-validator';
 
 export class CreateUsuarioDto {
-  @ApiProperty()
+  @Exclude()
   @IsUUID()
+  @IsOptional()
   readonly contatoId: string;
 
-  @ApiProperty({ default: false, required: false })
-  @IsBoolean()
-  readonly usaEspOdont?: boolean;
-
-  @ApiProperty({ example: 'nomeusuario', required: false })
+  @ApiProperty({ example: 'nomeusuario' })
   @IsString()
   @IsOptional()
   readonly username?: string;
@@ -27,7 +24,6 @@ export class CreateUsuarioDto {
   @IsEmail()
   readonly email: string;
 
-  @ApiProperty({ example: '*****' })
   @IsString()
   @MinLength(4)
   @MaxLength(20)

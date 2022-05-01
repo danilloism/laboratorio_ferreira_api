@@ -4,6 +4,6 @@ export enum Categoria {
   COLABORADOR = 'colaborador',
   GERENTE = 'gerente',
   FORNECEDOR = 'fornecedor',
-  PACIENTE = 'paciente',
+  CLIENTE = 'cliente',
   ENTREGADOR = 'entregador',
 }

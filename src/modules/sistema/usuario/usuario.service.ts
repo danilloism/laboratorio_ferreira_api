@@ -36,10 +36,9 @@ export class UsuarioService {
     });
   }
 
-  async getRole(id: string) {
-    return await (
-      await this.prisma.contato.findUnique({ where: { id } })
-    ).categoria;
+  async getRoles(id: string) {
+    const contato = await this.prisma.contato.findUnique({ where: { id } });
+    return contato.categorias;
   }
 
   async findAll(): Promise<Usuario[]> {

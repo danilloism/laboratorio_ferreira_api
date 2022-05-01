@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { v1 as uuid_v1 } from 'uuid';
 import { ContatoService } from './contato.service';
 import faker from '@faker-js/faker';
-import { PrismaService } from 'src/modules/sistema/prisma/prisma.service';
+import { PrismaService } from '../../../sistema/prisma/prisma.service';
 
 describe('ContatoService', () => {
   let service: ContatoService;

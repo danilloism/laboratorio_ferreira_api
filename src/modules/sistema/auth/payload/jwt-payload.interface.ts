@@ -4,5 +4,5 @@ export interface JwtPayload {
   sub: string;
   username?: string;
   email: string;
-  role: Categoria;
+  roles: Categoria[];
 }

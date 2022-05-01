@@ -1,15 +1,30 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
 import { UpdateContatoDto } from '../dto/update-contato.dto';
 import { CreateContatoDto } from '../dto/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
 import { HttpExceptionHelper } from '../../../../shared/helpers/http-exception.helper';
+import { RoleInterceptor } from 'src/modules/sistema/usuario/interceptors/role.interceptor';
+import { Categoria } from '../../../../shared/enums/categoria.enum';
+import { JwtAuthGuard } from 'src/modules/sistema/auth';
 
 @ApiTags('Contatos')
 @Controller('contatos')
+@UseGuards(JwtAuthGuard)
 export class ContatoController {
   constructor(private readonly service: ContatoService) {}
+
+  // @UseInterceptors(new RoleInterceptor(Categoria.))
   @Get()
   async get() {
     return await this.service.find();

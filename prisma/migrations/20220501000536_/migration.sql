@@ -1,11 +1,11 @@
 -- CreateEnum
-CREATE TYPE "Categoria" AS ENUM ('dentista', 'fornecedor', 'paciente', 'colaborador', 'entregador', 'gerente', 'admin');
+CREATE TYPE "Categoria" AS ENUM ('dentista', 'fornecedor', 'cliente', 'colaborador', 'entregador', 'gerente', 'admin');
 
 -- CreateTable
 CREATE TABLE "contato" (
     "id" TEXT NOT NULL,
     "nome" TEXT NOT NULL,
-    "categoria" "Categoria" NOT NULL,
+    "categorias" "Categoria"[],
     "telefone" TEXT NOT NULL,
     "criado_em" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizado_em" TIMESTAMP(3),

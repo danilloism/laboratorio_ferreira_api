@@ -13,14 +13,19 @@ import { Categoria } from '../../../../shared/enums/categoria.enum';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {
-  constructor(public readonly roles: Categoria[]) {}
+  constructor(...roles: Categoria[]) {
+    this.roles = roles;
+    roles.push(Categoria.ADMIN);
+  }
+
+  protected readonly roles: Categoria[];
 
   intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const payload: JwtPayload = context.switchToHttp().getRequest().user;
-    const temRole = this.roles.includes(payload.role);
+    const temRole = payload.roles.every(role => this.roles.includes(role));
     if (!temRole) {
       throw new HttpException(
         new ResultDto({ sucesso: false, mensagem: 'Acesso não autorizado.' }),

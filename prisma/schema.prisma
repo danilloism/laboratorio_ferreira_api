@@ -10,10 +10,10 @@ datasource db {
 //======//AGENDA//======//
 
 model Contato {
-  id        String    @id @default(uuid())
-  nome      String
-  categoria Categoria
-  telefone  String    @unique
+  id         String      @id @default(uuid())
+  nome       String
+  categorias Categoria[]
+  telefone   String      @unique
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -26,12 +26,11 @@ model Contato {
 model Usuario {
   contato Contato @relation(fields: [contatoId], references: [id])
 
-  contatoId   String  @id @map("contato_id")
-  email       String  @unique
-  username    String? @unique
-  senha       String
-  usaEspOdont Boolean @default(false) @map("usa_esp_odont")
-  ativo       Boolean @default(true)
+  contatoId String  @id @map("contato_id")
+  email     String  @unique
+  username  String? @unique
+  senha     String
+  ativo     Boolean @default(true)
 
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
@@ -42,7 +41,7 @@ model Usuario {
 enum Categoria {
   dentista
   fornecedor
-  paciente
+  cliente
   colaborador
   entregador
   gerente

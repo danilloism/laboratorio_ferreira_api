@@ -1,6 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  ArrayNotEmpty,
+  ArrayUnique,
+  IsArray,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -9,17 +14,23 @@ import {
   Length,
   ValidateNested,
 } from 'class-validator';
-import { TelefoneHelper } from 'src/shared/helpers/telefone.helper';
+import { Categoria } from '../../../../shared/enums/categoria.enum';
+import { TelefoneHelper } from '../../../../shared/helpers/telefone.helper';
 import { CreateUsuarioDto } from '../../../sistema/usuario/dto/create-usuario.dto';
-import { Categoria } from '../enum/categoria.enum';
+
+class UsuarioDto extends OmitType(CreateUsuarioDto, ['contatoId']) {}
+
 export class CreateContatoDto {
-  @ApiProperty({ example: 'Danillo Ilggner', description: 'Nome do contato.' })
   @IsString()
+  @ApiProperty({ example: 'Danillo Silva' })
   readonly nome: string;
 
-  @IsNotEmpty()
-  @IsEnum(Categoria)
-  categoria: Categoria;
+  @ArrayMinSize(1)
+  @ArrayMaxSize(7)
+  @ArrayNotEmpty()
+  @ArrayUnique()
+  @IsEnum(Categoria, { each: true })
+  readonly categorias: Categoria[];
 
   @ApiProperty({
     example: '62123456789',
@@ -34,10 +45,10 @@ export class CreateContatoDto {
       'Propriedade <telefone> inválida. Modelo válido: <ddd><numero>. Exemplo: 62123456789. Consulte a documentação para mais detalhes.',
   })
   @Transform(({ value }) => TelefoneHelper.format(value.toString()))
-  telefone?: string | number;
+  readonly telefone?: string | number;
 
   @IsOptional()
   @ValidateNested()
   @Type(() => CreateUsuarioDto)
-  readonly usuario?: CreateUsuarioDto;
+  readonly usuario?: UsuarioDto;
 }

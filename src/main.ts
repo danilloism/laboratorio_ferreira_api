@@ -12,7 +12,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
       enableDebugMessages: true,
-      validationError: { target: true, value: true },
     }),
   );
 
