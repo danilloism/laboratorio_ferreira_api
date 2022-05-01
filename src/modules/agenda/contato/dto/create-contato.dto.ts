@@ -45,8 +45,8 @@ export class CreateContatoDto {
     message:
       'Propriedade <telefone> inválida. Modelo válido: <ddd><numero>. Exemplo: 62123456789. Consulte a documentação para mais detalhes.',
   })
-  @Transform(({ value }) => TelefoneHelper.format(value.toString()))
-  readonly telefone?: string | number;
+  @Transform(({ value }) => TelefoneHelper.format(value))
+  readonly telefone?: string;
 
   @ApiProperty({ type: CreateUsuarioDto })
   @IsOptional()
