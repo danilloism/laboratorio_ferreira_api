@@ -21,20 +21,22 @@ export class HttpExceptionHelper {
     throw new HttpException(result, erro.getStatus());
   }
 
-  static throwBadRequestException(message?: string): never {
+  static throwBadRequestException(message?: string, erro?: any): never {
     throw new BadRequestException(
       new ResultDto({
         sucesso: false,
         mensagem: message || 'Falha desconhecida ao realizar operação.',
+        erro,
       }),
     );
   }
 
-  static throwNotFoundException(message?: string): never {
+  static throwNotFoundException(message?: string, erro?: any): never {
     throw new NotFoundException(
       new ResultDto({
         sucesso: false,
-        mensagem: message || 'Recurso não encontrado.',
+        mensagem: message || 'Erro ao realizar requisição.',
+        erro: erro || 'Recurso não encontrado.',
       }),
     );
   }
