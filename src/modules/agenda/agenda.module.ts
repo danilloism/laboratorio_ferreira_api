@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ContatoController } from './contato/controller/contato.controller';
-import { ContatoService } from './contato/service/contato.service';
+import { ContatoModule } from './contato/contato.module';
 
 @Module({
-  controllers: [ContatoController],
-  providers: [ContatoService],
+  imports: [ContatoModule],
+  controllers: [],
+  providers: [],
 })
 export class AgendaModule {}

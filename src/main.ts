@@ -40,7 +40,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT || 3000, () => {
     const logger = new Logger('Servidor');
-    logger.log(`Servidor iniciado na porta: ${app.getHttpServer()}`);
+    logger.log('Servidor iniciado');
 
     if (process.env.NODE_ENV == 'development') {
       fs.writeFileSync('./doc/api.doc.json', JSON.stringify(document));

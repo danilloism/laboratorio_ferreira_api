@@ -1,5 +1,5 @@
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+
 import {
   IsEmail,
   IsOptional,
@@ -10,10 +10,8 @@ import {
 } from 'class-validator';
 
 export class CreateUsuarioDto {
-  @Exclude()
   @IsUUID()
   @IsOptional()
-  @ApiHideProperty()
   readonly contatoId: string;
 
   @ApiProperty({ example: 'nomeusuario' })
