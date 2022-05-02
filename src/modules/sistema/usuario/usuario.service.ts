@@ -35,54 +35,48 @@ export class UsuarioService {
           data: data,
         })
       : HttpExceptionHelper.throwNotFoundException(
+          undefined,
           'Usuário não existe ou foi deletado.',
         );
   }
 
-  async delete({
-    id,
-    email,
-    username,
-  }: {
-    id?: string;
-    email?: string;
-    username?: string;
-  }): Promise<void> {
+  async delete(id: string): Promise<void> {
     const usuario = await this.prisma.usuario.findUnique({
-      where: { contatoId: id, email, username },
+      where: { contatoId: id },
     });
 
-    if (!usuario || !usuario.ativo) {
-      HttpExceptionHelper.throwNotFoundException();
-    }
-
-    await this.prisma.usuario.update({
-      where: { contatoId: id, email, username },
-      data: { ativo: false },
-    });
-  }
-
-  async recover({
-    id,
-    email,
-    username,
-  }: {
-    id?: string;
-    email?: string;
-    username?: string;
-  }): Promise<void> {
-    const usuario = await this.prisma.usuario.findUnique({
-      where: { contatoId: id, email, username },
-    });
-
-    if (!usuario || usuario.ativo) {
+    if (!usuario) {
       HttpExceptionHelper.throwNotFoundException(
-        'Usuário não existe ou não está na lixeira.',
+        'Erro ao deletar usuário.',
+        'Usuário não encontrado.',
+      );
+    } else if (!usuario.ativo) {
+      HttpExceptionHelper.throwNotFoundException(
+        'Erro ao deletar usuário.',
+        'Usuário já foi deletado.',
       );
     }
 
     await this.prisma.usuario.update({
-      where: { contatoId: id, email, username },
+      where: { contatoId: id },
+      data: { ativo: false },
+    });
+  }
+
+  async recover(id: string): Promise<Usuario> {
+    const usuario = await this.prisma.usuario.findUnique({
+      where: { contatoId: id },
+    });
+
+    if (!usuario || usuario.ativo) {
+      HttpExceptionHelper.throwNotFoundException(
+        'Erro ao recuperar usuário.',
+        'Usuário não existe ou não está na lixeira.',
+      );
+    }
+
+    return await this.prisma.usuario.update({
+      where: { contatoId: id },
       data: { ativo: true },
     });
   }
@@ -96,6 +90,6 @@ export class UsuarioService {
   }
 
   async findAll(): Promise<Usuario[]> {
-    return await this.prisma.usuario.findMany();
+    return await this.prisma.usuario.findMany({ where: { ativo: true } });
   }
 }
