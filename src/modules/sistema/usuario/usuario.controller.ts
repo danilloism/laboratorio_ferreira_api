@@ -3,21 +3,16 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Usuario } from '@prisma/client';
-import { CreateContatoDto } from 'src/modules/agenda/contato/dto/create-contato.dto';
-import { ContatoService } from 'src/modules/agenda/contato/service/contato.service';
 import { ResultDto } from 'src/shared/dtos/result.dto';
 import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
-import { Categoria } from '../shared/enum/categoria.enum';
 import { RoleInterceptor } from '../shared/interceptor/role.interceptor';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
@@ -75,7 +70,7 @@ export class UsuarioController {
     });
   }
 
-  @Put('lixeira/:id')
+  @Patch('lixeira/:id')
   async recover(@Param('id') id: string) {
     const usuario = await this.usuarioService.recover(id).catch(err => {
       HttpExceptionHelper.throwHttpExceptionFromHttpException(
