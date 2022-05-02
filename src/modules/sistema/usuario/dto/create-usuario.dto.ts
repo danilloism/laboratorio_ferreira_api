@@ -10,10 +10,8 @@ import {
 } from 'class-validator';
 
 export class CreateUsuarioDto {
-  @Exclude()
   @IsUUID()
   @IsOptional()
-  @ApiHideProperty()
   readonly contatoId: string;
 
   @ApiProperty({ example: 'nomeusuario' })

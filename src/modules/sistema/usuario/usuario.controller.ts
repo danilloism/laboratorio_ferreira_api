@@ -19,6 +19,8 @@ import { ResultDto } from 'src/shared/dtos/result.dto';
 import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
 import { Categoria } from '../shared/enum/categoria.enum';
 import { RoleInterceptor } from '../shared/interceptor/role.interceptor';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { UsuarioService } from './usuario.service';
 
 @ApiTags('Usuários')
@@ -87,5 +89,26 @@ export class UsuarioController {
       mensagem: 'Usuário recuperado com sucesso.',
       dados: usuario,
     });
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
+  ) {
+    return await this.usuarioService
+      .update(id, updateUsuarioDto)
+      .catch(err =>
+        HttpExceptionHelper.throwHttpExceptionFromHttpException(err),
+      );
+  }
+
+  @Post()
+  async create(@Body() createUsuarioDto: CreateUsuarioDto) {
+    return await this.usuarioService
+      .create(createUsuarioDto)
+      .catch(err =>
+        HttpExceptionHelper.throwHttpExceptionFromHttpException(err),
+      );
   }
 }

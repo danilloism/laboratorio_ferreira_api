@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Categoria, Usuario } from '@prisma/client';
 import { HttpExceptionHelper } from '../../../shared/helpers/http-exception.helper';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
 @Injectable()
@@ -91,5 +92,39 @@ export class UsuarioService {
 
   async findAll(): Promise<Usuario[]> {
     return await this.prisma.usuario.findMany({ where: { ativo: true } });
+  }
+
+  async create(data: CreateUsuarioDto): Promise<Usuario> {
+    const contato = await this.prisma.contato.findUnique({
+      where: { id: data.contatoId },
+    });
+
+    const existeEmail = await this.findByEmail(data.email);
+    const existeUsername = await this.findByUsername(data.username);
+    const existeUsuario = await this.findById(data.contatoId);
+
+    if (!contato) {
+      HttpExceptionHelper.throwNotFoundException(
+        'Erro ao criar usuário.',
+        'Contato informado não encontrado.',
+      );
+    } else if (existeUsuario) {
+      HttpExceptionHelper.throwBadRequestException(
+        'Erro ao criar usuário.',
+        'Contato informado já possui usuário cadastrado. Verifique se ele não foi deletado.',
+      );
+    } else if (existeEmail) {
+      HttpExceptionHelper.throwBadRequestException(
+        'Erro ao criar usuário.',
+        'Email informado já está em uso.',
+      );
+    } else if (existeUsername) {
+      HttpExceptionHelper.throwBadRequestException(
+        'Erro ao criar usuário.',
+        'Username informado já está em uso.',
+      );
+    }
+
+    return await this.prisma.usuario.create({ data });
   }
 }
