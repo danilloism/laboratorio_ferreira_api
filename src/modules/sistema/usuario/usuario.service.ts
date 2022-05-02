@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Categoria, Usuario } from '@prisma/client';
+import { PasswordHelper } from 'src/shared/helpers/password.helper';
 import { HttpExceptionHelper } from '../../../shared/helpers/http-exception.helper';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -100,7 +101,9 @@ export class UsuarioService {
     });
 
     const existeEmail = await this.findByEmail(data.email);
-    const existeUsername = await this.findByUsername(data.username);
+    const existeUsername = data.username
+      ? await this.findByUsername(data.username)
+      : false;
     const existeUsuario = await this.findById(data.contatoId);
 
     if (!contato) {
@@ -125,6 +128,11 @@ export class UsuarioService {
       );
     }
 
-    return await this.prisma.usuario.create({ data });
+    const senha = await new PasswordHelper(data.senha).encrypt();
+    data = { ...data, senha };
+
+    return await this.prisma.usuario.create({ data }).catch(err => {
+      throw err;
+    });
   }
 }
