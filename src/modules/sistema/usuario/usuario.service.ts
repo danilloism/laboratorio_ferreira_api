@@ -135,4 +135,10 @@ export class UsuarioService {
       throw err;
     });
   }
+
+  async getDeleted() {
+    return await this.prisma.usuario.findMany({
+      where: { ativo: false },
+    });
+  }
 }

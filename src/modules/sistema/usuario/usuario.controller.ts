@@ -106,4 +106,9 @@ export class UsuarioController {
         HttpExceptionHelper.throwHttpExceptionFromHttpException(err),
       );
   }
+
+  @Get('lixeira')
+  async getDeleted() {
+    return await this.usuarioService.getDeleted();
+  }
 }
