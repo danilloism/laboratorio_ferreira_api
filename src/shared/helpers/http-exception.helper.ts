@@ -25,7 +25,7 @@ export class HttpExceptionHelper {
     throw new BadRequestException(
       new ResultDto({
         sucesso: false,
-        mensagem: message ?? 'Falha desconhecida ao realizar operação.',
+        mensagem: message || 'Falha desconhecida ao realizar operação.',
       }),
     );
   }
@@ -34,7 +34,7 @@ export class HttpExceptionHelper {
     throw new NotFoundException(
       new ResultDto({
         sucesso: false,
-        erro: message ?? 'Recurso não encontrado.',
+        mensagem: message || 'Recurso não encontrado.',
       }),
     );
   }
