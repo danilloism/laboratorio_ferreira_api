@@ -5,11 +5,12 @@ import { AppModule } from './app.module';
 import { PrismaService } from './modules/sistema/prisma/prisma.service';
 import * as compression from 'compression';
 import * as fs from 'fs';
-import { join } from 'path';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(helmet());
   app.use(compression());
 
   app.useGlobalPipes(
