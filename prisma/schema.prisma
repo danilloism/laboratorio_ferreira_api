@@ -114,6 +114,8 @@ enum EstaoFabricacao {
   recebido
   fabricando
   concluido
+
+  @@map("estado_fabricacao")
 }
 
 //======//CAIXA//======//
