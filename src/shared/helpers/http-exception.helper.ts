@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpException,
   NotFoundException,
 } from '@nestjs/common';
@@ -39,6 +40,16 @@ export class HttpExceptionHelper {
       new ResultDto({
         sucesso: false,
         mensagem: message || 'Falha ao realizar operação.',
+        erro,
+      }),
+    );
+  }
+
+  static throwForbiddenException(message?: string, erro?: any): never {
+    throw new ForbiddenException(
+      new ResultDto({
+        sucesso: false,
+        mensagem: message || 'Erro de autorização.',
         erro,
       }),
     );
