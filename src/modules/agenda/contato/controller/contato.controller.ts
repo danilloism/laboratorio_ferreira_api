@@ -15,7 +15,6 @@ import { CreateContatoDto } from '../dto/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
 import { HttpExceptionHelper } from '../../../../shared/helpers/http-exception.helper';
 import { DentistaEspOdontRoleInterceptor } from '../../../sistema/shared/interceptor/dentista-esp-odont-role.interceptor';
-import { TelefoneHelper } from 'src/shared/helpers/telefone.helper';
 
 @ApiTags('Contatos')
 @Controller('contatos')

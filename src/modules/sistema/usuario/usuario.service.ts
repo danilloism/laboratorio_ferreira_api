@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Categoria, Usuario } from '@prisma/client';
-import { PasswordHelper } from 'src/shared/helpers/password.helper';
+import { PasswordHelper } from '../../../shared/helpers/password.helper';
 import { HttpExceptionHelper } from '../../../shared/helpers/http-exception.helper';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';

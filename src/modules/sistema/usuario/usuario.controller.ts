@@ -11,8 +11,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ResultDto } from 'src/shared/dtos/result.dto';
-import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
+import { ResultDto } from '../../../shared/dtos/result.dto';
+import { HttpExceptionHelper } from '../../../shared/helpers/http-exception.helper';
 import { RoleInterceptor } from '../shared/interceptor/role.interceptor';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
