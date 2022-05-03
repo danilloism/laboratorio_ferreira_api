@@ -46,6 +46,8 @@ enum Categoria {
   entregador
   gerente
   admin
+
+  @@map("categoria")
 }
 
 //======//OPERACIONAL//======//
@@ -53,15 +55,24 @@ enum Categoria {
 //==estoque==//
 
 model Produto {
-  id        String  @id @default(uuid())
-  nome      String  @unique
+  id        String      @id @default(uuid())
+  nome      String      @unique
   descricao String?
-  tipo      String
+  tipo      TipoProduto
 
   historicoValores ValorProduto[]
   itemServicos     ItemServico[]
 
   @@map("produto")
+}
+
+enum TipoProduto {
+  pt
+  ppr
+  pino
+  restauracao
+
+  @@map("tipo_produto")
 }
 
 model ValorProduto {
@@ -90,11 +101,19 @@ model ItemServico {
   produto Produto @relation(fields: [produtoId], references: [id])
   servico Servico @relation(fields: [servicoId], references: [id])
 
-  produtoId String @map("produto_id")
-  servicoId String @map("servico_id")
+  produtoId        String          @map("produto_id")
+  servicoId        String          @map("servico_id")
+  quantidade       Int
+  estadoFabricacao EstaoFabricacao @map("estado_fabricacao")
 
   @@id([produtoId, servicoId])
   @@map("item_servico")
+}
+
+enum EstaoFabricacao {
+  recebido
+  fabricando
+  concluido
 }
 
 //======//CAIXA//======//
