@@ -56,7 +56,8 @@ enum Categoria {
 
 model Produto {
   id        String      @id @default(uuid())
-  nome      String      @unique
+  nome      String
+  marca     String?
   descricao String?
   tipo      TipoProduto
 
