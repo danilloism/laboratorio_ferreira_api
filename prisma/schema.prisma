@@ -82,6 +82,7 @@ model ValorProduto {
   id        String    @id @default(uuid())
   produtoId String    @map("produto_id")
   espOdont  Boolean   @map("esp_odont")
+  valor     Int
   dtInicio  DateTime  @default(now()) @map("dt_inicio")
   dtFim     DateTime? @map("dt_fim")
 
