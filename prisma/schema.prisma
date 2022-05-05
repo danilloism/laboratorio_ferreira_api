@@ -64,6 +64,7 @@ model Produto {
   historicoValores ValorProduto[]
   itemServicos     ItemServico[]
 
+  @@unique([nome, tipo])
   @@map("produto")
 }
 
@@ -79,12 +80,12 @@ enum TipoProduto {
 model ValorProduto {
   produto Produto @relation(fields: [produtoId], references: [id])
 
-  id        String    @id @default(uuid())
-  produtoId String    @map("produto_id")
-  espOdont  Boolean   @map("esp_odont")
-  valor     Int
-  dtInicio  DateTime  @default(now()) @map("dt_inicio")
-  dtFim     DateTime? @map("dt_fim")
+  id              String    @id @default(uuid())
+  produtoId       String    @map("produto_id")
+  espOdont        Boolean   @map("esp_odont")
+  valorEmCentavos Int       @map("valor_em_cents")
+  dtInicio        DateTime  @default(now()) @map("dt_inicio")
+  dtFim           DateTime? @map("dt_fim")
 
   @@map("valor_produto")
 }
@@ -103,12 +104,13 @@ model ItemServico {
   produto Produto @relation(fields: [produtoId], references: [id])
   servico Servico @relation(fields: [servicoId], references: [id])
 
+  id               String          @id @default(uuid())
   produtoId        String          @map("produto_id")
   servicoId        String          @map("servico_id")
   quantidade       Int
   estadoFabricacao EstaoFabricacao @map("estado_fabricacao")
 
-  @@id([produtoId, servicoId])
+  @@unique([produtoId, servicoId])
   @@map("item_servico")
 }
 
