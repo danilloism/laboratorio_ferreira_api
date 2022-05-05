@@ -6,12 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { ProdutoService } from './produto.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 
-@Controller('produto')
+@Controller('produtos')
 export class ProdutoController {
   constructor(private readonly produtoService: ProdutoService) {}
 
@@ -27,12 +28,12 @@ export class ProdutoController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.produtoService.findOne(+id);
+    return this.produtoService.getProdutoComValorAtual(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto) {
-    return this.produtoService.update(+id, updateProdutoDto);
+    return this.produtoService.update(id, updateProdutoDto);
   }
 
   @Delete(':id')
