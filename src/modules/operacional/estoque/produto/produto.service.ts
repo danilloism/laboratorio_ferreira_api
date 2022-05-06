@@ -72,6 +72,17 @@ export class ProdutoService {
     return produtos;
   }
 
+  async getHistoricoValores(id: string) {
+    const produto = await this.prisma.produto.findUnique({ where: { id } });
+    if (!produto) {
+      HttpExceptionHelper.throwNotFoundException();
+    }
+
+    return await this.prisma.valorProduto.findMany({
+      where: { produtoId: id },
+    });
+  }
+
   async update(id: string, updateProdutoDto: UpdateProdutoDto) {
     const { valorDentista, valorEspOdont } = updateProdutoDto;
 
@@ -180,7 +191,7 @@ export class ProdutoService {
     return await this.getProdutoComValorAtual(id);
   }
 
-  remove(id: number) {
+  remove(id: string) {
     throw new Error('Não implementado');
   }
 }

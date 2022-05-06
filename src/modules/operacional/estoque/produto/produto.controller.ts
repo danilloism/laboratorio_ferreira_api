@@ -17,32 +17,35 @@ export class ProdutoController {
   constructor(private readonly produtoService: ProdutoService) {}
 
   @Post()
-  create(@Body() createProdutoDto: CreateProdutoDto) {
-    return this.produtoService.create(createProdutoDto);
+  async create(@Body() createProdutoDto: CreateProdutoDto) {
+    return await this.produtoService.create(createProdutoDto);
   }
 
   @Get()
-  findAll() {
-    return this.produtoService.findAll();
+  async findAll() {
+    return await this.produtoService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.produtoService.getProdutoComValorAtual(id);
+  async findOne(@Param('id') id: string) {
+    return await this.produtoService.getProdutoComValorAtual(id);
   }
 
   @Get(':id/historico-valores')
   async getHistoricoValores(@Param('id') id: string) {
-    throw new NotImplementedException('Não implementado');
+    return await this.produtoService.getHistoricoValores(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateProdutoDto: UpdateProdutoDto) {
-    return this.produtoService.update(id, updateProdutoDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateProdutoDto: UpdateProdutoDto,
+  ) {
+    return await this.produtoService.update(id, updateProdutoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.produtoService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.produtoService.remove(id);
   }
 }
