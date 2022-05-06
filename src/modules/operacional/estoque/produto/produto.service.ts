@@ -16,7 +16,7 @@ export class ProdutoService {
     console.log(data);
     console.log(valores);
 
-    await this.prisma.produto
+    const produto = await this.prisma.produto
       .create({
         data: { ...data, historicoValores: { create: valores } },
       })
@@ -26,6 +26,10 @@ export class ProdutoService {
           'Erro desconhecido.',
         );
       });
+
+    return produto
+      ? await this.getProdutoComValorAtual(produto.id)
+      : HttpExceptionHelper.throwInternalServerException();
   }
 
   async getProdutoComValorAtual(id: string) {
