@@ -124,6 +124,20 @@ export class ProdutoService {
       return await this.getProdutoComValorAtual(id);
     }
 
+    if (!valorDentista && !valorEspOdont) {
+      this.prisma.produto.update({
+        where: { id },
+        data: {
+          marca: updateProdutoDto.marca,
+          nome: updateProdutoDto.nome,
+          descricao: updateProdutoDto.descricao,
+          tipo: updateProdutoDto.tipo,
+        },
+      });
+
+      return await this.getProdutoComValorAtual(id);
+    }
+
     if (valorDentista) {
       await this.prisma.$transaction([
         this.prisma.valorProduto.update({

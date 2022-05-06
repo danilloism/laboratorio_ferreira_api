@@ -3,10 +3,10 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
+  NotImplementedException,
 } from '@nestjs/common';
 import { ProdutoService } from './produto.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
@@ -29,6 +29,11 @@ export class ProdutoController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.produtoService.getProdutoComValorAtual(id);
+  }
+
+  @Get(':id/historico-valores')
+  async getHistoricoValores(@Param('id') id: string) {
+    throw new NotImplementedException('Não implementado');
   }
 
   @Put(':id')
