@@ -1,11 +1,4 @@
-import {
-  IsCurrency,
-  IsEnum,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 import { TipoProduto } from '../enum/tipo-produto.enum';
 
 export class CreateProdutoDto {
@@ -25,9 +18,9 @@ export class CreateProdutoDto {
 
   @IsInt()
   @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 })
-  readonly valorEspOdontEmCentavos: number;
+  readonly valorEspOdont: number;
 
   @IsInt()
   @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 })
-  readonly valorDentistaEmCentavos: number;
+  readonly valorDentista: number;
 }

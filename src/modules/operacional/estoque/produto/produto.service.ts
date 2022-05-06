@@ -41,7 +41,7 @@ export class ProdutoService {
       : valores[0].valorEmCentavos;
 
     Object.assign(produto, {
-      valorEspOdontEmCentavos: valorEspOdont,
+      valorEspOdont: valorEspOdont,
       valorDentista: valorDentista,
     });
 
@@ -63,7 +63,7 @@ export class ProdutoService {
         : valores[0].valorEmCentavos;
 
       Object.assign(produto, {
-        valorEspOdontEmCentavos: valorEspOdont,
+        valorEspOdont: valorEspOdont,
         valorDentista: valorDentista,
       });
     }
@@ -72,22 +72,21 @@ export class ProdutoService {
   }
 
   async update(id: string, updateProdutoDto: UpdateProdutoDto) {
-    const { valorDentistaEmCentavos, valorEspOdontEmCentavos } =
-      updateProdutoDto;
+    const { valorDentista, valorEspOdont } = updateProdutoDto;
 
     const valores = {
-      dentista: valorDentistaEmCentavos
+      dentista: valorDentista
         ? {
             produtoId: id,
             espOdont: false,
-            valorEmCentavos: valorDentistaEmCentavos,
+            valorEmCentavos: valorDentista,
           }
         : undefined,
-      espOdont: valorEspOdontEmCentavos
+      espOdont: valorEspOdont
         ? {
             produtoId: id,
             espOdont: true,
-            valorEmCentavos: valorEspOdontEmCentavos,
+            valorEmCentavos: valorEspOdont,
           }
         : undefined,
     };
@@ -102,27 +101,56 @@ export class ProdutoService {
       valor => !valor.espOdont,
     ).id;
 
+    if (valorDentista && valorEspOdont) {
+      await this.prisma.$transaction([
+        this.prisma.valorProduto.updateMany({
+          where: { produtoId: id, dtFim: { equals: null } },
+          data: { dtFim: new Date() },
+        }),
+        this.prisma.valorProduto.createMany({
+          data: [valores.dentista, valores.espOdont],
+        }),
+        this.prisma.produto.update({
+          where: { id },
+          data: {
+            marca: updateProdutoDto.marca,
+            nome: updateProdutoDto.nome,
+            descricao: updateProdutoDto.descricao,
+            tipo: updateProdutoDto.tipo,
+          },
+        }),
+      ]);
+
+      return await this.getProdutoComValorAtual(id);
+    }
+
+    if (valorDentista) {
+      await this.prisma.$transaction([
+        this.prisma.valorProduto.update({
+          where: { id: idValorDentistaAtual },
+          data: { dtFim: new Date() },
+        }),
+        this.prisma.valorProduto.create({ data: valores.dentista }),
+        this.prisma.produto.update({
+          where: { id },
+          data: {
+            marca: updateProdutoDto.marca,
+            nome: updateProdutoDto.nome,
+            descricao: updateProdutoDto.descricao,
+            tipo: updateProdutoDto.tipo,
+          },
+        }),
+      ]);
+
+      return await this.getProdutoComValorAtual(id);
+    }
+
     await this.prisma.$transaction([
-      valorDentistaEmCentavos
-        ? this.prisma.valorProduto.update({
-            where: { id: idValorDentistaAtual },
-            data: { dtFim: new Date() },
-          })
-        : undefined,
-
-      valorEspOdontEmCentavos
-        ? this.prisma.valorProduto.update({
-            where: { id: idValorEspOdontAtual },
-            data: { dtFim: new Date() },
-          })
-        : undefined,
-
-      valorDentistaEmCentavos
-        ? this.prisma.valorProduto.create({ data: valores.dentista })
-        : undefined,
-      valorEspOdontEmCentavos
-        ? this.prisma.valorProduto.create({ data: valores.espOdont })
-        : undefined,
+      this.prisma.valorProduto.update({
+        where: { id: idValorEspOdontAtual },
+        data: { dtFim: new Date() },
+      }),
+      this.prisma.valorProduto.create({ data: valores.espOdont }),
       this.prisma.produto.update({
         where: { id },
         data: {

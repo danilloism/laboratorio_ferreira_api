@@ -8,13 +8,16 @@ export class CreateProdutoDtoHelper {
         marca: createProdutoDto.marca,
         tipo: createProdutoDto.tipo,
       },
-      valores: [ {
-        espOdont: true,
-        valorEmCentavos: createProdutoDto.valorEspOdontEmCentavos,
-      }, {
-        espOdont: false,
-        valorEmCentavos: createProdutoDto.valorDentistaEmCentavos,
-      } ],
+      valores: [
+        {
+          espOdont: true,
+          valorEmCentavos: createProdutoDto.valorEspOdont,
+        },
+        {
+          espOdont: false,
+          valorEmCentavos: createProdutoDto.valorDentista,
+        },
+      ],
     };
   }
 }
