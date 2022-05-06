@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
 import { PrismaService } from '../../../sistema/prisma/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
@@ -20,9 +21,9 @@ export class ProdutoService {
         data: { ...data, historicoValores: { create: valores } },
       })
       .catch(err => {
-        throw new HttpException(
-          { onde: 'Criar produto', erro: err },
-          HttpStatus.BAD_REQUEST,
+        HttpExceptionHelper.throwBadRequestException(
+          'Erro ao criar pedido.',
+          'Erro desconhecido.',
         );
       });
   }
@@ -51,7 +52,7 @@ export class ProdutoService {
   async findAll() {
     const produtos = await this.prisma.produto.findMany();
 
-    for (let produto of produtos) {
+    for (const produto of produtos) {
       const valores = await this.prisma.valorProduto.findMany({
         where: { produtoId: produto.id, dtFim: null },
       });

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
   Patch,
   Post,
@@ -25,42 +26,54 @@ export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
   @Get()
-  async find(
-    @Query('id') id?: string,
-    @Query('email') email?: string,
-    @Query('username') username?: string,
-  ) {
-    if (id || email || username) {
-      if ((id && (email || username)) || (email && username)) {
-        HttpExceptionHelper.throwBadRequestException(
-          'Requisição deve conter apenas um identificador.',
-        );
-      }
-
-      const usuario = id
-        ? await this.usuarioService.findById(id)
-        : email
-        ? await this.usuarioService.findByEmail(email)
-        : await this.usuarioService.findByUsername(username);
-
-      return usuario && usuario.ativo
-        ? usuario
-        : HttpExceptionHelper.throwNotFoundException(
-            undefined,
-            'Usuário não encontrado.',
-          );
-    }
-
+  async find() {
     return await this.usuarioService.findAll();
+  }
+
+  @Get(':id')
+  async getById(@Param('id') id: string) {
+    const usuario = await this.usuarioService.findById(id);
+
+    return usuario && usuario.ativo
+      ? usuario
+      : HttpExceptionHelper.throwNotFoundException(
+          undefined,
+          'Usuário não encontrado.',
+        );
+  }
+
+  @Get('by-email/:email')
+  async getByEmail(@Param() email: string) {
+    const usuario = await this.usuarioService.findById(email);
+
+    return usuario && usuario.ativo
+      ? usuario
+      : HttpExceptionHelper.throwNotFoundException(
+          undefined,
+          'Usuário não encontrado.',
+        );
+  }
+
+  @Get('by-username/:username')
+  async getByUsername(@Param() username: string) {
+    const usuario = await this.usuarioService.findById(username);
+
+    return usuario && usuario.ativo
+      ? usuario
+      : HttpExceptionHelper.throwNotFoundException(
+          undefined,
+          'Usuário não encontrado.',
+        );
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
     await this.usuarioService.delete(id).catch(err => {
-      HttpExceptionHelper.throwHttpExceptionFromHttpException(
-        err,
-        'Erro ao deletar usuário.',
-      );
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      //TODO: fazer um result dto aqui
     });
 
     return new ResultDto({
@@ -73,10 +86,11 @@ export class UsuarioController {
   @Patch('lixeira/:id')
   async recover(@Param('id') id: string) {
     const usuario = await this.usuarioService.recover(id).catch(err => {
-      HttpExceptionHelper.throwHttpExceptionFromHttpException(
-        err,
-        'Erro ao recuperar usuário.',
-      );
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      //TODO: fazer um result dto aqui
     });
 
     return new ResultDto({
@@ -91,24 +105,28 @@ export class UsuarioController {
     @Param('id') id: string,
     @Body() updateUsuarioDto: UpdateUsuarioDto,
   ) {
-    return await this.usuarioService
-      .update(id, updateUsuarioDto)
-      .catch(err =>
-        HttpExceptionHelper.throwHttpExceptionFromHttpException(err),
-      );
+    return await this.usuarioService.update(id, updateUsuarioDto).catch(err => {
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      //TODO: fazer um result dto aqui
+    });
   }
 
   @Post()
   async create(@Body() createUsuarioDto: CreateUsuarioDto) {
-    return await this.usuarioService
-      .create(createUsuarioDto)
-      .catch(err =>
-        HttpExceptionHelper.throwHttpExceptionFromHttpException(err),
-      );
+    return await this.usuarioService.create(createUsuarioDto).catch(err => {
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      //TODO: fazer um result dto aqui
+    });
   }
 
   @Get('lixeira')
   async getDeleted() {
-    return await this.usuarioService.getDeleted();
+    return await this.usuarioService.getTrash();
   }
 }
