@@ -60,6 +60,7 @@ model Produto {
   marca     String?
   descricao String?
   tipo      TipoProduto
+  ativo     Boolean     @default(true)
 
   historicoValores ValorProduto[]
   itemServicos     ItemServico[]
