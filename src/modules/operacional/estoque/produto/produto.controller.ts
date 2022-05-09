@@ -6,15 +6,18 @@ import {
   Param,
   Delete,
   Put,
-  NotImplementedException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProdutoService } from './produto.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
 import { ApiTags } from '@nestjs/swagger';
+import { RoleInterceptor } from 'src/modules/sistema/shared/interceptor/role.interceptor';
+import { Categoria } from 'src/modules/sistema/shared/enum/categoria.enum';
 
 @ApiTags('Produtos')
+@UseInterceptors(new RoleInterceptor(Categoria.GERENTE))
 @Controller('produtos')
 export class ProdutoController {
   constructor(private readonly produtoService: ProdutoService) {}
