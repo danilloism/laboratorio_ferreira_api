@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Produto } from '@prisma/client';
 import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
 import { PrismaService } from '../../../sistema/prisma/prisma.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
@@ -13,27 +14,41 @@ export class ProdutoService {
     const { data, valores } =
       CreateProdutoDtoHelper.normalize(createProdutoDto);
 
-    console.log(data);
-    console.log(valores);
+    const existeProduto = await this.prisma.produto.findUnique({
+      where: { nome_tipo: { nome: data.nome, tipo: data.tipo } },
+    });
+
+    if (existeProduto) {
+      HttpExceptionHelper.throwConflictException(
+        'Erro ao criar produto.',
+        'Produto com nome e tipo informados já existe.',
+      );
+    }
 
     const produto = await this.prisma.produto
       .create({
         data: { ...data, historicoValores: { create: valores } },
       })
-      .catch(err => {
-        HttpExceptionHelper.throwBadRequestException(
+      .catch(() => {
+        HttpExceptionHelper.throwInternalServerException(
           'Erro ao criar pedido.',
           'Erro desconhecido.',
         );
       });
 
-    return produto
-      ? await this.getProdutoComValorAtual(produto.id)
-      : HttpExceptionHelper.throwInternalServerException();
+    if (!produto) {
+      HttpExceptionHelper.throwInternalServerException();
+    }
+
+    return await this.getProdutoComValorAtual((produto as Produto).id);
   }
 
   async getProdutoComValorAtual(id: string) {
     const produto = await this.prisma.produto.findUnique({ where: { id } });
+
+    if (!produto) {
+      return;
+    }
     const valores = await this.prisma.valorProduto.findMany({
       where: { produtoId: produto.id, dtFim: null },
     });
@@ -88,6 +103,14 @@ export class ProdutoService {
   }
 
   async update(id: string, updateProdutoDto: UpdateProdutoDto) {
+    const existeProduto = await this.prisma.produto.findUnique({
+      where: { id },
+    });
+
+    if (!existeProduto) {
+      HttpExceptionHelper.throwNotFoundException();
+    }
+
     const { valorDentista, valorEspOdont } = updateProdutoDto;
 
     const valores = {

@@ -11,6 +11,7 @@ import {
 import { ProdutoService } from './produto.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
+import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
 
 @Controller('produtos')
 export class ProdutoController {
@@ -28,7 +29,12 @@ export class ProdutoController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return await this.produtoService.getProdutoComValorAtual(id);
+    const produto = await this.produtoService.getProdutoComValorAtual(id);
+    if (!produto) {
+      HttpExceptionHelper.throwNotFoundException();
+    }
+
+    return produto;
   }
 
   @Get(':id/historico-valores')
