@@ -10,6 +10,7 @@ import { CreateContatoDto } from '../dto/create-contato.dto';
 import { PasswordHelper } from '../../../../shared/helpers/password.helper';
 import type { PrismaException } from '../../../../shared/types/prisma-exception.type';
 import { PrismaService } from '../../../sistema/prisma/prisma.service';
+import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
 
 @Injectable()
 export class ContatoService {
@@ -50,8 +51,38 @@ export class ContatoService {
 
   async create({ nome, telefone, usuario, categorias }: CreateContatoDto) {
     if (usuario) {
+      const { email, username } = usuario;
+
+      const invalidaEmail = await this.prismaService.usuario.findUnique({
+        where: { email },
+      });
+      if (invalidaEmail) {
+        HttpExceptionHelper.throwConflictException(
+          'Erro ao criar contato.',
+          'Email informado já está em uso.',
+        );
+      }
+
+      const invalidaUsername = await this.prismaService.usuario.findUnique({
+        where: { username },
+      });
+      if (invalidaUsername) {
+        HttpExceptionHelper.throwConflictException(
+          'Erro ao criar contato.',
+          'Username informado já está em uso.',
+        );
+      }
+
       const senha = await new PasswordHelper(usuario.senha).encrypt();
       Object.assign(usuario, { ...usuario, senha: senha });
+    }
+
+    const invalidaTelefone = await this.findByTelefone(telefone);
+    if (invalidaTelefone) {
+      HttpExceptionHelper.throwConflictException(
+        'Erro ao criar contato.',
+        'Telefone já consta no sistema.',
+      );
     }
 
     return await this.prismaService.contato
@@ -73,17 +104,10 @@ export class ContatoService {
             : false,
         },
       })
-      .catch(err => {
-        const erro: PrismaException = err;
-        const target = erro.meta['target'] ?? undefined;
-        if (target == 'username' || target == 'email') {
-          throw new UnprocessableEntityException(
-            'Credenciais de usuário (email ou username) já cadastradas e associadas a um contato.',
-          );
-        }
-
-        throw new InternalServerErrorException(
-          'Erro desconhecido ao tentar criar contato.',
+      .catch(() => {
+        HttpExceptionHelper.throwInternalServerException(
+          'Erro ao criar contato',
+          'Erro desconhecido.',
         );
       });
   }
@@ -91,7 +115,10 @@ export class ContatoService {
   async update(id: string, atualizarContatoDto: UpdateContatoDto) {
     const valida = this.findById(id);
     if (!valida) {
-      throw new NotFoundException('Id informado não existe.');
+      HttpExceptionHelper.throwNotFoundException(
+        'Erro ao atualizar contato.',
+        'Contato não encontrado.',
+      );
     }
 
     return await this.prismaService.contato
@@ -100,8 +127,8 @@ export class ContatoService {
         data: atualizarContatoDto,
       })
       .catch(() => {
-        throw new InternalServerErrorException(
-          'Erro desconhecido ao tentar atualizar contato.',
+        HttpExceptionHelper.throwInternalServerException(
+          'Erro ao atualizar contato.',
         );
       });
   }

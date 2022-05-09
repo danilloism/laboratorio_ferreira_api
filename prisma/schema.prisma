@@ -46,6 +46,8 @@ enum Categoria {
   entregador
   gerente
   admin
+
+  @@map("categoria")
 }
 
 //======//OPERACIONAL//======//
@@ -53,25 +55,38 @@ enum Categoria {
 //==estoque==//
 
 model Produto {
-  id        String  @id @default(uuid())
-  nome      String  @unique
+  id        String      @id @default(uuid())
+  nome      String
+  marca     String?
   descricao String?
-  tipo      String
+  tipo      TipoProduto
+  ativo     Boolean     @default(true)
 
   historicoValores ValorProduto[]
   itemServicos     ItemServico[]
 
+  @@unique([nome, tipo])
   @@map("produto")
+}
+
+enum TipoProduto {
+  pt
+  ppr
+  pino
+  restauracao
+
+  @@map("tipo_produto")
 }
 
 model ValorProduto {
   produto Produto @relation(fields: [produtoId], references: [id])
 
-  id        String    @id @default(uuid())
-  produtoId String    @map("produto_id")
-  espOdont  Boolean   @map("esp_odont")
-  dtInicio  DateTime  @default(now()) @map("dt_inicio")
-  dtFim     DateTime? @map("dt_fim")
+  id              String    @id @default(uuid())
+  produtoId       String    @map("produto_id")
+  espOdont        Boolean   @map("esp_odont")
+  valorEmCentavos Int       @map("valor_em_cents")
+  dtInicio        DateTime  @default(now()) @map("dt_inicio")
+  dtFim           DateTime? @map("dt_fim")
 
   @@map("valor_produto")
 }
@@ -90,11 +105,22 @@ model ItemServico {
   produto Produto @relation(fields: [produtoId], references: [id])
   servico Servico @relation(fields: [servicoId], references: [id])
 
-  produtoId String @map("produto_id")
-  servicoId String @map("servico_id")
+  id               String          @id @default(uuid())
+  produtoId        String          @map("produto_id")
+  servicoId        String          @map("servico_id")
+  quantidade       Int
+  estadoFabricacao EstaoFabricacao @map("estado_fabricacao")
 
-  @@id([produtoId, servicoId])
+  @@unique([produtoId, servicoId])
   @@map("item_servico")
+}
+
+enum EstaoFabricacao {
+  recebido
+  fabricando
+  concluido
+
+  @@map("estado_fabricacao")
 }
 
 //======//CAIXA//======//

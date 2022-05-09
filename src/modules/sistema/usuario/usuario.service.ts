@@ -31,6 +31,26 @@ export class UsuarioService {
       where: { contatoId: id },
     });
 
+    const invalidaEmail = await this.prisma.usuario.findUnique({
+      where: { email: usuario?.email },
+    });
+    if (invalidaEmail && invalidaEmail.contatoId != id) {
+      HttpExceptionHelper.throwConflictException(
+        'Erro ao atualizar contato.',
+        'Email informado já está em uso.',
+      );
+    }
+
+    const invalidaUsername = await this.prisma.usuario.findUnique({
+      where: { username: usuario?.username },
+    });
+    if (invalidaUsername && invalidaUsername.contatoId != id) {
+      HttpExceptionHelper.throwConflictException(
+        'Erro ao atualizar contato.',
+        'Username informado já está em uso.',
+      );
+    }
+
     return usuario && usuario.ativo
       ? await this.prisma.usuario.update({
           where: { contatoId: id },
@@ -52,7 +72,9 @@ export class UsuarioService {
         'Erro ao deletar usuário.',
         'Usuário não encontrado.',
       );
-    } else if (!usuario.ativo) {
+    }
+
+    if (!usuario.ativo) {
       HttpExceptionHelper.throwNotFoundException(
         'Erro ao deletar usuário.',
         'Usuário já foi deletado.',
@@ -70,10 +92,17 @@ export class UsuarioService {
       where: { contatoId: id },
     });
 
-    if (!usuario || usuario.ativo) {
+    if (!usuario) {
       HttpExceptionHelper.throwNotFoundException(
         'Erro ao recuperar usuário.',
-        'Usuário não existe ou não está na lixeira.',
+        'Usuário não existe.',
+      );
+    }
+
+    if (usuario.ativo) {
+      HttpExceptionHelper.throwNotFoundException(
+        'Erro ao recuperar usuário.',
+        'Usuário não está na lixeira.',
       );
     }
 
@@ -111,18 +140,24 @@ export class UsuarioService {
         'Erro ao criar usuário.',
         'Contato informado não encontrado.',
       );
-    } else if (existeUsuario) {
-      HttpExceptionHelper.throwBadRequestException(
+    }
+
+    if (existeUsuario) {
+      HttpExceptionHelper.throwConflictException(
         'Erro ao criar usuário.',
         'Contato informado já possui usuário cadastrado. Verifique se ele não foi deletado.',
       );
-    } else if (existeEmail) {
-      HttpExceptionHelper.throwBadRequestException(
+    }
+
+    if (existeEmail) {
+      HttpExceptionHelper.throwConflictException(
         'Erro ao criar usuário.',
         'Email informado já está em uso.',
       );
-    } else if (existeUsername) {
-      HttpExceptionHelper.throwBadRequestException(
+    }
+
+    if (existeUsername) {
+      HttpExceptionHelper.throwConflictException(
         'Erro ao criar usuário.',
         'Username informado já está em uso.',
       );
@@ -136,7 +171,7 @@ export class UsuarioService {
     });
   }
 
-  async getDeleted() {
+  async getTrash() {
     return await this.prisma.usuario.findMany({
       where: { ativo: false },
     });

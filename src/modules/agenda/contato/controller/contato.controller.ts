@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Param,
   Post,
   Put,
@@ -42,7 +43,11 @@ export class ContatoController {
   @Post()
   async create(@Body() model: CreateContatoDto): Promise<ResultDto> {
     const contato = await this.service.create(model).catch(err => {
-      HttpExceptionHelper.throwHttpExceptionFromHttpException(err);
+      if (err instanceof HttpException) {
+        throw err;
+      }
+
+      //TODO: criar result dto para outros erros
     });
 
     return contato
@@ -62,7 +67,11 @@ export class ContatoController {
     const result = await this.service
       .update(id, atualizarContatoDto)
       .catch(err => {
-        HttpExceptionHelper.throwHttpExceptionFromHttpException(err);
+        if (err instanceof HttpException) {
+          throw err;
+        }
+
+        //TODO: criar result dto para outros erros
       });
 
     return new ResultDto({
