@@ -240,7 +240,12 @@ export class ProdutoService {
     return await this.getProdutoComValorAtual(id);
   }
 
-  remove(id: string) {
-    throw new Error('Não implementado');
+  async remove(id: string) {
+    const produtoExiste = await this.getProdutoComValorAtual(id);
+    if (!produtoExiste) {
+      HttpExceptionHelper.throwNotFoundException();
+    }
+
+    await this.prisma.produto.update({ where: { id }, data: { ativo: false } });
   }
 }
