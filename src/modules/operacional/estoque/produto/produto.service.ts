@@ -102,6 +102,28 @@ export class ProdutoService {
     });
   }
 
+  async getHistoricoValoresDentista(id: string) {
+    const produto = await this.prisma.produto.findUnique({ where: { id } });
+    if (!produto) {
+      HttpExceptionHelper.throwNotFoundException();
+    }
+
+    return await this.prisma.valorProduto.findMany({
+      where: { produtoId: id, espOdont: false },
+    });
+  }
+
+  async getHistoricoValoresEspOdont(id: string) {
+    const produto = await this.prisma.produto.findUnique({ where: { id } });
+    if (!produto) {
+      HttpExceptionHelper.throwNotFoundException();
+    }
+
+    return await this.prisma.valorProduto.findMany({
+      where: { produtoId: id, espOdont: true },
+    });
+  }
+
   async update(id: string, updateProdutoDto: UpdateProdutoDto) {
     const existeProduto = await this.prisma.produto.findUnique({
       where: { id },

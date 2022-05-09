@@ -12,7 +12,9 @@ import { ProdutoService } from './produto.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Produtos')
 @Controller('produtos')
 export class ProdutoController {
   constructor(private readonly produtoService: ProdutoService) {}
@@ -40,6 +42,16 @@ export class ProdutoController {
   @Get(':id/historico-valores')
   async getHistoricoValores(@Param('id') id: string) {
     return await this.produtoService.getHistoricoValores(id);
+  }
+
+  @Get(':id/historico-valores/esp-odont')
+  async getHistoricoValoresEspOdont(@Param('id') id: string) {
+    return await this.produtoService.getHistoricoValoresEspOdont(id);
+  }
+
+  @Get(':id/historico-valores/dentista')
+  async getHistoricoValoresDentista(@Param('id') id: string) {
+    return await this.produtoService.getHistoricoValoresDentista(id);
   }
 
   @Put(':id')
