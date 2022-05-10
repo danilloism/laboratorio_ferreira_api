@@ -24,7 +24,7 @@ model Contato {
 }
 
 model Usuario {
-  contato Contato @relation(fields: [contatoId], references: [id])
+  contato Contato @relation(fields: [contatoId], references: [id], onDelete: Restrict)
 
   contatoId String  @id @map("contato_id")
   email     String  @unique
@@ -55,31 +55,51 @@ enum Categoria {
 //==estoque==//
 
 model Produto {
-  id        String      @id @default(uuid())
+  tipoProduto TipoProduto @relation(fields: [tipo], references: [nome], onDelete: Restrict)
+
+  id        String  @id @default(uuid())
   nome      String
   marca     String?
   descricao String?
-  tipo      TipoProduto
-  ativo     Boolean     @default(true)
+  ativo     Boolean @default(true)
+  tipo      String
 
-  historicoValores ValorProduto[]
-  itemServicos     ItemServico[]
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+  atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
-  @@unique([nome, tipo])
+  historicoValores       ValorProduto[]
+  itemServicos           ItemServico[]
+  EtapaFabricacaoProduto EtapaFabricacaoProduto[]
+
   @@map("produto")
 }
 
-enum TipoProduto {
-  pt
-  ppr
-  pino
-  restauracao
+model EtapaFabricacaoProduto {
+  produto         Produto         @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  etapaFabricacao EtapaFabricacao @relation(fields: [etapa], references: [nome])
+
+  id        String @id @default(uuid())
+  etapa     String
+  ordem     Int
+  produtoId String
+
+  ItemServico ItemServico[]
+  @@unique([ordem, produtoId])
+  @@unique([etapa, produtoId])
+}
+
+model TipoProduto {
+  id        String  @id @default(uuid())
+  nome      String  @unique
+  descricao String?
+
+  Produto Produto[]
 
   @@map("tipo_produto")
 }
 
 model ValorProduto {
-  produto Produto @relation(fields: [produtoId], references: [id])
+  produto Produto @relation(fields: [produtoId], references: [id], onDelete: Restrict)
 
   id              String    @id @default(uuid())
   produtoId       String    @map("produto_id")
@@ -102,25 +122,31 @@ model Servico {
 }
 
 model ItemServico {
-  produto Produto @relation(fields: [produtoId], references: [id])
-  servico Servico @relation(fields: [servicoId], references: [id])
+  produto         Produto                @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+  servico         Servico                @relation(fields: [servicoId], references: [id], onDelete: Restrict)
+  etapaFabricacao EtapaFabricacaoProduto @relation(fields: [etapaId], references: [id], onDelete: SetNull)
 
-  id               String          @id @default(uuid())
-  produtoId        String          @map("produto_id")
-  servicoId        String          @map("servico_id")
-  quantidade       Int
-  estadoFabricacao EstaoFabricacao @map("estado_fabricacao")
+  id         String @id @default(uuid())
+  produtoId  String @map("produto_id")
+  servicoId  String @map("servico_id")
+  quantidade Int
+  etapaId    String
 
+  EtapaFabricacao   EtapaFabricacao? @relation(fields: [etapaFabricacaoId], references: [id])
+  etapaFabricacaoId String?
   @@unique([produtoId, servicoId])
   @@map("item_servico")
 }
 
-enum EstaoFabricacao {
-  recebido
-  fabricando
-  concluido
+model EtapaFabricacao {
+  id        String  @id @default(uuid())
+  nome      String  @unique
+  descricao String?
 
-  @@map("estado_fabricacao")
+  ItemServico            ItemServico[]
+  EtapaFabricacaoProduto EtapaFabricacaoProduto[]
+
+  @@map("etapa_fabricacao")
 }
 
 //======//CAIXA//======//
