@@ -133,6 +133,16 @@ export class ProdutoService {
       HttpExceptionHelper.throwNotFoundException();
     }
 
+    const existeNomeTipo = await this.prisma.produto.findUnique({
+      where: {
+        nome_tipo: { nome: updateProdutoDto.nome, tipo: updateProdutoDto.tipo },
+      },
+    });
+
+    if (existeNomeTipo && existeNomeTipo.id != id) {
+      HttpExceptionHelper.throwConflictException();
+    }
+
     const { valorDentista, valorEspOdont } = updateProdutoDto;
 
     const valores = {
