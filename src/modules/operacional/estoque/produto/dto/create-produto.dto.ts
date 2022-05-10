@@ -1,5 +1,4 @@
 import { IsEnum, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
-import { TipoProduto } from '../enum/tipo-produto.enum';
 
 export class CreateProdutoDto {
   @IsString()
@@ -9,8 +8,8 @@ export class CreateProdutoDto {
   @IsString()
   readonly marca?: string;
 
-  @IsEnum(TipoProduto)
-  readonly tipo: TipoProduto;
+  @IsString()
+  readonly tipo: string;
 
   @IsOptional()
   @IsString()

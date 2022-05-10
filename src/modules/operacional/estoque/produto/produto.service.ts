@@ -15,7 +15,7 @@ export class ProdutoService {
       CreateProdutoDtoHelper.normalize(createProdutoDto);
 
     const existeProduto = await this.prisma.produto.findUnique({
-      where: { nome_tipo: { nome: data.nome, tipo: data.tipo } },
+      where: { nome_tipo: { nome: data.nome, tipo: data.tipo ?? null } },
     });
 
     if (existeProduto) {
@@ -131,6 +131,16 @@ export class ProdutoService {
 
     if (!existeProduto) {
       HttpExceptionHelper.throwNotFoundException();
+    }
+
+    const tipo = await this.prisma.tipoProduto.findUnique({
+      where: { nome: updateProdutoDto.tipo },
+    });
+    if (!tipo) {
+      HttpExceptionHelper.throwBadRequestException(
+        'Erro ao atualizar produto.',
+        'Tipo informado não existe.',
+      );
     }
 
     const existeNomeTipo = await this.prisma.produto.findUnique({
@@ -257,5 +267,9 @@ export class ProdutoService {
     }
 
     await this.prisma.produto.update({ where: { id }, data: { ativo: false } });
+  }
+
+  async getTiposProduto() {
+    return (await this.prisma.tipoProduto.findMany()).map(tipo => tipo.nome);
   }
 }
