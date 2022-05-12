@@ -1,16 +1,16 @@
 import { Transform } from 'class-transformer';
 import {
-  IsArray,
-  IsEnum,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { StringHelper } from 'src/shared/helpers/string.helper';
+import { StringHelper } from '../../../../../shared/helpers/string.helper';
 
 export class CreateProdutoDto {
   @IsString()
+  @IsNotEmpty()
   readonly nome: string;
 
   @IsOptional()
@@ -19,7 +19,8 @@ export class CreateProdutoDto {
   readonly marca?: string;
 
   @IsString()
-  @Transform(({ value }) => StringHelper.capitalize(value.toLowerCase()))
+  @IsNotEmpty()
+  @Transform(({ value }) => value.toLowerCase())
   readonly tipo: string;
 
   @IsOptional()
@@ -28,13 +29,15 @@ export class CreateProdutoDto {
 
   @IsInt()
   @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 })
+  @IsNotEmpty()
   readonly valorEspOdont: number;
 
   @IsInt()
   @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 })
+  @IsNotEmpty()
   readonly valorDentista: number;
 
-  @IsOptional()
-  @IsString({ each: true })
-  readonly etapasFabricacao: string[];
+  // @IsOptional()
+  // @IsString({ each: true })
+  // readonly etapasFabricacao: string[];
 }

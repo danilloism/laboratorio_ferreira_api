@@ -11,10 +11,10 @@ import {
 import { ProdutoService } from './produto.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
-import { HttpExceptionHelper } from 'src/shared/helpers/http-exception.helper';
+import { HttpExceptionHelper } from '../../../../shared/helpers/http-exception.helper';
 import { ApiTags } from '@nestjs/swagger';
-import { RoleInterceptor } from 'src/modules/sistema/shared/interceptor/role.interceptor';
-import { Categoria } from 'src/modules/sistema/shared/enum/categoria.enum';
+import { RoleInterceptor } from '../../../sistema/shared/interceptor/role.interceptor';
+import { Categoria } from '../../../sistema/shared/enum/categoria.enum';
 
 @ApiTags('Produtos')
 @UseInterceptors(new RoleInterceptor(Categoria.GERENTE))
