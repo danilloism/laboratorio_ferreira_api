@@ -27,7 +27,19 @@ export class ProdutoService {
 
     const produto = await this.prisma.produto
       .create({
-        data: { ...data, historicoValores: { create: valores } },
+        data: {
+          nome: data.nome,
+          marca: data.marca,
+          historicoValores: { create: valores },
+          tipoProduto: {
+            connectOrCreate: {
+              where: { nome: data.tipo },
+              create: {
+                nome: data.tipo,
+              },
+            },
+          },
+        },
       })
       .catch(() => {
         HttpExceptionHelper.throwInternalServerException(
@@ -133,19 +145,12 @@ export class ProdutoService {
       HttpExceptionHelper.throwNotFoundException();
     }
 
-    const tipo = await this.prisma.tipoProduto.findUnique({
-      where: { nome: updateProdutoDto.tipo },
-    });
-    if (!tipo) {
-      HttpExceptionHelper.throwBadRequestException(
-        'Erro ao atualizar produto.',
-        'Tipo informado não existe.',
-      );
-    }
-
     const existeNomeTipo = await this.prisma.produto.findUnique({
       where: {
-        nome_tipo: { nome: updateProdutoDto.nome, tipo: updateProdutoDto.tipo },
+        nome_tipo: {
+          nome: updateProdutoDto.nome,
+          tipo: updateProdutoDto.tipo ?? null,
+        },
       },
     });
 
@@ -197,7 +202,12 @@ export class ProdutoService {
             marca: updateProdutoDto.marca,
             nome: updateProdutoDto.nome,
             descricao: updateProdutoDto.descricao,
-            tipo: updateProdutoDto.tipo,
+            tipoProduto: {
+              connectOrCreate: {
+                where: { nome: updateProdutoDto.nome },
+                create: { nome: updateProdutoDto.tipo },
+              },
+            },
           },
         }),
       ]);
@@ -212,7 +222,12 @@ export class ProdutoService {
           marca: updateProdutoDto.marca,
           nome: updateProdutoDto.nome,
           descricao: updateProdutoDto.descricao,
-          tipo: updateProdutoDto.tipo,
+          tipoProduto: {
+            connectOrCreate: {
+              where: { nome: updateProdutoDto.nome },
+              create: { nome: updateProdutoDto.tipo },
+            },
+          },
         },
       });
 
@@ -232,7 +247,12 @@ export class ProdutoService {
             marca: updateProdutoDto.marca,
             nome: updateProdutoDto.nome,
             descricao: updateProdutoDto.descricao,
-            tipo: updateProdutoDto.tipo,
+            tipoProduto: {
+              connectOrCreate: {
+                where: { nome: updateProdutoDto.nome },
+                create: { nome: updateProdutoDto.tipo },
+              },
+            },
           },
         }),
       ]);
@@ -252,7 +272,12 @@ export class ProdutoService {
           marca: updateProdutoDto.marca,
           nome: updateProdutoDto.nome,
           descricao: updateProdutoDto.descricao,
-          tipo: updateProdutoDto.tipo,
+          tipoProduto: {
+            connectOrCreate: {
+              where: { nome: updateProdutoDto.nome },
+              create: { nome: updateProdutoDto.tipo },
+            },
+          },
         },
       }),
     ]);
