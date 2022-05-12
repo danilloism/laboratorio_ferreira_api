@@ -56,7 +56,7 @@ enum Categoria {
 //==estoque==//
 
 model Produto {
-  tipoProduto TipoProduto @relation(fields: [tipo], references: [nome], onDelete: Restrict)
+  tipoProduto TipoProduto @relation(fields: [tipo], references: [nome], onDelete: Restrict, onUpdate: Cascade)
 
   id        String  @id @default(uuid())
   nome      String
@@ -78,7 +78,7 @@ model Produto {
 
 model EtapaFabricacaoProduto {
   produto         Produto         @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  etapaFabricacao EtapaFabricacao @relation(fields: [etapa], references: [nome])
+  etapaFabricacao EtapaFabricacao @relation(fields: [etapa], references: [nome], onUpdate: Cascade)
 
   id        String @id @default(uuid())
   etapa     String
@@ -126,7 +126,7 @@ model Servico {
 model ItemServico {
   produto         Produto                @relation(fields: [produtoId], references: [id], onDelete: Restrict)
   servico         Servico                @relation(fields: [servicoId], references: [id], onDelete: Restrict)
-  etapaFabricacao EtapaFabricacaoProduto @relation(fields: [etapaId], references: [id], onDelete: SetNull)
+  etapaFabricacao EtapaFabricacaoProduto @relation(fields: [etapaId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   id         String @id @default(uuid())
   produtoId  String @map("produto_id")
