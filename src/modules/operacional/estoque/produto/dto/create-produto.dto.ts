@@ -36,8 +36,4 @@ export class CreateProdutoDto {
   @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 })
   @IsNotEmpty()
   readonly valorDentista: number;
-
-  // @IsOptional()
-  // @IsString({ each: true })
-  // readonly etapasFabricacao: string[];
 }
