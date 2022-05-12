@@ -18,8 +18,6 @@ import { Categoria } from '../../../sistema/shared/enum/categoria.enum';
 import { TelefoneHelper } from '../../../../shared/helpers/telefone.helper';
 import { CreateUsuarioDto } from '../../../sistema/usuario/dto/create-usuario.dto';
 
-class UsuarioDto extends OmitType(CreateUsuarioDto, ['contatoId']) {}
-
 export class CreateContatoDto {
   @IsString()
   @ApiProperty({ example: 'Danillo Silva' })
@@ -48,9 +46,8 @@ export class CreateContatoDto {
   @Transform(({ value }) => TelefoneHelper.format(value))
   readonly telefone?: string;
 
-  @ApiProperty({ type: CreateUsuarioDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => CreateUsuarioDto)
-  readonly usuario?: UsuarioDto;
+  readonly usuario?: CreateUsuarioDto;
 }
