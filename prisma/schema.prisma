@@ -68,26 +68,11 @@ model Produto {
   criadoEm     DateTime  @default(now()) @map("criado_em")
   atualizadoEm DateTime? @updatedAt @map("atualizado_em")
 
-  historicoValores       ValorProduto[]
-  itemServicos           ItemServico[]
-  EtapaFabricacaoProduto EtapaFabricacaoProduto[]
+  historicoValores ValorProduto[]
+  itemServicos     ItemServico[]
 
   @@unique([nome, tipo])
   @@map("produto")
-}
-
-model EtapaFabricacaoProduto {
-  produto         Produto         @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  etapaFabricacao EtapaFabricacao @relation(fields: [etapa], references: [nome], onUpdate: Cascade)
-
-  id        String @id @default(uuid())
-  etapa     String
-  ordem     Int
-  produtoId String
-
-  ItemServico ItemServico[]
-  @@unique([ordem, produtoId])
-  @@unique([etapa, produtoId])
 }
 
 model TipoProduto {
@@ -124,9 +109,8 @@ model Servico {
 }
 
 model ItemServico {
-  produto         Produto                @relation(fields: [produtoId], references: [id], onDelete: Restrict)
-  servico         Servico                @relation(fields: [servicoId], references: [id], onDelete: Restrict)
-  etapaFabricacao EtapaFabricacaoProduto @relation(fields: [etapaId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  produto Produto @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+  servico Servico @relation(fields: [servicoId], references: [id], onDelete: Restrict)
 
   id         String @id @default(uuid())
   produtoId  String @map("produto_id")
@@ -145,8 +129,7 @@ model EtapaFabricacao {
   nome      String  @unique
   descricao String?
 
-  ItemServico            ItemServico[]
-  EtapaFabricacaoProduto EtapaFabricacaoProduto[]
+  ItemServico ItemServico[]
 
   @@map("etapa_fabricacao")
 }
