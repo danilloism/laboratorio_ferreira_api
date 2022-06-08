@@ -21,6 +21,8 @@ model Contato {
 
   usuario Usuario?
 
+  Servico         Servico[]
+  PacienteServico PacienteServico[]
   @@map("contato")
 }
 
@@ -100,11 +102,27 @@ model ValorProduto {
 
 //==prestação de serviços==//
 
-model Servico {
+model PacienteServico {
   id String @id @default(uuid())
 
+  paciente Contato @relation(fields: [pacienteId], references: [id])
+  servico  Servico @relation(fields: [servicoId], references: [id])
+
+  pacienteId String @map("paciente_id")
+  servicoId  String @map("servico_id")
+
+  @@unique([servicoId, pacienteId])
+  @@map("paciente_servico")
+}
+
+model Servico {
+  id           String        @id @default(uuid())
+  dentista     Contato       @relation(fields: [dentistaId], references: [id])
   itensServico ItemServico[]
 
+  dentistaId String @map("contato_id")
+
+  PacienteServico PacienteServico[]
   @@map("servico")
 }
 
@@ -116,10 +134,10 @@ model ItemServico {
   produtoId  String @map("produto_id")
   servicoId  String @map("servico_id")
   quantidade Int
-  etapaId    String
+  etapa      String
 
-  EtapaFabricacao   EtapaFabricacao? @relation(fields: [etapaFabricacaoId], references: [id])
-  etapaFabricacaoId String?
+  EtapaFabricacao EtapaFabricacao @relation(fields: [etapa], references: [nome])
+
   @@unique([produtoId, servicoId])
   @@map("item_servico")
 }
