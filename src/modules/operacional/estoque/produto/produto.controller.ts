@@ -13,7 +13,7 @@ import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { HttpExceptionHelper } from '../../../../shared/helpers/http-exception.helper';
 import { ApiTags } from '@nestjs/swagger';
-import { RoleInterceptor } from '../../../sistema/shared/interceptor/role.interceptor';
+import { RoleInterceptor } from '../../../sistema/auth/interceptors/role.interceptor';
 
 @ApiTags('Produtos')
 @UseInterceptors(new RoleInterceptor('gerente'))

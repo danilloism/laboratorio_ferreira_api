@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpCode,
@@ -23,13 +24,22 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() login: LoginDto) {
+    if (!login.email && !login.username) {
+      const result = new ResultDto({
+        sucesso: false,
+        mensagem: 'Erro ao realizar login.',
+        erro: 'Deve ser informado pelo menos username ou email.',
+      });
+      throw new BadRequestException(result);
+    }
+
     const usuario = await this.authService
       .authenticate(login.username || login.email, login.senha)
       .catch(err => {
         const result = new ResultDto({
           sucesso: false,
           mensagem: 'Erro ao autenticar usuário.',
-          erro: err,
+          erro: err.message,
         });
 
         throw new NotFoundException(result);
@@ -38,7 +48,8 @@ export class AuthController {
     if (!usuario) {
       const result = new ResultDto({
         sucesso: false,
-        mensagem: 'Usuário ou senha inválidos.',
+        mensagem: 'Erro ao realizar login.',
+        erro: 'Usuário ou senha inválidos.',
       });
       throw new NotFoundException(result);
     }

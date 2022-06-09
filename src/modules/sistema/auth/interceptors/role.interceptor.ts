@@ -9,7 +9,7 @@ import {
 import { Categoria } from '@prisma/client';
 import { Observable } from 'rxjs';
 import { ResultDto } from '../../../../shared/dtos/result.dto';
-import { JwtPayload } from '../../auth';
+import { JwtPayload } from '..';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {

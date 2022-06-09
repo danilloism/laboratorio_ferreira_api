@@ -8,6 +8,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Put,
   UseInterceptors,
@@ -19,10 +20,8 @@ import { CreateContatoDto } from '../dto/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { UpdateAccountDto } from '../dto/update-account.dto';
-import { IsPublic } from '../../../sistema/auth/decorators/is-public.decorator';
 import { Contato, Usuario } from '@prisma/client';
 
-@IsPublic()
 @ApiTags('Contatos')
 @Controller('contatos')
 export class ContatoController {
@@ -208,6 +207,27 @@ export class ContatoController {
     return new ResultDto({
       sucesso: true,
       mensagem: 'Conta de usuário deletada com sucesso.',
+    });
+  }
+
+  @Patch(':id/account/recover')
+  async recoverAccount(@Param('id') id: string) {
+    await this.contatoService.recoverAccount(id).catch(err => {
+      const result = new ResultDto({
+        sucesso: false,
+        mensagem: 'Erro ao recuperar conta de usuário.',
+        erro: err.message,
+      });
+
+      throw new HttpException(
+        result,
+        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
+      );
+    });
+
+    return new ResultDto({
+      sucesso: true,
+      mensagem: 'Conta de usuário recuperada com sucesso.',
     });
   }
 }

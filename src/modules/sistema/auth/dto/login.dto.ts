@@ -6,9 +6,10 @@ export class LoginDto {
   @Transform(({ value }) => value.toLowerCase())
   username?: string;
 
+  @IsOptional()
   @IsEmail()
   @Transform(({ value }) => value.toLowerCase())
-  email: string;
+  email?: string;
 
   @IsNotEmpty()
   senha: string;
