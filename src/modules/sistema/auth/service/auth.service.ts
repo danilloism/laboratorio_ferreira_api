@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../payload/jwt-payload.interface';
-import { PasswordHelper } from '../../../../shared/helpers/password.helper';
+import { PasswordHelper } from '../../../common/helpers/password.helper';
 import { ContatoService } from '../../../agenda/contato/service/contato.service';
 
 @Injectable()
@@ -16,19 +16,19 @@ export class AuthService {
   }
 
   async authenticate(emailOrUsername: string, senha: string) {
-    const usuario =
-      (await this.contatoService.getAccountByEmail(emailOrUsername)) ||
-      (await this.contatoService.getAccountByUsername(emailOrUsername));
+    const account =
+      (await this.contatoService.findAccountByEmail(emailOrUsername)) ||
+      (await this.contatoService.findAccountByUsername(emailOrUsername));
 
-    if (usuario) {
+    if (account) {
       const senhaValida = await new PasswordHelper(senha).compare(
-        usuario.senha,
+        account.senha,
       );
 
-      const roles = await this.contatoService.getRoles(usuario.contatoId);
+      const roles = await this.contatoService.getRoles(account.contato.id);
 
       if (senhaValida) {
-        return { ...usuario, roles: roles, senha: null };
+        return { ...account, roles: roles, senha: null };
       }
     }
   }

@@ -3,13 +3,14 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpException,
   HttpStatus,
   NotFoundException,
   Post,
   Req,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ResultDto } from '../../../../shared/dtos/result.dto';
+import { ResultDto } from '../../../common/dtos/result.dto';
 import { IsPublic } from '../decorators/is-public.decorator';
 import { LoginDto } from '../dto/login.dto';
 import { JwtPayload } from '../payload/jwt-payload.interface';
@@ -33,7 +34,7 @@ export class AuthController {
       throw new BadRequestException(result);
     }
 
-    const usuario = await this.authService
+    const account = await this.authService
       .authenticate(login.username || login.email, login.senha)
       .catch(err => {
         const result = new ResultDto({
@@ -42,10 +43,15 @@ export class AuthController {
           erro: err.message,
         });
 
-        throw new NotFoundException(result);
+        throw new HttpException(
+          result,
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.BAD_REQUEST,
+        );
       });
 
-    if (!usuario) {
+    if (!account) {
       const result = new ResultDto({
         sucesso: false,
         mensagem: 'Erro ao realizar login.',
@@ -55,10 +61,10 @@ export class AuthController {
     }
 
     const dados: JwtPayload = {
-      sub: usuario.contatoId,
-      username: usuario.username,
-      email: usuario.email,
-      roles: usuario.roles,
+      sub: account.contato.id,
+      username: account.username,
+      email: account.email,
+      roles: account.roles,
     };
 
     const token = await this.authService.createToken(dados);

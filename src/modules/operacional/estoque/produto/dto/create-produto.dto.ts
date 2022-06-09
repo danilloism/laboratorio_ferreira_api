@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { StringHelper } from '../../../../../shared/helpers/string.helper';
+import { StringHelper } from '../../../../common/helpers/string.helper';
 
 export class CreateProdutoDto {
   @IsString()

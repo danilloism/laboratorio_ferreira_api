@@ -11,7 +11,7 @@ import { ContatoModule } from '../../agenda/contato/contato.module';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       signOptions: { expiresIn: '7d' },
-      secret: process.env.JWT_SECRET,
+      secret: `${process.env.JWT_SECRET}`,
     }),
     ContatoModule,
   ],

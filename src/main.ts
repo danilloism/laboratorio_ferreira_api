@@ -2,9 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { PrismaService } from './modules/sistema/prisma/prisma.service';
 import * as compression from 'compression';
-import * as fs from 'fs';
 import helmet from 'helmet';
 
 async function bootstrap() {
@@ -28,24 +26,15 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
 
-  const document =
-    process.env.NODE_ENV == 'development'
-      ? SwaggerModule.createDocument(app, config)
-      : JSON.parse(fs.readFileSync('./doc/api.doc.json').toString());
+  const document = SwaggerModule.createDocument(app, config);
+
   SwaggerModule.setup('api-docs', app, document, {
     customSiteTitle: 'Documentação da API RESTful do Laboratório Ferreira.',
   });
 
-  const prisma = app.get(PrismaService);
-  prisma.enableShutdownHooks(app);
-
   await app.listen(process.env.PORT || 3000, () => {
     const logger = new Logger('Servidor');
     logger.log('Servidor iniciado');
-
-    if (process.env.NODE_ENV == 'development') {
-      fs.writeFileSync('./doc/api.doc.json', JSON.stringify(document));
-    }
   });
 }
 bootstrap();

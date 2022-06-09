@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { CategoriaEnum } from 'src/modules/agenda/contato/enums/categoria.enum';
 import { RoleInterceptor } from './role.interceptor';
 
 @Injectable()
 export class DentistaEspOdontRoleInterceptor extends RoleInterceptor {
   constructor() {
-    super('dentista', 'colaborador');
+    super(CategoriaEnum.DENTISTA, CategoriaEnum.COLABORADOR);
   }
 }

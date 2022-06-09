@@ -1,62 +1,73 @@
 import {
   ConflictException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Categoria, Prisma, Usuario } from '@prisma/client';
 import { UpdateContatoDto } from '../dto/update-contato.dto';
 import { CreateContatoDto } from '../dto/create-contato.dto';
-import { PasswordHelper } from '../../../../shared/helpers/password.helper';
-import { PrismaService } from '../../../sistema/prisma/prisma.service';
+import { PasswordHelper } from '../../../common/helpers/password.helper';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { UpdateAccountDto } from '../dto/update-account.dto';
+import { Repository } from 'typeorm';
+import { Account } from '../entities/account.entity';
+import { Contato } from '../entities/contato.entity';
+import { CategoriaEnum } from '../enums/categoria.enum';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ContatoService {
-  constructor(private readonly prismaService: PrismaService) {}
-  async findById(id: string) {
-    return await this.prismaService.contato.findUnique({
+  constructor(
+    @InjectRepository(Contato)
+    private readonly contatoRepository: Repository<Contato>,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
+  ) {}
+
+  async findById(id: string): Promise<Contato> {
+    return await this.contatoRepository.findOne({
       where: { id },
+      relations: ['account'],
     });
   }
 
-  async findByTelefone(telefone: string) {
-    return await this.prismaService.contato.findUnique({
+  async findByTelefone(telefone: string): Promise<Contato> {
+    return await this.contatoRepository.findOne({
       where: { telefone },
+      relations: ['account'],
     });
   }
 
-  async find(
-    where?: Prisma.ContatoWhereInput,
-    include?: Prisma.ContatoInclude,
-  ) {
-    return await this.prismaService.contato.findMany({
-      where: where,
-      include: include,
-    });
+  async find(): Promise<Contato[]> {
+    return await this.contatoRepository.find({ relations: ['account'] });
   }
 
-  async create({ nome, telefone, usuario, categorias }: CreateContatoDto) {
-    if (usuario) {
-      const { email, username } = usuario;
+  async create({
+    nome,
+    telefone,
+    account,
+    categorias,
+  }: CreateContatoDto): Promise<Contato> {
+    const accountEntity = this.accountRepository.create(account);
 
-      const emailExiste = await this.prismaService.usuario.findUnique({
+    if (account) {
+      const { email, username } = account;
+
+      const emailExiste = await this.accountRepository.findOne({
         where: { email },
       });
       if (emailExiste) {
         throw new ConflictException('Email informado já existe.');
       }
 
-      const usernameExiste = await this.prismaService.usuario.findUnique({
+      const usernameExiste = await this.accountRepository.findOne({
         where: { username },
       });
       if (usernameExiste) {
         throw new ConflictException('Username informado já existe.');
       }
 
-      const senha = await new PasswordHelper(usuario.senha).encrypt();
-      Object.assign(usuario, { ...usuario, senha: senha });
+      const senha = await new PasswordHelper(account.senha).encrypt();
+      Object.assign(accountEntity, { ...account, senha: senha });
     }
 
     const telefoneExiste = await this.findByTelefone(telefone);
@@ -64,86 +75,73 @@ export class ContatoService {
       throw new ConflictException('Telefone informado já existe.');
     }
 
-    return await this.prismaService.contato
-      .create({
-        data: {
-          nome,
-          telefone,
-          categorias,
-          usuario: { create: usuario },
-        },
-        include: {
-          usuario: usuario
-            ? {
-                select: {
-                  email: true,
-                  username: true,
-                },
-              }
-            : false,
-        },
-      })
-      .catch(() => {
-        throw new InternalServerErrorException('Erro interno do servidor.');
-      });
+    const contato = this.contatoRepository.create({
+      nome,
+      telefone,
+      categorias,
+    });
+
+    contato.account = account ? accountEntity : undefined;
+
+    return await this.contatoRepository.save(contato);
   }
 
-  async update(id: string, atualizarContatoDto: UpdateContatoDto) {
-    const contatoExiste = this.findById(id);
-    if (!contatoExiste) {
+  async update(
+    id: string,
+    atualizarContatoDto: UpdateContatoDto,
+  ): Promise<Contato> {
+    const contato = await this.findById(id);
+    if (!contato) {
       throw new NotFoundException('Contato não encontrado.');
     }
 
-    return await this.prismaService.contato
-      .update({
-        where: { id },
-        data: atualizarContatoDto,
-      })
-      .catch(() => {
-        throw new InternalServerErrorException('Erro interno do servidor.');
-      });
+    Object.assign(contato, atualizarContatoDto);
+
+    return await this.contatoRepository.save(contato);
   }
 
-  async getAccount(id: string): Promise<Usuario> {
+  async findAccountByContatoId(id: string): Promise<Account> {
     const contato = await this.findById(id);
 
     if (!contato) {
       throw new NotFoundException('Contato não encontrado.');
     }
 
-    return await this.prismaService.usuario.findUnique({
-      where: { contatoId: id },
+    return await this.accountRepository.findOne({
+      where: { contato: { id } },
     });
   }
 
-  async getAccountByEmail(email: string): Promise<Usuario> {
-    return await this.prismaService.usuario.findUnique({ where: { email } });
-  }
-
-  async getAccountByUsername(username: string): Promise<Usuario> {
-    return await this.prismaService.usuario.findUnique({ where: { username } });
-  }
-
-  async updateAccount(id: string, updateAccountDto: UpdateAccountDto) {
-    const contato = await this.findById(id);
-
-    if (!contato) {
-      throw new NotFoundException('Contato não encontrado.');
-    }
-
-    return await this.prismaService.usuario.update({
-      where: { contatoId: id },
-      data: updateAccountDto,
+  async findAccountByEmail(email: string): Promise<Account> {
+    return await this.accountRepository.findOne({
+      where: { email },
+      relations: ['contato'],
     });
   }
 
-  async createAccount(id: string, createAccountDto: CreateAccountDto) {
-    const contato = await this.findById(id);
-    const accountExiste = await this.getAccount(id);
+  async findAccountByUsername(username: string): Promise<Account> {
+    return await this.accountRepository.findOne({
+      where: { username },
+      relations: ['contato'],
+    });
+  }
 
-    if (!contato) {
-      throw new NotFoundException('Contato não encontrado.');
-    } else if (accountExiste) {
+  async updateAccount(contatoId: string, updateAccountDto: UpdateAccountDto) {
+    const account = await this.findAccountByContatoId(contatoId);
+
+    if (!account) {
+      throw new NotFoundException('Conta de usuário não encontrada.');
+    }
+
+    Object.assign(account, updateAccountDto);
+
+    return await this.accountRepository.save(account);
+  }
+
+  async createAccount(contatoId: string, createAccountDto: CreateAccountDto) {
+    const accountExiste = await this.findAccountByContatoId(contatoId);
+
+    if (accountExiste) {
       throw new ConflictException(
         'Conta de usuário já existe para contato informado.',
       );
@@ -152,19 +150,11 @@ export class ContatoService {
     const senha = await new PasswordHelper(createAccountDto.senha).encrypt();
     createAccountDto = { ...createAccountDto, senha };
 
-    return await this.prismaService.usuario.create({
-      data: { contatoId: id, ...createAccountDto },
-    });
+    return await this.accountRepository.save(createAccountDto);
   }
 
-  async deleteAccount(id: string): Promise<void> {
-    const contato = await this.findById(id);
-
-    if (!contato) {
-      throw new NotFoundException('Contato não encontrado.');
-    }
-
-    const account = await this.getAccount(id);
+  async deleteAccount(contatoId: string): Promise<void> {
+    const account = await this.findAccountByContatoId(contatoId);
 
     if (!account) {
       throw new NotFoundException('Conta de usuário não encontrada.');
@@ -174,20 +164,11 @@ export class ContatoService {
       throw new ConflictException('Conta de usuário já foi deletada.');
     }
 
-    await this.prismaService.usuario.update({
-      where: { contatoId: id },
-      data: { ativo: false },
-    });
+    await this.accountRepository.update(account.id, { ativo: false });
   }
 
-  async recoverAccount(id: string): Promise<Usuario> {
-    const contato = await this.findById(id);
-
-    if (!contato) {
-      throw new NotFoundException('Contato não encontrado.');
-    }
-
-    const account = await this.getAccount(id);
+  async restoreAccount(contatoId: string): Promise<Account> {
+    const account = await this.findAccountByContatoId(contatoId);
 
     if (!account) {
       throw new NotFoundException('Conta de usuário não encontrada.');
@@ -197,16 +178,13 @@ export class ContatoService {
       throw new ConflictException('Conta de usuário não está deletada.');
     }
 
-    return await this.prismaService.usuario.update({
-      where: { contatoId: id },
-      data: { ativo: true },
-    });
+    account.ativo = false;
+
+    return await this.accountRepository.save(account);
   }
 
-  async getRoles(id: string): Promise<Categoria[]> {
-    const contato = await this.prismaService.contato.findUnique({
-      where: { id },
-    });
+  async getRoles(id: string): Promise<CategoriaEnum[]> {
+    const contato = await this.findById(id);
 
     if (!contato) {
       throw new NotFoundException('Contato não encontrado.');

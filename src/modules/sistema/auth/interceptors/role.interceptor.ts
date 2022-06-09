@@ -6,19 +6,19 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Categoria } from '@prisma/client';
 import { Observable } from 'rxjs';
-import { ResultDto } from '../../../../shared/dtos/result.dto';
+import { ResultDto } from '../../../common/dtos/result.dto';
 import { JwtPayload } from '..';
+import { CategoriaEnum } from 'src/modules/agenda/contato/enums/categoria.enum';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {
-  constructor(...roles: Categoria[]) {
+  constructor(...roles: CategoriaEnum[]) {
     this.roles = roles;
-    roles.push('admin');
+    roles.push(CategoriaEnum.ADMIN);
   }
 
-  protected readonly roles: Categoria[];
+  protected readonly roles: CategoriaEnum[];
 
   intercept(
     context: ExecutionContext,

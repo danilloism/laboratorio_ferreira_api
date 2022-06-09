@@ -29,8 +29,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
-      throw err || new UnauthorizedException(err?.message, info);
+      throw err || new UnauthorizedException('Operação não autorizada.', info);
     }
+
     return user;
   }
 }
