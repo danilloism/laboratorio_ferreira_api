@@ -1,4 +1,5 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
+import { Categoria } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -6,7 +7,6 @@ import {
   ArrayNotEmpty,
   ArrayUnique,
   IsArray,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
@@ -14,9 +14,8 @@ import {
   Length,
   ValidateNested,
 } from 'class-validator';
-import { Categoria } from '../../../sistema/shared/enum/categoria.enum';
 import { TelefoneHelper } from '../../../../shared/helpers/telefone.helper';
-import { CreateUsuarioDto } from '../../../sistema/usuario/dto/create-usuario.dto';
+import { CreateAccountDto } from './create-account.dto';
 
 export class CreateContatoDto {
   @IsString()
@@ -28,7 +27,6 @@ export class CreateContatoDto {
   @ArrayMaxSize(7)
   @ArrayNotEmpty()
   @ArrayUnique()
-  @IsEnum(Categoria, { each: true })
   readonly categorias: Categoria[];
 
   @ApiProperty({
@@ -48,6 +46,6 @@ export class CreateContatoDto {
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => CreateUsuarioDto)
-  readonly usuario?: CreateUsuarioDto;
+  @Type(() => CreateAccountDto)
+  readonly usuario?: CreateAccountDto;
 }

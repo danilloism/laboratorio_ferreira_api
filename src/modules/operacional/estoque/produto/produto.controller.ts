@@ -14,10 +14,9 @@ import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { HttpExceptionHelper } from '../../../../shared/helpers/http-exception.helper';
 import { ApiTags } from '@nestjs/swagger';
 import { RoleInterceptor } from '../../../sistema/shared/interceptor/role.interceptor';
-import { Categoria } from '../../../sistema/shared/enum/categoria.enum';
 
 @ApiTags('Produtos')
-@UseInterceptors(new RoleInterceptor(Categoria.GERENTE))
+@UseInterceptors(new RoleInterceptor('gerente'))
 @Controller('produtos')
 export class ProdutoController {
   constructor(private readonly produtoService: ProdutoService) {}

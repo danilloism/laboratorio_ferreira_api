@@ -5,16 +5,11 @@ import {
   IsEmail,
   IsOptional,
   IsString,
-  IsUUID,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
-export class CreateUsuarioDto {
-  @IsUUID()
-  @IsOptional()
-  readonly contatoId: string;
-
+export class CreateAccountDto {
   @ApiProperty({ example: 'nomeusuario' })
   @IsString()
   @IsOptional()

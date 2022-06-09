@@ -8,28 +8,6 @@ import {
 import { ResultDto } from '../dtos/result.dto';
 
 export class HttpExceptionHelper {
-  // static throwHttpExceptionFromHttpException(err: any, status?: number): never {
-  //   if (!(err instanceof HttpException)) {
-  //     throw err;
-  //   }
-
-  //   if (err instanceof NotFoundException) {
-  //     this.throwNotFoundException(mensagem, altErro);
-  //   }
-
-  //   if (err instanceof BadRequestException) {
-  //     this.throwBadRequestException(mensagem, altErro);
-  //   }
-
-  //   const erroConvertido: HttpException = err;
-  //   const result = new ResultDto({
-  //     sucesso: false,
-  //     mensagem: mensagem || 'Erro ao realizar operação.',
-  //     erro: altErro || erroConvertido.getResponse(),
-  //   });
-
-  //   throw new HttpException(result, status || erroConvertido.getStatus());
-  // }
 
   static throwInternalServerException(mensagem?: string, erro?: any) {
     throw new InternalServerErrorException(

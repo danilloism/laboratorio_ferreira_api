@@ -3,8 +3,8 @@ import { AuthService } from './service/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { UsuarioModule } from '../usuario/usuario.module';
 import { AuthController } from './controller/auth.controller';
+import { ContatoModule } from '../../agenda/contato/contato.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { AuthController } from './controller/auth.controller';
       signOptions: { expiresIn: '7d' },
       secret: process.env.JWT_SECRET,
     }),
-    UsuarioModule,
+    ContatoModule,
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

@@ -1,4 +1,4 @@
-import { Categoria } from '../../shared/enum/categoria.enum';
+import { Categoria } from '@prisma/client';
 
 export interface JwtPayload {
   sub: string;
