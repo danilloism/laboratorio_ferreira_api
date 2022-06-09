@@ -11,7 +11,6 @@ import {
 import { ProdutoService } from './produto.service';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
-import { HttpExceptionHelper } from '../../../common/helpers/http-exception.helper';
 import { ApiTags } from '@nestjs/swagger';
 import { RoleInterceptor } from '../../../sistema/auth/interceptors/role.interceptor';
 

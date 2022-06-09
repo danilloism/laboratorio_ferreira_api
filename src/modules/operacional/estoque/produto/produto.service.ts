@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { HttpExceptionHelper } from '../../../common/helpers/http-exception.helper';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
 import { CreateProdutoDtoHelper } from './helper/create-produto-dto.helper';
