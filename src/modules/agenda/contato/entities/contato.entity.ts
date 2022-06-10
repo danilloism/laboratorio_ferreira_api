@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
-import { BaseEntity } from 'src/modules/common/entities/base.entity';
+import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, OneToOne } from 'typeorm';
 import { CategoriaEnum } from '../enums/categoria.enum';
 import { Account } from './account.entity';
@@ -20,7 +20,10 @@ export class Contato extends BaseEntity {
   categorias: CategoriaEnum[];
 
   @Exclude()
-  @OneToOne(() => Account, account => account.contato, { cascade: ['insert'] })
+  @OneToOne(() => Account, account => account.contato, {
+    cascade: ['insert'],
+    nullable: true,
+  })
   account?: Account;
 
   @Expose()

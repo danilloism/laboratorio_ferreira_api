@@ -9,7 +9,7 @@ import {
 import { Observable } from 'rxjs';
 import { ResultDto } from '../../../common/dtos/result.dto';
 import { JwtPayload } from '..';
-import { CategoriaEnum } from 'src/modules/agenda/contato/enums/categoria.enum';
+import { CategoriaEnum } from '../../../agenda/contato/enums/categoria.enum';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {
@@ -18,7 +18,7 @@ export class RoleInterceptor implements NestInterceptor {
     roles.push(CategoriaEnum.ADMIN);
   }
 
-  protected readonly roles: CategoriaEnum[];
+  private readonly roles: CategoriaEnum[];
 
   intercept(
     context: ExecutionContext,
@@ -28,7 +28,7 @@ export class RoleInterceptor implements NestInterceptor {
     const temRole = payload.roles.every(role => this.roles.includes(role));
     if (!temRole) {
       throw new HttpException(
-        new ResultDto({ sucesso: false, mensagem: 'Acesso não autorizado.' }),
+        new ResultDto({ sucesso: false, mensagem: 'Acesso proibido.' }),
         HttpStatus.FORBIDDEN,
       );
     }

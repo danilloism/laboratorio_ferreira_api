@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ResultDto } from 'src/modules/common/dtos/result.dto';
+import { ResultDto } from '../../common/dtos/result.dto';
 import { IsPublic } from '../auth/decorators/is-public.decorator';
 
 @IsPublic()

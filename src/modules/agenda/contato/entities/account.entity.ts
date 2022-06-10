@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
-import { BaseEntity } from 'src/modules/common/entities/base.entity';
+import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { Contato } from './contato.entity';
 
@@ -16,7 +16,10 @@ export class Account extends BaseEntity {
   senha: string;
 
   @Exclude()
-  @OneToOne(() => Contato, contato => contato.account)
+  @OneToOne(() => Contato, contato => contato.account, {
+    eager: true,
+    nullable: false,
+  })
   @JoinColumn()
   contato: Contato;
 

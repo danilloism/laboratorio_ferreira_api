@@ -1,4 +1,4 @@
-import { CreateProdutoDto } from '../dto/create-produto.dto';
+import { CreateProdutoDto } from '../dtos/create-produto.dto';
 
 export class CreateProdutoDtoHelper {
   static normalize(createProdutoDto: CreateProdutoDto) {
@@ -15,7 +15,7 @@ export class CreateProdutoDtoHelper {
         },
         {
           espOdont: false,
-          valorEmCentavos: createProdutoDto.valorDentista,
+          valorEmCentavos: createProdutoDto.valorCliente,
         },
       ],
     };

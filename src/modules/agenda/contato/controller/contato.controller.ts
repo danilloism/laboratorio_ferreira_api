@@ -15,17 +15,18 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ResultDto } from '../../../common/dtos/result.dto';
-import { UpdateContatoDto } from '../dto/update-contato.dto';
-import { CreateContatoDto } from '../dto/create-contato.dto';
+import { UpdateContatoDto } from '../dtos/update-contato.dto';
+import { CreateContatoDto } from '../dtos/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
-import { CreateAccountDto } from '../dto/create-account.dto';
-import { UpdateAccountDto } from '../dto/update-account.dto';
+import { CreateAccountDto } from '../dtos/create-account.dto';
+import { UpdateAccountDto } from '../dtos/update-account.dto';
 import { Contato } from '../entities/contato.entity';
 import { Account } from '../entities/account.entity';
-import { IsPublic } from 'src/modules/sistema/auth/decorators/is-public.decorator';
+import { IsPublic } from '../../../sistema/auth/decorators/is-public.decorator';
 
-// @IsPublic() //TODO: retirar isso aqui depois
+@IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
+// @UseInterceptors(new RoleInterceptor())
 @Controller('contatos')
 export class ContatoController {
   constructor(private readonly contatoService: ContatoService) {}

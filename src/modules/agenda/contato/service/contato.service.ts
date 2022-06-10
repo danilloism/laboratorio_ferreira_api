@@ -3,11 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateContatoDto } from '../dto/update-contato.dto';
-import { CreateContatoDto } from '../dto/create-contato.dto';
+import { UpdateContatoDto } from '../dtos/update-contato.dto';
+import { CreateContatoDto } from '../dtos/create-contato.dto';
 import { PasswordHelper } from '../../../common/helpers/password.helper';
-import { CreateAccountDto } from '../dto/create-account.dto';
-import { UpdateAccountDto } from '../dto/update-account.dto';
+import { CreateAccountDto } from '../dtos/create-account.dto';
+import { UpdateAccountDto } from '../dtos/update-account.dto';
 import { Repository } from 'typeorm';
 import { Account } from '../entities/account.entity';
 import { Contato } from '../entities/contato.entity';
@@ -139,18 +139,22 @@ export class ContatoService {
   }
 
   async createAccount(contatoId: string, createAccountDto: CreateAccountDto) {
-    const accountExiste = await this.findAccountByContatoId(contatoId);
+    const contato = await this.findById(contatoId);
 
-    if (accountExiste) {
+    if (contato.account) {
       throw new ConflictException(
         'Conta de usuário já existe para contato informado.',
       );
     }
 
     const senha = await new PasswordHelper(createAccountDto.senha).encrypt();
-    createAccountDto = { ...createAccountDto, senha };
+    const account = this.accountRepository.create({
+      ...createAccountDto,
+      senha,
+      contato,
+    });
 
-    return await this.accountRepository.save(createAccountDto);
+    return await this.accountRepository.save(account);
   }
 
   async deleteAccount(contatoId: string): Promise<void> {
