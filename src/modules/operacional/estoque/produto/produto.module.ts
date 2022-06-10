@@ -6,6 +6,10 @@ import { Produto } from './entities/produto.entity';
 import { TipoProduto } from './entities/tipo-produto.entity';
 import { ValorProduto } from './entities/valor-produto.entity';
 import { MarcaProduto } from './entities/marca-produto.entity';
+import { TipoProdutoController } from './controllers/tipo-produto.controller';
+import { TipoProdutoService } from './services/tipo-produto.service';
+import { MarcaProdutoController } from './controllers/marca-produto.controller';
+import { MarcaProdutoService } from './services/marca-produto.service';
 
 @Module({
   imports: [
@@ -16,7 +20,11 @@ import { MarcaProduto } from './entities/marca-produto.entity';
       MarcaProduto,
     ]),
   ],
-  controllers: [ProdutoController],
-  providers: [ProdutoService],
+  controllers: [
+    ProdutoController,
+    TipoProdutoController,
+    MarcaProdutoController,
+  ],
+  providers: [ProdutoService, TipoProdutoService, MarcaProdutoService],
 })
 export class ProdutoModule {}
