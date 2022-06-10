@@ -95,14 +95,23 @@ export class ProdutoService {
     }
 
     if ((espOdont && cliente) || (!espOdont && !cliente)) {
-      return produto.historicoValores;
+      return await this.valorProdutoRepository.find({
+        order: { dtFim: 'DESC' },
+        where: { produto: { id } },
+      });
     }
 
     if (espOdont) {
-      return produto.historicoValores.filter(valor => valor.espOdont);
+      return await this.valorProdutoRepository.find({
+        order: { dtFim: 'DESC' },
+        where: { produto: { id }, espOdont: true },
+      });
     }
 
-    return produto.historicoValores.filter(valor => !valor.espOdont);
+    return await this.valorProdutoRepository.find({
+      order: { dtFim: 'DESC' },
+      where: { produto: { id }, espOdont: false },
+    });
   }
 
   async update(id: string, updateProdutoDto: UpdateProdutoDto) {
@@ -114,25 +123,33 @@ export class ProdutoService {
       throw new NotFoundException('Produto não encontrado.');
     }
 
-    const existeTipo = await this.tipoProdutoRepository.findOne({
-      where: { nome: tipo },
-    });
-    const existeMarca = await this.marcaProdutoRepository.findOne({
-      where: { nome: marca },
-    });
+    let marcaProduto: MarcaProduto;
 
-    const marcaProduto = this.marcaProdutoRepository.create(
-      existeMarca ?? { nome: marca },
-    );
-    const tipoProduto = this.tipoProdutoRepository.create(
-      existeTipo ?? { nome: tipo },
-    );
+    if (marca) {
+      marcaProduto = await this.marcaProdutoRepository.findOne({
+        where: { nome: marca },
+      });
+
+      if (!marcaProduto) {
+        throw new NotFoundException('Marca de produto não encontrada.');
+      }
+    }
+
+    const tipoProduto = tipo
+      ? await this.tipoProdutoRepository.findOne({
+          where: { nome: tipo },
+        })
+      : produto.tipoProduto;
+
+    if (!tipoProduto) {
+      throw new NotFoundException('Tipo de produto não encontrado.');
+    }
 
     const jaExisteProduto = await this.produtoRepository.findOne({
       where: {
         id: Not(id),
-        marcaProduto,
-        tipoProduto,
+        marcaProduto: marca ? { id: marcaProduto.id } : null,
+        tipoProduto: { id: tipoProduto.id },
         nome: dados.nome,
       },
     });
@@ -163,14 +180,19 @@ export class ProdutoService {
     }
 
     if (valorCliente && valorEspOdont) {
-      return await this.dataSource.transaction(async manager => {
-        await manager.update(
-          ValorProduto,
-          { dtFim: null },
-          { dtFim: new Date() },
-        );
-        produto.historicoValores.push(valorClienteEntity);
-        produto.historicoValores.push(valorEspOdontEntity);
+      return await this.dataSource.manager.transaction(async manager => {
+        const valoresAtuais = await manager.find(ValorProduto, {
+          where: { dtFim: null },
+        });
+
+        for (const valor of valoresAtuais) {
+          valor.ativo = false;
+          valor.dtFim = new Date();
+        }
+
+        await manager.save(valoresAtuais);
+
+        produto.historicoValores.push(valorClienteEntity, valorEspOdontEntity);
         return await manager.save(produto);
       });
     }
@@ -180,23 +202,27 @@ export class ProdutoService {
     }
 
     if (valorCliente) {
-      return await this.dataSource.transaction(async manager => {
-        await manager.update(
-          ValorProduto,
-          { dtFim: null, espOdont: false },
-          { dtFim: new Date() },
-        );
+      return await this.dataSource.manager.transaction(async manager => {
+        const valorAtual = await manager.findOne(ValorProduto, {
+          where: { ativo: true, espOdont: false, produto: { id } },
+        });
+        valorAtual.dtFim = new Date();
+        valorAtual.ativo = false;
+        await manager.save(valorAtual);
+
         produto.historicoValores.push(valorClienteEntity);
         return await manager.save(produto);
       });
     }
 
-    return await this.dataSource.transaction(async manager => {
-      await manager.update(
-        ValorProduto,
-        { dtFim: null, espOdont: true },
-        { dtFim: new Date() },
-      );
+    return await this.dataSource.manager.transaction(async manager => {
+      const valorAtual = await manager.findOne(ValorProduto, {
+        where: { ativo: true, espOdont: true, produto: { id } },
+      });
+      valorAtual.dtFim = new Date();
+      valorAtual.ativo = false;
+      await manager.save(valorAtual);
+
       produto.historicoValores.push(valorEspOdontEntity);
       return await manager.save(produto);
     });
@@ -212,13 +238,5 @@ export class ProdutoService {
     await this.produtoRepository.save(produto);
 
     return true;
-  }
-
-  async getTiposProduto() {
-    return (await this.tipoProdutoRepository.find()).map(tipo => tipo.nome);
-  }
-
-  async getMarcasProduto() {
-    return (await this.marcaProdutoRepository.find()).map(marca => marca.nome);
   }
 }

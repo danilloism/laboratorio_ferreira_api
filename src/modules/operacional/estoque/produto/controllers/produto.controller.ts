@@ -55,13 +55,13 @@ export class ProdutoController {
     @Query('filtro') filtro: ('espOdont' | 'cliente')[],
   ) {
     if (
-      filtro.length == 0 ||
-      (filtro.includes('espOdont') && filtro.includes('cliente'))
+      filtro?.length == 0 ||
+      (filtro?.includes('espOdont') && filtro.includes('cliente'))
     ) {
       return await this.produtoService.getHistoricoValores(id);
     }
 
-    if (filtro.includes('espOdont')) {
+    if (filtro?.includes('espOdont')) {
       return await this.produtoService.getHistoricoValores(id, true);
     }
 
