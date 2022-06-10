@@ -42,7 +42,7 @@ export class CreateContatoDto {
       'Propriedade <telefone> inválida. Modelo válido: <ddd><numero>. Exemplo: 62123456789. Consulte a documentação para mais detalhes.',
   })
   @Transform(({ value }) => TelefoneHelper.format(value))
-  readonly telefone?: string;
+  readonly telefone: string;
 
   @IsOptional()
   @ValidateNested()

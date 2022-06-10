@@ -10,7 +10,6 @@ import { StringHelper } from '../../../../common/helpers/string.helper';
 
 export class CreateProdutoDto {
   @IsString()
-  @IsNotEmpty()
   readonly nome: string;
 
   @IsOptional()
@@ -19,7 +18,6 @@ export class CreateProdutoDto {
   readonly marca?: string;
 
   @IsString()
-  @IsNotEmpty()
   @Transform(({ value }) => value.toLowerCase())
   readonly tipo: string;
 
@@ -28,12 +26,8 @@ export class CreateProdutoDto {
   readonly descricao?: string;
 
   @IsInt()
-  @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 })
-  @IsNotEmpty()
   readonly valorEspOdont: number;
 
   @IsInt()
-  @IsNumber({ allowInfinity: false, allowNaN: false, maxDecimalPlaces: 0 })
-  @IsNotEmpty()
-  readonly valorDentista: number;
+  readonly valorCliente: number;
 }
