@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
-import { BaseEntity } from '../../../../common/entities/base.entity';
+import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { MarcaProduto } from './marca-produto.entity';
 import { TipoProduto } from './tipo-produto.entity';
