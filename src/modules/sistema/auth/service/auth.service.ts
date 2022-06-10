@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../payload/jwt-payload.interface';
 import { PasswordHelper } from '../../../common/helpers/password.helper';
 import { ContatoService } from '../../../agenda/contato/service/contato.service';
+import { Account } from '../../../agenda/contato/entities/account.entity';
+import { CategoriaEnum } from '../../../agenda/contato/enums/categoria.enum';
 
 @Injectable()
 export class AuthService {
@@ -11,11 +13,18 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async createToken(payload: JwtPayload) {
+  createToken(payload: JwtPayload) {
     return this.jwtService.sign(payload);
   }
 
-  async authenticate(emailOrUsername: string, senha: string) {
+  decodeToken(token: string) {
+    return this.jwtService.decode(token);
+  }
+
+  async authenticate(
+    emailOrUsername: string,
+    senha: string,
+  ): Promise<{ info: Account; roles: CategoriaEnum[] }> {
     const account =
       (await this.contatoService.findAccountByEmail(emailOrUsername)) ||
       (await this.contatoService.findAccountByUsername(emailOrUsername));
@@ -28,7 +37,7 @@ export class AuthService {
       const roles = await this.contatoService.getRoles(account.contato.id);
 
       if (senhaValida) {
-        return { ...account, roles: roles, senha: null };
+        return { info: account, roles };
       }
     }
   }

@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: `${process.env.JWT_SECRET}`,
+      secretOrKey: process.env.JWT_SECRET,
     });
   }
 
@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const usuario = await this.authService.validateUsuario(payload);
 
     if (!usuario) {
-      throw new UnauthorizedException('Operação não autorizada.');
+      throw new UnauthorizedException('Acesso não autenticado.');
     }
 
     return usuario;
