@@ -9,9 +9,13 @@ import { ContatoModule } from '../../agenda/contato/contato.module';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      signOptions: { expiresIn: '7d' },
-      secret: `${process.env.JWT_SECRET}`,
+    JwtModule.registerAsync({
+      useFactory: () => {
+        return {
+          signOptions: { expiresIn: '7d' },
+          secret: process.env.JWT_SECRET,
+        };
+      },
     }),
     ContatoModule,
   ],

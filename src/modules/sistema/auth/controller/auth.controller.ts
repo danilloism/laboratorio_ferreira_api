@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ClassSerializerInterceptor,
   Controller,
   HttpCode,
   HttpException,
@@ -8,6 +9,7 @@ import {
   NotFoundException,
   Post,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ResultDto } from '../../../common/dtos/result.dto';
@@ -21,6 +23,7 @@ import { AuthService } from '../service/auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @IsPublic()
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -39,7 +42,7 @@ export class AuthController {
       .catch(err => {
         const result = new ResultDto({
           sucesso: false,
-          mensagem: 'Erro ao autenticar usuário.',
+          mensagem: 'Erro ao realizar login.',
           erro: err.message,
         });
 
@@ -61,24 +64,25 @@ export class AuthController {
     }
 
     const dados: JwtPayload = {
-      sub: account.contato.id,
-      username: account.username,
-      email: account.email,
+      sub: account.info.contato.id,
+      username: account.info.username,
+      email: account.info.email,
       roles: account.roles,
     };
 
-    const token = await this.authService.createToken(dados);
+    const token = this.authService.createToken(dados);
 
-    const { email, username } = dados;
+    // const { email, username } = dados;
 
     return new ResultDto({
       sucesso: true,
       mensagem: 'Token gerado com sucesso.',
       dados: {
         access_token: token,
-        roles: dados.roles,
-        id: dados.sub,
-        login: { email, username },
+        // roles: dados.roles,
+        // id: dados.sub,
+        // login: { email, username },
+        info: this.authService.decodeToken(token),
       },
     });
   }
@@ -87,7 +91,7 @@ export class AuthController {
   async refreshToken(@Req() request) {
     const payload: JwtPayload = request.user;
     console.log(payload);
-    const token = await this.authService.createToken({
+    const token = this.authService.createToken({
       sub: payload.sub,
       email: payload.email,
       roles: payload.roles,
@@ -99,9 +103,10 @@ export class AuthController {
       mensagem: 'Token atualizado com sucesso.',
       dados: {
         access_token: token,
-        roles: payload.roles,
-        id: payload.sub,
-        login: { email: payload.email, username: payload.username },
+        // roles: payload.roles,
+        // id: payload.sub,
+        // login: { email: payload.email, username: payload.username },
+        data: this.authService.decodeToken(token),
       },
     });
   }
