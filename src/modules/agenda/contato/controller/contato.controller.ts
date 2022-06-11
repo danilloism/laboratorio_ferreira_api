@@ -14,19 +14,24 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ResultDto } from '../../../../shared/dtos/result.dto';
-import { UpdateContatoDto } from '../dto/update-contato.dto';
-import { CreateContatoDto } from '../dto/create-contato.dto';
+import { ResultDto } from '../../../common/dtos/result.dto';
+import { UpdateContatoDto } from '../dtos/update-contato.dto';
+import { CreateContatoDto } from '../dtos/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
-import { CreateAccountDto } from '../dto/create-account.dto';
-import { UpdateAccountDto } from '../dto/update-account.dto';
-import { Contato, Usuario } from '@prisma/client';
+import { CreateAccountDto } from '../dtos/create-account.dto';
+import { UpdateAccountDto } from '../dtos/update-account.dto';
+import { Contato } from '../entities/contato.entity';
+import { Account } from '../entities/account.entity';
+import { IsPublic } from '../../../auth/decorators/is-public.decorator';
 
+@IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
+// @UseInterceptors(new RoleInterceptor())
 @Controller('contatos')
 export class ContatoController {
   constructor(private readonly contatoService: ContatoService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   async get(): Promise<Contato[]> {
     return await this.contatoService.find();
@@ -34,17 +39,21 @@ export class ContatoController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id/account')
-  async getAccount(@Param('id') id: string): Promise<Usuario> {
-    const account = await this.contatoService.getAccount(id).catch(err => {
-      throw new HttpException(
-        new ResultDto({
-          sucesso: false,
-          mensagem: 'Erro ao procurar por conta de usuário.',
-          erro: err.message,
-        }),
-        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
-      );
-    });
+  async getAccount(@Param('id') id: string): Promise<Account> {
+    const account = await this.contatoService
+      .findAccountByContatoId(id)
+      .catch(err => {
+        throw new HttpException(
+          new ResultDto({
+            sucesso: false,
+            mensagem: 'Erro ao procurar por conta de usuário.',
+            erro: err.message,
+          }),
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.BAD_REQUEST,
+        );
+      });
 
     if (!account) {
       throw new NotFoundException(
@@ -56,10 +65,10 @@ export class ContatoController {
       );
     }
 
-    delete account.senha;
     return account;
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   async getById(@Param('id') id: string): Promise<Contato> {
     const contato = await this.contatoService.findById(id);
@@ -92,7 +101,6 @@ export class ContatoController {
       );
     });
 
-    delete contato.usuario?.senha;
     return new ResultDto({
       sucesso: true,
       mensagem: 'Contato criado com sucesso.',
@@ -100,6 +108,7 @@ export class ContatoController {
     });
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   async put(
     @Body() atualizarContatoDto: UpdateContatoDto,
@@ -129,6 +138,7 @@ export class ContatoController {
     });
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post(':id/account')
   async createAccount(
     @Param('id') id: string,
@@ -151,7 +161,6 @@ export class ContatoController {
         );
       });
 
-    delete account.senha;
     return new ResultDto({
       sucesso: true,
       mensagem: 'Conta de usuário criada com sucesso.',
@@ -159,7 +168,8 @@ export class ContatoController {
     });
   }
 
-  @Post(':id/account')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Put(':id/account')
   async updateAccount(
     @Param('id') id: string,
     @Body() updateAccountDto: UpdateAccountDto,
@@ -181,7 +191,6 @@ export class ContatoController {
         );
       });
 
-    delete account.senha;
     return new ResultDto({
       sucesso: true,
       mensagem: 'Conta de usuário atualizada com sucesso.',
@@ -210,9 +219,10 @@ export class ContatoController {
     });
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id/account/recover')
   async recoverAccount(@Param('id') id: string) {
-    await this.contatoService.recoverAccount(id).catch(err => {
+    await this.contatoService.restoreAccount(id).catch(err => {
       const result = new ResultDto({
         sucesso: false,
         mensagem: 'Erro ao recuperar conta de usuário.',
