@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../payload/jwt-payload.interface';
-import { PasswordHelper } from '../../../common/helpers/password.helper';
-import { ContatoService } from '../../../agenda/contato/service/contato.service';
-import { Account } from '../../../agenda/contato/entities/account.entity';
-import { CategoriaEnum } from '../../../agenda/contato/enums/categoria.enum';
+import { PasswordHelper } from '../../common/helpers/password.helper';
+import { ContatoService } from '../../agenda/contato/service/contato.service';
+import { Account } from '../../agenda/contato/entities/account.entity';
+import { CategoriaEnum } from '../../agenda/contato/enums/categoria.enum';
 
 @Injectable()
 export class AuthService {

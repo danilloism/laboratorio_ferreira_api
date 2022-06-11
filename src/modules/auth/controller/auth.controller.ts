@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ResultDto } from '../../../common/dtos/result.dto';
+import { ResultDto } from '../../common/dtos/result.dto';
 import { IsPublic } from '../decorators/is-public.decorator';
 import { LoginDto } from '../dto/login.dto';
 import { JwtPayload } from '../payload/jwt-payload.interface';

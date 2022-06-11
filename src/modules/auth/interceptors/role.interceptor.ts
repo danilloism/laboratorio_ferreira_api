@@ -7,9 +7,9 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { ResultDto } from '../../../common/dtos/result.dto';
+import { ResultDto } from '../../common/dtos/result.dto';
 import { JwtPayload } from '..';
-import { CategoriaEnum } from '../../../agenda/contato/enums/categoria.enum';
+import { CategoriaEnum } from '../../agenda/contato/enums/categoria.enum';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {

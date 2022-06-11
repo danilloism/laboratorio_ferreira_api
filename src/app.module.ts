@@ -3,10 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { AppController } from './app.controller';
 import { AgendaModule } from './modules/agenda/agenda.module';
-import { OperacionalModule } from './modules/operacional/operacional.module';
-import { JwtAuthGuard } from './modules/sistema/auth';
-import { SistemaModule } from './modules/sistema/sistema.module';
+import { EstoqueModule } from './modules/estoque/estoque.module';
+import { JwtAuthGuard } from './modules/auth';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -24,11 +25,11 @@ import { SistemaModule } from './modules/sistema/sistema.module';
       synchronize: true,
       applicationName: 'lab-ferreira-api',
     }),
-    SistemaModule,
+    AuthModule,
     AgendaModule,
-    OperacionalModule,
+    EstoqueModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [Logger, { provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule {}

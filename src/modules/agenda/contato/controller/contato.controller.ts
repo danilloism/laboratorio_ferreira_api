@@ -22,7 +22,7 @@ import { CreateAccountDto } from '../dtos/create-account.dto';
 import { UpdateAccountDto } from '../dtos/update-account.dto';
 import { Contato } from '../entities/contato.entity';
 import { Account } from '../entities/account.entity';
-import { IsPublic } from '../../../sistema/auth/decorators/is-public.decorator';
+import { IsPublic } from '../../../auth/decorators/is-public.decorator';
 
 @IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')

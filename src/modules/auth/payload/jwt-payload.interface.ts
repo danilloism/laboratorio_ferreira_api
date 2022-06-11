@@ -1,4 +1,4 @@
-import { CategoriaEnum } from '../../../agenda/contato/enums/categoria.enum';
+import { CategoriaEnum } from '../../agenda/contato/enums/categoria.enum';
 
 export interface JwtPayload {
   sub: string;

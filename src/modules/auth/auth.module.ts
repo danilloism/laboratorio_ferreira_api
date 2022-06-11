@@ -4,7 +4,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './controller/auth.controller';
-import { ContatoModule } from '../../agenda/contato/contato.module';
+import { ContatoModule } from '../agenda/contato/contato.module';
 
 @Module({
   imports: [

@@ -17,4 +17,7 @@ export abstract class BaseEntity {
 
   @Column({ default: true })
   ativo: boolean;
+
+  @Column({ nullable: true })
+  obervacoes?: string;
 }
