@@ -3,7 +3,7 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { Contato } from './contato.entity';
 
-@Entity('account')
+@Entity()
 export class Account extends BaseEntity {
   @Column({ unique: true })
   email: string;
@@ -25,6 +25,6 @@ export class Account extends BaseEntity {
 
   @Expose()
   get contatoId() {
-    return this.contato?.id;
+    return this.contato.id;
   }
 }

@@ -1,10 +1,11 @@
 import { Exclude, Expose } from 'class-transformer';
 import { BaseEntity } from '../../../common/entities/base.entity';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { CategoriaEnum } from '../enums/categoria.enum';
 import { Account } from './account.entity';
+import { Servico } from 'src/modules/servico/entities/servico.entity';
 
-@Entity('contato')
+@Entity()
 export class Contato extends BaseEntity {
   @Column()
   nome: string;
@@ -25,6 +26,14 @@ export class Contato extends BaseEntity {
     nullable: true,
   })
   account?: Account;
+
+  @Exclude()
+  @OneToMany(() => Servico, servico => servico.dentista)
+  servicosComoDentista: Servico[];
+
+  @Exclude()
+  @OneToMany(() => Servico, servico => servico.paciente)
+  servicosComoPaciente: Servico[];
 
   @Expose()
   get accountId() {

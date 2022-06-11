@@ -2,12 +2,13 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'path';
 import { AppController } from './app.controller';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { EstoqueModule } from './modules/estoque/estoque.module';
 import { JwtAuthGuard } from './modules/auth';
 import { AuthModule } from './modules/auth/auth.module';
+import { ServicoModule } from './modules/servico/servico.module';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Module({
   imports: [
@@ -24,10 +25,12 @@ import { AuthModule } from './modules/auth/auth.module';
       logger: 'debug',
       synchronize: true,
       applicationName: 'lab-ferreira-api',
+      namingStrategy: new SnakeNamingStrategy(),
     }),
     AuthModule,
     AgendaModule,
     EstoqueModule,
+    ServicoModule,
   ],
   controllers: [AppController],
   providers: [Logger, { provide: APP_GUARD, useClass: JwtAuthGuard }],

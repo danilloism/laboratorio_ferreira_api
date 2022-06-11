@@ -21,7 +21,8 @@
     "test:v": "jest --verbose",
     "test:vcov": "jest --verbose --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docker:init": "docker exec -it postgresql bash"
   },
   "dependencies": {
     "@faker-js/faker": "^6.3.1",
@@ -53,6 +54,7 @@
     "rxjs": "^7.5.5",
     "swagger-ui-express": "^4.4.0",
     "typeorm": "^0.3.6",
+    "typeorm-naming-strategies": "^4.1.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

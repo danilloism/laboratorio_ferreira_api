@@ -27,7 +27,10 @@ export class ProdutoService {
   ) {}
 
   async findById(id: string) {
-    return await this.produtoRepository.findOne({ where: { id } });
+    return await this.produtoRepository.findOne({
+      where: { id },
+      relationLoadStrategy: 'query',
+    });
   }
 
   async create(createProdutoDto: CreateProdutoDto) {

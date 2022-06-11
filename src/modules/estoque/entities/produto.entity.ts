@@ -4,8 +4,9 @@ import { Column, Entity, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { MarcaProduto } from './marca-produto.entity';
 import { TipoProduto } from './tipo-produto.entity';
 import { ValorProduto } from './valor-produto.entity';
+import { ItemServico } from 'src/modules/servico/entities/item-servico.entity';
 
-@Entity('produto')
+@Entity()
 @Unique(['nome', 'tipoProduto', 'marcaProduto'])
 export class Produto extends BaseEntity {
   @Column()
@@ -18,6 +19,7 @@ export class Produto extends BaseEntity {
   @ManyToOne(() => TipoProduto, tipo => tipo.produtos, {
     cascade: ['insert'],
     eager: true,
+    nullable: false,
   })
   tipoProduto: TipoProduto;
 
@@ -36,6 +38,10 @@ export class Produto extends BaseEntity {
   })
   historicoValores: ValorProduto[];
 
+  @Exclude()
+  @OneToMany(() => ItemServico, item => item.produto)
+  itensServico: ItemServico[];
+
   @Expose()
   get tipo() {
     return this.tipoProduto.nome;
@@ -49,10 +55,10 @@ export class Produto extends BaseEntity {
   @Expose()
   get valor() {
     const espOdont = this.historicoValores.find(
-      valor => !valor.dtFim && valor.espOdont,
+      valor => valor.ativo && valor.espOdont,
     );
     const cliente = this.historicoValores.find(
-      valor => !valor.dtFim && !valor.espOdont,
+      valor => valor.ativo && !valor.espOdont,
     );
     return { espOdont: espOdont.valor, cliente: cliente.valor };
   }

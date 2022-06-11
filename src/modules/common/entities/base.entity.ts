@@ -9,10 +9,10 @@ export abstract class BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @CreateDateColumn({ name: 'criado_em' })
+  @CreateDateColumn()
   criadoEm: Date;
 
-  @UpdateDateColumn({ name: 'atualizado_em' })
+  @UpdateDateColumn()
   atualizadoEm: Date;
 
   @Column({ default: true })

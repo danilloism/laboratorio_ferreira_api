@@ -3,19 +3,21 @@ import { BaseEntity } from '../../common/entities/base.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { Produto } from './produto.entity';
 
-@Entity('valor_produto')
+@Entity()
 export class ValorProduto extends BaseEntity {
-  @Column({ name: 'esp_odont' })
+  @Column()
   espOdont: boolean;
 
   @Column()
   valor: number;
 
-  @Column({ name: 'dt_fim', nullable: true })
+  @Column({ nullable: true })
   dtFim?: Date;
 
   @Exclude()
-  @ManyToOne(() => Produto, produto => produto.historicoValores)
+  @ManyToOne(() => Produto, produto => produto.historicoValores, {
+    nullable: false,
+  })
   produto: Produto;
 
   @Expose()
