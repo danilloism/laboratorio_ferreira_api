@@ -4,7 +4,7 @@ import { Column, Entity, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { MarcaProduto } from './marca-produto.entity';
 import { TipoProduto } from './tipo-produto.entity';
 import { ValorProduto } from './valor-produto.entity';
-import { ItemServico } from 'src/modules/servico/entities/item-servico.entity';
+import { ItemServico } from '../../servico/entities/item-servico.entity';
 
 @Entity()
 @Unique(['nome', 'tipoProduto', 'marcaProduto'])

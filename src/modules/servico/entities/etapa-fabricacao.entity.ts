@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { BaseEntity } from 'src/modules/common/entities/base.entity';
+import { BaseEntity } from '../../common/entities/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { ItemServico } from './item-servico.entity';
 

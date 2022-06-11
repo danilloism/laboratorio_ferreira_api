@@ -1,6 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { BaseEntity } from 'src/modules/common/entities/base.entity';
-import { Produto } from 'src/modules/estoque/entities/produto.entity';
+import { BaseEntity } from '../../common/entities/base.entity';
+import { Produto } from '../../estoque/entities/produto.entity';
 import { Column, Entity, ManyToOne, Unique } from 'typeorm';
 import { EtapaFabricacao } from './etapa-fabricacao.entity';
 import { Servico } from './servico.entity';

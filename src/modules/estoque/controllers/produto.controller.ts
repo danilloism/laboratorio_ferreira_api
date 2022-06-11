@@ -15,7 +15,7 @@ import { ProdutoService } from '../services/produto.service';
 import { CreateProdutoDto } from '../dtos/create-produto.dto';
 import { UpdateProdutoDto } from '../dtos/update-produto.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ResultDto } from 'src/modules/common/dtos/result.dto';
+import { ResultDto } from '../../common/dtos/result.dto';
 
 @ApiTags('Produtos')
 @UseInterceptors(ClassSerializerInterceptor)

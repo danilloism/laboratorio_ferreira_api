@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './modules/auth';
 import { AuthModule } from './modules/auth/auth.module';
 import { ServicoModule } from './modules/servico/servico.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { FinanceiroModule } from './modules/financeiro/financeiro.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
     AgendaModule,
     EstoqueModule,
     ServicoModule,
+    FinanceiroModule,
   ],
   controllers: [AppController],
   providers: [Logger, { provide: APP_GUARD, useClass: JwtAuthGuard }],
