@@ -48,4 +48,8 @@ export class CreateContatoDto {
   @ValidateNested()
   @Type(() => CreateAccountDto)
   readonly account?: CreateAccountDto;
+
+  @IsString()
+  @IsOptional()
+  readonly observacoes?: string;
 }

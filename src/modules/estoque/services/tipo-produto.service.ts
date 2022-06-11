@@ -1,6 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateTipoProdutoDto } from '../dtos/create-tipo-produto.dto';
+import { UpdateTipoProdutoDto } from '../dtos/update-tipo-produto.dto';
 import { TipoProduto } from '../entities/tipo-produto.entity';
 
 @Injectable()
@@ -20,9 +26,37 @@ export class TipoProdutoService {
     return await this.tipoProdutoRepository.findOne({ where: { nome } });
   }
 
-  async update() {}
+  async update(nome: string, updateTipoDto: UpdateTipoProdutoDto) {
+    const tipo = await this.findByNome(nome);
 
-  async create() {}
+    if (!tipo) {
+      throw new NotFoundException('Tipo de produto não encontrado.');
+    }
 
-  async delete() {}
+    Object.assign(tipo, updateTipoDto);
+
+    return await this.tipoProdutoRepository.save(tipo);
+  }
+
+  async create(createTipoDto: CreateTipoProdutoDto) {
+    const jaExisteTipo = await this.findByNome(createTipoDto.nome);
+
+    if (jaExisteTipo) {
+      throw new ConflictException('Nome de marca já existe.');
+    }
+
+    return await this.tipoProdutoRepository.save(createTipoDto);
+  }
+
+  async delete(nome: string) {
+    const tipo = await this.findByNome(nome);
+
+    if (!tipo) {
+      throw new NotFoundException('Tipo de produto não encontrado.');
+    }
+
+    tipo.ativo = false;
+
+    return true;
+  }
 }

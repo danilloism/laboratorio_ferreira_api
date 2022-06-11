@@ -25,4 +25,8 @@ export class CreateAccountDto {
   @MinLength(4)
   @MaxLength(20)
   readonly senha: string;
+
+  @IsString()
+  @IsOptional()
+  readonly observacoes?: string;
 }

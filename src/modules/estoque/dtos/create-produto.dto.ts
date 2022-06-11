@@ -30,4 +30,8 @@ export class CreateProdutoDto {
 
   @IsInt()
   readonly valorCliente: number;
+
+  @IsString()
+  @IsOptional()
+  readonly observacoes?: string;
 }
