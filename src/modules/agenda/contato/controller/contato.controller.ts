@@ -101,6 +101,7 @@ export class ContatoController {
       );
     });
 
+    delete contato.account?.senha;
     return new ResultDto({
       sucesso: true,
       mensagem: 'Contato criado com sucesso.',
