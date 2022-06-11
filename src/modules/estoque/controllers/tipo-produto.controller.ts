@@ -14,6 +14,6 @@ export class TipoProdutoController {
 
   @Get()
   async find() {
-    return await this.tipoProdutoService.getTiposProduto();
+    return await this.tipoProdutoService.find();
   }
 }

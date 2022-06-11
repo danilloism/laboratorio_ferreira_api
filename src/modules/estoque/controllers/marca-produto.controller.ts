@@ -15,6 +15,6 @@ export class MarcaProdutoController {
 
   @Get()
   async find() {
-    return await this.marcaProdutoService.getMarcasProduto();
+    return await this.marcaProdutoService.find();
   }
 }

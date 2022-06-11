@@ -11,9 +11,19 @@ export class MarcaProdutoService {
     private readonly marcaProdutoRepository: Repository<MarcaProduto>,
   ) {}
 
-  async getMarcasProduto() {
+  async find() {
     return (
       await this.marcaProdutoRepository.find({ select: { nome: true } })
     ).map(tipo => tipo.nome);
   }
+
+  async findByNome(nome: string) {
+    return await this.marcaProdutoRepository.findOne({ where: { nome } });
+  }
+
+  async update() {}
+
+  async create() {}
+
+  async delete() {}
 }
