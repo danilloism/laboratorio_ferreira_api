@@ -3,7 +3,8 @@ import { BaseEntity } from '../../../common/entities/base.entity';
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { CategoriaEnum } from '../enums/categoria.enum';
 import { Account } from './account.entity';
-import { Servico } from 'src/modules/servico/entities/servico.entity';
+import { Servico } from '../../../servico/entities/servico.entity';
+import { LancamentoDinheiro } from '../../../financeiro/entities/lancamento-dinheiro.entity';
 
 @Entity()
 export class Contato extends BaseEntity {
@@ -34,6 +35,9 @@ export class Contato extends BaseEntity {
   @Exclude()
   @OneToMany(() => Servico, servico => servico.paciente)
   servicosComoPaciente: Servico[];
+
+  @OneToMany(() => LancamentoDinheiro, lancamento => lancamento.paraQuem)
+  lancamentosRecebidos: LancamentoDinheiro[];
 
   @Expose()
   get accountId() {
