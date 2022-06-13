@@ -8,6 +8,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Put,
@@ -39,7 +40,7 @@ export class ContatoController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id/account')
-  async getAccount(@Param('id') id: string): Promise<Account> {
+  async getAccount(@Param('id', ParseUUIDPipe) id: string): Promise<Account> {
     const account = await this.contatoService
       .findAccountByContatoId(id)
       .catch(err => {
@@ -70,7 +71,7 @@ export class ContatoController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  async getById(@Param('id') id: string): Promise<Contato> {
+  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<Contato> {
     const contato = await this.contatoService.findById(id);
 
     if (!contato) {
@@ -113,7 +114,7 @@ export class ContatoController {
   @Put(':id')
   async put(
     @Body() atualizarContatoDto: UpdateContatoDto,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ResultDto> {
     const contato = await this.contatoService
       .update(id, atualizarContatoDto)
@@ -142,7 +143,7 @@ export class ContatoController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Post(':id/account')
   async createAccount(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() createAccountDto: CreateAccountDto,
   ) {
     const account = await this.contatoService
@@ -172,7 +173,7 @@ export class ContatoController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id/account')
   async updateAccount(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateAccountDto: UpdateAccountDto,
   ) {
     const account = await this.contatoService
@@ -200,7 +201,7 @@ export class ContatoController {
   }
 
   @Delete(':id/account')
-  async deleteAccount(@Param('id') id: string) {
+  async deleteAccount(@Param('id', ParseUUIDPipe) id: string) {
     await this.contatoService.deleteAccount(id).catch(err => {
       const result = new ResultDto({
         sucesso: false,
@@ -222,7 +223,7 @@ export class ContatoController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id/account/recover')
-  async recoverAccount(@Param('id') id: string) {
+  async recoverAccount(@Param('id', ParseUUIDPipe) id: string) {
     await this.contatoService.restoreAccount(id).catch(err => {
       const result = new ResultDto({
         sucesso: false,

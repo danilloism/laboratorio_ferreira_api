@@ -10,6 +10,7 @@ import {
   ClassSerializerInterceptor,
   NotFoundException,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ProdutoService } from '../services/produto.service';
 import { CreateProdutoDto } from '../dtos/create-produto.dto';
@@ -34,7 +35,7 @@ export class ProdutoController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const produto = await this.produtoService.findById(id);
     if (!produto) {
       const result = new ResultDto({
@@ -51,7 +52,7 @@ export class ProdutoController {
 
   @Get(':id/valores')
   async getHistoricoValores(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Query('filtro') filtro: ('espOdont' | 'cliente')[],
   ) {
     if (
@@ -70,14 +71,14 @@ export class ProdutoController {
 
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProdutoDto: UpdateProdutoDto,
   ) {
     return await this.produtoService.update(id, updateProdutoDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     return await this.produtoService.remove(id);
   }
 }
