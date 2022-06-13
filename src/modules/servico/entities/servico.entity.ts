@@ -9,10 +9,10 @@ export class Servico extends BaseEntity {
   @Column({ nullable: true })
   descricao?: string;
 
-  @ManyToOne(() => Contato, { nullable: false })
+  @ManyToOne(() => Contato, { nullable: false, cascade: ['insert'] })
   dentista: Contato;
 
-  @ManyToOne(() => Contato)
+  @ManyToOne(() => Contato, { cascade: ['insert'] })
   paciente?: Contato;
 
   @OneToMany(() => ItemServico, item => item.servico, { nullable: false })

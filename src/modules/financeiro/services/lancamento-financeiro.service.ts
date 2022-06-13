@@ -45,13 +45,14 @@ export class LancamentoFinanceiroService {
     });
   }
 
-  async findByPaciente(pacienteId: string) {
+  async findEntradaByPaciente(pacienteId: string) {
     const lancamentos = await this.dtSource
       .createQueryBuilder()
       .from(LancamentoFinanceiro, 'lancamento')
       .leftJoin(Servico, 'servico', 'servico.id = lancamento.servicoId')
       .leftJoin(Contato, 'paciente', 'servico.pacienteId = paciente.id')
       .where('paciente.id = :id', { id: pacienteId })
+      .andWhere('lancamento.fluxo = "entrada"')
       .getRawMany();
 
     return lancamentos;
