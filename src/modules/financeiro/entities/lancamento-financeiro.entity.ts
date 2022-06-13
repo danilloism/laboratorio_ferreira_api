@@ -7,11 +7,11 @@ import { Parcela } from './parcela.entity';
 import { FluxoPagamentoEnum } from '../enums/fluxo-pagamento.enum';
 
 @Entity()
-export class LancamentoDinheiro extends BaseEntity {
-  @Column()
+export class LancamentoFinanceiro extends BaseEntity {
+  @Column({ default: 1 })
   numParcelas: number;
 
-  @Column()
+  @Column({ default: new Date() })
   dtLancamento: Date;
 
   @Column({ nullable: true })
@@ -20,7 +20,12 @@ export class LancamentoDinheiro extends BaseEntity {
   @Column({ nullable: true })
   intervaloEntreParcelas?: number;
 
-  @Column({ nullable: true })
+  @Column({
+    nullable: true,
+    enum: FinalidadeSaidaEnum,
+    type: 'enum',
+    enumName: 'finalidade_saida',
+  })
   finalidadeSaida?: FinalidadeSaidaEnum;
 
   @ManyToOne(() => Contato, contato => contato.lancamentosRecebidos, {
@@ -31,12 +36,19 @@ export class LancamentoDinheiro extends BaseEntity {
   @Column({ nullable: true })
   descricao?: string;
 
-  @Column()
+  @Column({
+    enum: FluxoPagamentoEnum,
+    type: 'enum',
+    enumName: 'fluxo_pagamento',
+  })
   fluxo: FluxoPagamentoEnum;
 
   @ManyToOne(() => Servico, servico => servico.lancamentos, { nullable: true })
   servico?: Servico;
 
-  @OneToMany(() => Parcela, parcela => parcela.lancamento, { nullable: false })
+  @OneToMany(() => Parcela, parcela => parcela.lancamento, {
+    nullable: false,
+    eager: true,
+  })
   parcelas: Parcela[];
 }
