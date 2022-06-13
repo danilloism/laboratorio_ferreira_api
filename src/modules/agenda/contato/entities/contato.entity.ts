@@ -4,7 +4,7 @@ import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { CategoriaEnum } from '../enums/categoria.enum';
 import { Account } from './account.entity';
 import { Servico } from '../../../servico/entities/servico.entity';
-import { LancamentoDinheiro } from '../../../financeiro/entities/lancamento-dinheiro.entity';
+import { LancamentoFinanceiro } from '../../../financeiro/entities/lancamento-financeiro.entity';
 
 @Entity()
 export class Contato extends BaseEntity {
@@ -18,6 +18,7 @@ export class Contato extends BaseEntity {
     array: true,
     enum: CategoriaEnum,
     type: 'enum',
+    enumName: 'categoria',
   })
   categorias: CategoriaEnum[];
 
@@ -36,8 +37,8 @@ export class Contato extends BaseEntity {
   @OneToMany(() => Servico, servico => servico.paciente)
   servicosComoPaciente: Servico[];
 
-  @OneToMany(() => LancamentoDinheiro, lancamento => lancamento.paraQuem)
-  lancamentosRecebidos: LancamentoDinheiro[];
+  @OneToMany(() => LancamentoFinanceiro, lancamento => lancamento.paraQuem)
+  lancamentosRecebidos: LancamentoFinanceiro[];
 
   @Expose()
   get accountId() {

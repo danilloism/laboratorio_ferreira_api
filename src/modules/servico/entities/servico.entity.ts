@@ -1,6 +1,6 @@
 import { Contato } from '../../agenda/contato/entities/contato.entity';
 import { BaseEntity } from '../../common/entities/base.entity';
-import { LancamentoDinheiro } from '../../financeiro/entities/lancamento-dinheiro.entity';
+import { LancamentoFinanceiro } from '../../financeiro/entities/lancamento-financeiro.entity';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { ItemServico } from './item-servico.entity';
 
@@ -18,8 +18,8 @@ export class Servico extends BaseEntity {
   @OneToMany(() => ItemServico, item => item.servico, { nullable: false })
   itensServico: ItemServico[];
 
-  @OneToMany(() => LancamentoDinheiro, lancamento => lancamento.servico, {
+  @OneToMany(() => LancamentoFinanceiro, lancamento => lancamento.servico, {
     nullable: true,
   })
-  lancamentos?: LancamentoDinheiro[];
+  lancamentos?: LancamentoFinanceiro[];
 }
