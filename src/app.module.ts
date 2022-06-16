@@ -5,8 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { EstoqueModule } from './modules/estoque/estoque.module';
-import { JwtAuthGuard } from './modules/auth';
-import { AuthModule } from './modules/auth/auth.module';
+import { JwtAuthGuard, AuthModule } from './modules/auth';
 import { ServicoModule } from './modules/servico/servico.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { FinanceiroModule } from './modules/financeiro/financeiro.module';
@@ -16,11 +15,11 @@ import { FinanceiroModule } from './modules/financeiro/financeiro.module';
     ConfigModule.forRoot({ isGlobal: true, cache: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      host: process.env.POSTGRES_HOST,
+      port: parseInt(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
       logNotifications: true,
       logger: 'debug',
