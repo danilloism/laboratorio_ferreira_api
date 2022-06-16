@@ -1,11 +1,7 @@
 import { Transform } from 'class-transformer';
-import {
-  IsInt,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
+import currency from 'currency.js';
+import { CurrencyHelper } from 'src/modules/common/helpers/currency.helper';
 import { StringHelper } from '../../common/helpers/string.helper';
 
 export class CreateProdutoDto {
@@ -26,10 +22,12 @@ export class CreateProdutoDto {
   readonly descricao?: string;
 
   @IsInt()
-  readonly valorEspOdont: number;
+  @Transform(({ value }) => CurrencyHelper.createCurrencyInstance(value))
+  readonly valorEspOdont: currency;
 
   @IsInt()
-  readonly valorCliente: number;
+  @Transform(({ value }) => CurrencyHelper.createCurrencyInstance(value))
+  readonly valorCliente: currency;
 
   @IsString()
   @IsOptional()
