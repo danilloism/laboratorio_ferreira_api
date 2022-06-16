@@ -8,7 +8,7 @@ export class EtapaFabricacao extends BaseEntity {
   @Column({ unique: true })
   nome: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 300 })
   descricao?: string;
 
   @Exclude()

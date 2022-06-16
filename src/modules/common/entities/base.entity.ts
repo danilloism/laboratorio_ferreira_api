@@ -18,6 +18,6 @@ export abstract class BaseEntity {
   @Column({ default: true })
   ativo: boolean;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 300 })
   obervacoes?: string;
 }

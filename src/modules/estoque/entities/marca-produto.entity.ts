@@ -7,7 +7,7 @@ export class MarcaProduto extends BaseEntity {
   @Column({ unique: true })
   nome: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 300 })
   descricao?: string;
 
   @OneToMany(() => Produto, produto => produto.marcaProduto)

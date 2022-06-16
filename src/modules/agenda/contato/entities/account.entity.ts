@@ -5,14 +5,14 @@ import { Contato } from './contato.entity';
 
 @Entity()
 export class Account extends BaseEntity {
-  @Column({ unique: true })
+  @Column({ unique: true, length: 254 })
   email: string;
 
-  @Column({ nullable: true, unique: true })
+  @Column({ nullable: true, unique: true, length: 64 })
   username: string;
 
   @Exclude()
-  @Column()
+  @Column({ length: 200, type: 'varchar' })
   senha: string;
 
   @Exclude()

@@ -12,7 +12,7 @@ export class Produto extends BaseEntity {
   @Column()
   nome: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 300 })
   descricao?: string;
 
   @Exclude()

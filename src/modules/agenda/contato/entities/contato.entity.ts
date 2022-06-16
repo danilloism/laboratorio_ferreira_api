@@ -11,7 +11,7 @@ export class Contato extends BaseEntity {
   @Column()
   nome: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, length: 11 })
   telefone: string;
 
   @Column({

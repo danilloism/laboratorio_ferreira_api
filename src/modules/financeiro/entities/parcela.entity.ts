@@ -1,22 +1,18 @@
 import { BaseEntity } from '../../common/entities/base.entity';
-import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { StatusPagamentoEnum } from '../enums/status-pagamento.enum';
 import { LancamentoFinanceiro } from './lancamento-financeiro.entity';
 import { Pagamento } from './pagamento.entity';
+import { CurrencyHelper } from 'src/modules/common/helpers/currency.helper';
+import currency from 'currency.js';
 
 @Entity()
 export class Parcela extends BaseEntity {
-  @Column()
-  valor: number;
+  @Column({ transformer: CurrencyHelper.entityTransformer, type: 'int' })
+  valor: currency;
 
   @Column({ default: 1 })
   numParcela: number;
-
-  @Column({ nullable: true })
-  desconto?: number;
-
-  @Column({ nullable: true })
-  multa?: number;
 
   @ManyToOne(() => LancamentoFinanceiro, lancamento => lancamento.parcelas, {
     nullable: false,
@@ -30,6 +26,6 @@ export class Parcela extends BaseEntity {
   })
   status: StatusPagamentoEnum;
 
-  @OneToOne(() => Pagamento, pgmnt => pgmnt.parcela, { nullable: true })
-  pagamento?: Pagamento;
+  @OneToMany(() => Pagamento, pgmnt => pgmnt.parcela, { nullable: true })
+  pagamentos?: Pagamento[];
 }
