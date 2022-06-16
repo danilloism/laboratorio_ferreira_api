@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMarcaProdutoDto } from '../dtos/create-marca-produto.dto';
 import { UpdateMarcaProdutoDto } from '../dtos/update-marca-produto.dto';
-import { UpdateTipoProdutoDto } from '../dtos/update-tipo-produto.dto';
 import { MarcaProduto } from '../entities/marca-produto.entity';
 
 @Injectable()

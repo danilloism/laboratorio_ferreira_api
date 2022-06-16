@@ -26,5 +26,6 @@ import { MarcaProdutoService } from './services/marca-produto.service';
     MarcaProdutoController,
   ],
   providers: [ProdutoService, TipoProdutoService, MarcaProdutoService],
+  exports: [ProdutoService],
 })
 export class EstoqueModule {}

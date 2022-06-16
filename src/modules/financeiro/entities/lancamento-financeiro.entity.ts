@@ -5,6 +5,8 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { FinalidadeSaidaEnum } from '../enums/finalidade-saida.enum';
 import { Parcela } from './parcela.entity';
 import { FluxoPagamentoEnum } from '../enums/fluxo-pagamento.enum';
+import { CurrencyHelper } from 'src/modules/common/helpers/currency.helper';
+import currency from 'currency.js';
 
 @Entity()
 export class LancamentoFinanceiro extends BaseEntity {
@@ -22,6 +24,13 @@ export class LancamentoFinanceiro extends BaseEntity {
 
   @Column({
     nullable: true,
+    transformer: CurrencyHelper.entityTransformer,
+    type: 'int',
+  })
+  valorEntrada?: currency;
+
+  @Column({
+    nullable: true,
     enum: FinalidadeSaidaEnum,
     type: 'enum',
     enumName: 'finalidade_saida',
@@ -33,7 +42,7 @@ export class LancamentoFinanceiro extends BaseEntity {
   })
   paraQuem?: Contato;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 300 })
   descricao?: string;
 
   @Column({
