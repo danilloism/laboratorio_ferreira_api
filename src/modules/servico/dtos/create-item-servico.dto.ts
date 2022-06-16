@@ -13,11 +13,6 @@ export class CreateItemServicoDto {
   @Transform(({ value }) => CurrencyHelper.createCurrencyInstance(value))
   readonly desconto?: currency;
 
-  @IsInt()
-  @IsOptional()
-  @Transform(({ value }) => CurrencyHelper.createCurrencyInstance(value))
-  readonly multa?: currency;
-
   @IsUUID()
   readonly produtoId?: string;
 }

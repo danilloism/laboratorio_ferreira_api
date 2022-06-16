@@ -20,13 +20,6 @@ export class ItemServico extends BaseEntity {
   })
   desconto?: currency;
 
-  @Column({
-    nullable: true,
-    transformer: CurrencyHelper.entityTransformer,
-    type: 'int',
-  })
-  multa?: currency;
-
   /*----------- Relações -----------*/
 
   @Exclude()
