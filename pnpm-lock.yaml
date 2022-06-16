@@ -29,6 +29,7 @@ specifiers:
   class-transformer: ^0.5.1
   class-validator: ^0.13.2
   compression: ^1.7.4
+  currency.js: ^2.0.4
   eslint: ^8.17.0
   eslint-config-prettier: ^8.5.0
   eslint-plugin-prettier: ^4.0.0
@@ -74,6 +75,7 @@ dependencies:
   class-transformer: 0.5.1
   class-validator: 0.13.2
   compression: 1.7.4
+  currency.js: 2.0.4
   express: 4.18.1
   helmet: 5.1.0
   jest: 27.5.1_ts-node@10.8.1
@@ -2219,6 +2221,11 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       cssom: 0.3.8
+
+  /currency.js/2.0.4:
+    resolution: {integrity: sha512-6/OplJYgJ0RUlli74d93HJ/OsKVBi8lB1+Z6eJYS1YZzBuIp4qKKHpJ7ad+GvTlWmLR/hLJOWTykN5Nm8NJ7+w==}
+    engines: {node: '>=4'}
+    dev: false
 
   /data-urls/2.0.0:
     resolution: {integrity: sha512-X5eWTSXO/BJmpdIKCRuKUgSCgAN0OwliVK3yPKbwIWU1Tdw5BRajxlzMidvh+gwko9AfQ9zIj52pzF91Q3YAvQ==}
