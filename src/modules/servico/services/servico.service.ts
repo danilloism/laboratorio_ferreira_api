@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CategoriaEnum } from 'src/modules/agenda/contato/enums/categoria.enum';
+import { CategoriaHelper } from 'src/modules/agenda/contato/helpers/categoria.helper';
 import { ContatoService } from 'src/modules/agenda/contato/service/contato.service';
 import { CurrencyHelper } from 'src/modules/common/helpers/currency.helper';
 import { ProdutoService } from 'src/modules/estoque/services/produto.service';
@@ -64,6 +68,16 @@ export class ServicoService {
     if (!dentista) {
       throw new NotFoundException('Dentista não encontrado.');
     }
+
+    if (
+      !CategoriaHelper.isDentistaEspOdont(dentista) &&
+      createServicoDto.espOdont
+    ) {
+      throw new ConflictException(
+        'Dentista informado não é colaborador do Espaço Odontológico.',
+      );
+    }
+
     servico.dentista = dentista;
 
     if (createServicoDto.pacienteId) {
@@ -91,16 +105,18 @@ export class ServicoService {
           produto,
           servico,
           quantidade: itemServico.quantidade,
-          multa: itemServico.multa,
           desconto: itemServico.desconto,
         });
 
-        const valor = CurrencyHelper.createCurrencyInstance(
-          produto.valor.espOdont,
-        );
+        const valor = CurrencyHelper.createCurrencyInstance(0);
+
+        if (createServicoDto.espOdont) {
+          valor.add(produto.valor.espOdont);
+        } else {
+          valor.add(produto.valor.cliente);
+        }
 
         valor.multiply(item.quantidade);
-        valor.add(item.multa ?? 0);
         valor.subtract(item.desconto ?? 0);
         valorTotal.add(valor);
 
@@ -122,17 +138,9 @@ export class ServicoService {
     Object.assign(servico, {
       descricao: createServicoDto.descricao,
       observacoes: createServicoDto.observacoes,
+      espOdont: createServicoDto.espOdont,
     });
 
-    if (
-      servico.dentista.categorias.includes(CategoriaEnum.DENTISTA) &&
-      servico.dentista.categorias.includes(CategoriaEnum.COLABORADOR)
-    ) {
-    } else if (
-      servico.dentista.categorias.includes(CategoriaEnum.DENTISTA) &&
-      servico.dentista.categorias.includes(CategoriaEnum.CLIENTE)
-    ) {
-    }
     return await this.servicoRepository.save(servico);
   }
 }
