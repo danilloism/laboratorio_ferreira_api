@@ -9,6 +9,9 @@ export class Servico extends BaseEntity {
   @Column({ nullable: true, length: 300 })
   descricao?: string;
 
+  @Column()
+  espOdont: boolean;
+
   @ManyToOne(() => Contato, { nullable: false, cascade: ['insert'] })
   dentista: Contato;
 

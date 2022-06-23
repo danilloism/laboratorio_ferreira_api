@@ -2,6 +2,7 @@ import { Optional } from '@nestjs/common';
 import {
   ArrayNotEmpty,
   IsArray,
+  IsBoolean,
   IsOptional,
   IsString,
   IsUUID,
@@ -24,6 +25,9 @@ export class CreateServicoDto {
   @IsOptional()
   @IsUUID()
   readonly pacienteId?: string;
+
+  @IsBoolean()
+  readonly espOdont: boolean;
 
   @IsArray()
   @ArrayNotEmpty()
