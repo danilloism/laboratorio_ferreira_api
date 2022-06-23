@@ -1,83 +1,245 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   HttpException,
+  HttpStatus,
+  NotFoundException,
   Param,
+  ParseUUIDPipe,
+  Patch,
   Post,
   Put,
-  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ResultDto } from '../../../../shared/dtos/result.dto';
-import { UpdateContatoDto } from '../dto/update-contato.dto';
-import { CreateContatoDto } from '../dto/create-contato.dto';
+import { ResultDto } from '../../../common/dtos/result.dto';
+import { UpdateContatoDto } from '../dtos/update-contato.dto';
+import { CreateContatoDto } from '../dtos/create-contato.dto';
 import { ContatoService } from '../service/contato.service';
-import { HttpExceptionHelper } from '../../../../shared/helpers/http-exception.helper';
-import { DentistaEspOdontRoleInterceptor } from '../../../sistema/shared/interceptor/dentista-esp-odont-role.interceptor';
+import { CreateAccountDto } from '../dtos/create-account.dto';
+import { UpdateAccountDto } from '../dtos/update-account.dto';
+import { Contato } from '../entities/contato.entity';
+import { Account } from '../entities/account.entity';
+import { IsPublic } from '../../../auth/decorators/is-public.decorator';
 
+@IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
+// @UseInterceptors(new RoleInterceptor())
 @Controller('contatos')
-@UseInterceptors(DentistaEspOdontRoleInterceptor)
 export class ContatoController {
-  constructor(private readonly service: ContatoService) {}
+  constructor(private readonly contatoService: ContatoService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async get(@Query('telefone') telefone?: string) {
-    if (telefone) {
-      const contato = await this.service.findByTelefone(telefone);
-      return contato ?? HttpExceptionHelper.throwNotFoundException();
-    }
-
-    return await this.service.find();
+  async get(): Promise<Contato[]> {
+    return await this.contatoService.find();
   }
 
-  @Get(':id')
-  async getById(@Param('id') id: string) {
-    const contato = await this.service.findById(id);
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':id/account')
+  async getAccount(@Param('id', ParseUUIDPipe) id: string): Promise<Account> {
+    const account = await this.contatoService
+      .findAccountByContatoId(id)
+      .catch(err => {
+        throw new HttpException(
+          new ResultDto({
+            sucesso: false,
+            mensagem: 'Erro ao procurar por conta de usuário.',
+            erro: err.message,
+          }),
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.BAD_REQUEST,
+        );
+      });
 
-    return contato ?? HttpExceptionHelper.throwNotFoundException();
+    if (!account) {
+      throw new NotFoundException(
+        new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao procurar por conta de usuário.',
+          erro: 'Conta de usuário não encontrada.',
+        }),
+      );
+    }
+
+    return account;
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':id')
+  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<Contato> {
+    const contato = await this.contatoService.findById(id);
+
+    if (!contato) {
+      const result = new ResultDto({
+        sucesso: false,
+        mensagem: 'Erro ao procurar por contato.',
+        erro: 'Contato não encontrado.',
+      });
+
+      throw new NotFoundException(result);
+    }
+
+    return contato;
   }
 
   @Post()
   async create(@Body() model: CreateContatoDto): Promise<ResultDto> {
-    const contato = await this.service.create(model).catch(err => {
-      if (err instanceof HttpException) {
-        throw err;
-      }
+    const contato = await this.contatoService.create(model).catch(err => {
+      const result = new ResultDto({
+        sucesso: false,
+        mensagem: 'Erro ao criar contato.',
+        erro: err.message,
+      });
 
-      //TODO: criar result dto para outros erros
+      throw new HttpException(
+        result,
+        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
+      );
     });
 
-    return contato
-      ? new ResultDto({
-          sucesso: true,
-          mensagem: 'Contato criado com sucesso.',
-          dados: contato,
-        })
-      : HttpExceptionHelper.throwBadRequestException();
+    delete contato.account?.senha;
+    return new ResultDto({
+      sucesso: true,
+      mensagem: 'Contato criado com sucesso.',
+      dados: contato,
+    });
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   async put(
     @Body() atualizarContatoDto: UpdateContatoDto,
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ResultDto> {
-    const result = await this.service
+    const contato = await this.contatoService
       .update(id, atualizarContatoDto)
       .catch(err => {
-        if (err instanceof HttpException) {
-          throw err;
-        }
+        const result = new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao atualizar contato.',
+          erro: err.message,
+        });
 
-        //TODO: criar result dto para outros erros
+        throw new HttpException(
+          result,
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.BAD_REQUEST,
+        );
       });
 
     return new ResultDto({
       mensagem: 'Contato atualizado com sucesso.',
       sucesso: true,
-      dados: result,
+      dados: contato,
+    });
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post(':id/account')
+  async createAccount(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() createAccountDto: CreateAccountDto,
+  ) {
+    const account = await this.contatoService
+      .createAccount(id, createAccountDto)
+      .catch(err => {
+        const result = new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao criar conta de usuário.',
+          erro: err.message,
+        });
+
+        throw new HttpException(
+          result,
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.BAD_REQUEST,
+        );
+      });
+
+    return new ResultDto({
+      sucesso: true,
+      mensagem: 'Conta de usuário criada com sucesso.',
+      dados: account,
+    });
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Put(':id/account')
+  async updateAccount(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateAccountDto: UpdateAccountDto,
+  ) {
+    const account = await this.contatoService
+      .updateAccount(id, updateAccountDto)
+      .catch(err => {
+        const result = new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao atualizar conta de usuário.',
+          erro: err.message,
+        });
+
+        throw new HttpException(
+          result,
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.BAD_REQUEST,
+        );
+      });
+
+    return new ResultDto({
+      sucesso: true,
+      mensagem: 'Conta de usuário atualizada com sucesso.',
+      dados: account,
+    });
+  }
+
+  @Delete(':id/account')
+  async deleteAccount(@Param('id', ParseUUIDPipe) id: string) {
+    await this.contatoService.deleteAccount(id).catch(err => {
+      const result = new ResultDto({
+        sucesso: false,
+        mensagem: 'Erro ao deletar conta de usuário.',
+        erro: err.message,
+      });
+
+      throw new HttpException(
+        result,
+        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
+      );
+    });
+
+    return new ResultDto({
+      sucesso: true,
+      mensagem: 'Conta de usuário deletada com sucesso.',
+    });
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Patch(':id/account/recover')
+  async recoverAccount(@Param('id', ParseUUIDPipe) id: string) {
+    await this.contatoService.restoreAccount(id).catch(err => {
+      const result = new ResultDto({
+        sucesso: false,
+        mensagem: 'Erro ao recuperar conta de usuário.',
+        erro: err.message,
+      });
+
+      throw new HttpException(
+        result,
+        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
+      );
+    });
+
+    return new ResultDto({
+      sucesso: true,
+      mensagem: 'Conta de usuário recuperada com sucesso.',
     });
   }
 }
