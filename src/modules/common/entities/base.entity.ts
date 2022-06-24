@@ -1,23 +1,17 @@
-import {
-  Column,
-  CreateDateColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+export interface BaseEntityParams {
+  uid?: string;
+  criadoEm?: Date;
+  atualizadoEm?: Date;
+  ativo?: boolean;
+}
 
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  public uid?: string;
+  public criadoEm?: Date;
+  public atualizadoEm?: Date;
+  public ativo?: boolean;
 
-  @CreateDateColumn()
-  criadoEm: Date;
-
-  @UpdateDateColumn()
-  atualizadoEm: Date;
-
-  @Column({ default: true })
-  ativo: boolean;
-
-  @Column({ nullable: true, length: 300 })
-  obervacoes?: string;
+  constructor(params?: BaseEntityParams) {
+    Object.assign(this, params);
+  }
 }
