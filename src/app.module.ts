@@ -9,9 +9,13 @@ import { JwtAuthGuard, AuthModule } from './modules/auth';
 import { ServicoModule } from './modules/servico/servico.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { FinanceiroModule } from './modules/financeiro/financeiro.module';
+import { TerminusModule } from '@nestjs/terminus';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    TerminusModule,
+    HttpModule,
     ConfigModule.forRoot({ isGlobal: true, cache: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
