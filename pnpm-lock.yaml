@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@faker-js/faker': ^6.3.1
+  '@nestjs/axios': ^0.0.8
   '@nestjs/cli': ^8.2.7
   '@nestjs/common': ^8.4.7
   '@nestjs/config': ^2.1.0
@@ -12,6 +13,7 @@ specifiers:
   '@nestjs/platform-express': ^8.4.7
   '@nestjs/schematics': ^8.0.11
   '@nestjs/swagger': ^5.2.1
+  '@nestjs/terminus': ^8.0.8
   '@nestjs/testing': ^8.4.7
   '@nestjs/typeorm': ^8.1.4
   '@types/bcrypt': ^5.0.0
@@ -61,6 +63,7 @@ specifiers:
 
 dependencies:
   '@faker-js/faker': 6.3.1
+  '@nestjs/axios': 0.0.8_g7av3gvncewo44y4rurz3mgav4
   '@nestjs/cli': 8.2.7
   '@nestjs/common': 8.4.7_kgmvgmqc4iohdboj3f7yqhrie4
   '@nestjs/config': 2.1.0_g7av3gvncewo44y4rurz3mgav4
@@ -70,6 +73,7 @@ dependencies:
   '@nestjs/passport': 8.2.2_vmlpjpjapp5nw4nimfi5m56upy
   '@nestjs/platform-express': 8.4.7_7tsmhnugyerf5okgqzer2mfqme
   '@nestjs/swagger': 5.2.1_22mmkdqibyufqwcxfa6zn2qjnu
+  '@nestjs/terminus': 8.0.8_is5nhplidwfwwktrrhg7r46vx4
   '@nestjs/typeorm': 8.1.4_yieplrfifnpd2adyzvulnrztri
   bcrypt: 5.0.1
   class-transformer: 0.5.1
@@ -821,6 +825,21 @@ packages:
       - supports-color
     dev: false
 
+  /@nestjs/axios/0.0.8_g7av3gvncewo44y4rurz3mgav4:
+    resolution: {integrity: sha512-oJyfR9/h9tVk776il0829xyj3b2e81yTu6HjPraxynwNtMNGqZBHHmAQL24yMB3tVbBM0RvG3eUXH8+pRCGwlg==}
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0
+      reflect-metadata: ^0.1.12
+      rxjs: ^6.0.0 || ^7.0.0
+    dependencies:
+      '@nestjs/common': 8.4.7_kgmvgmqc4iohdboj3f7yqhrie4
+      axios: 0.27.2
+      reflect-metadata: 0.1.13
+      rxjs: 7.5.5
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /@nestjs/cli/8.2.7:
     resolution: {integrity: sha512-wvdH9FLpLPj3HVyYVAVLgy4QJSUALVBzaOtd+eAkZgubkhteao+P1Qnqhu7Sugyiv2/bV5yVOJm7x7yqgueJ9g==}
     engines: {node: '>= 10.13.0', npm: '>= 6.11.0'}
@@ -1040,6 +1059,21 @@ packages:
     transitivePeerDependencies:
       - class-transformer
       - class-validator
+    dev: false
+
+  /@nestjs/terminus/8.0.8_is5nhplidwfwwktrrhg7r46vx4:
+    resolution: {integrity: sha512-VQwIfnbnvqVN1K2o82mjbqnFJnwP/TT8qojSsIUIEqW29elz0TfvjquICrQdEfqxsqn6DcGjLYF4kjHBORsJZQ==}
+    peerDependencies:
+      '@nestjs/common': 8.x
+      '@nestjs/core': 8.x
+      reflect-metadata: 0.1.x
+      rxjs: 7.x
+    dependencies:
+      '@nestjs/common': 8.4.7_kgmvgmqc4iohdboj3f7yqhrie4
+      '@nestjs/core': 8.4.7_fkqgj3xrohk2pflugljc4sz7ea
+      check-disk-space: 3.3.0
+      reflect-metadata: 0.1.13
+      rxjs: 7.5.5
     dev: false
 
   /@nestjs/testing/8.4.7_yg656aic4dli3q2c2sx4xyqza4:
@@ -2012,6 +2046,11 @@ packages:
 
   /chardet/0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
+    dev: false
+
+  /check-disk-space/3.3.0:
+    resolution: {integrity: sha512-Hvr+Nr01xSSvuCpXvJ8oZ2iXjIu4XT3uHbw3g7F/Uiw6O5xk8c/Ot7ZGFDaTRDf2Bz8AdWA4DvpAgCJVKt8arw==}
+    engines: {node: '>=12'}
     dev: false
 
   /chokidar/3.5.3:
