@@ -30,7 +30,6 @@ import { HttpModule } from '@nestjs/axios';
       synchronize: true,
       applicationName: 'lab-ferreira-api',
       namingStrategy: new SnakeNamingStrategy(),
-      ssl: process.env.NODE_ENV == 'production' ?? null,
     }),
     AuthModule,
     AgendaModule,
