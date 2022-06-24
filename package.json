@@ -22,7 +22,11 @@
     "test:vcov": "jest --verbose --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "docker:init": "docker start postgresql && docker exec -it postgresql bash -c \"psql -U danilloism -c 'create database lab;'\" && pnpm start:dev"
+    "typeorm:cli": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli -d src/config/db-source.config.ts",
+    "migration:generate": "pnpm typeorm:cli migration:generate",
+    "migration:create": "pnpm typeorm:cli migration:create",
+    "migration:run": "pnpm typeorm:cli migration:run",
+    "migration:revert": "pnpm typeorm:cli migration:revert"
   },
   "dependencies": {
     "@faker-js/faker": "^6.3.1",
