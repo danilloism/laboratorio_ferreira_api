@@ -35,4 +35,3 @@ DROP TABLE "_contato_categoria";
 -- DropTable
 
 DROP TABLE "categoria";
-

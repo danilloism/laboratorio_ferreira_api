@@ -395,4 +395,3 @@ ALTER TABLE "_contato_categoria"
     ADD CONSTRAINT "_contato_categoria_B_fkey" FOREIGN KEY ("B") REFERENCES "contato" ("uid") ON DELETE CASCADE ON
     UPDATE
         CASCADE;
-

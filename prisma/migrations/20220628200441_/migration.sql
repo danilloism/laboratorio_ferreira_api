@@ -6,4 +6,3 @@
 -- AlterTable
 
 ALTER TABLE "telefone" DROP COLUMN "ativo";
-

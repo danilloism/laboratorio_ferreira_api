@@ -39,4 +39,3 @@ ALTER TABLE "telefone"
     ADD CONSTRAINT "telefone_contato_uid_fkey" FOREIGN KEY ("contato_uid") REFERENCES "contato" ("uid") ON DELETE RESTRICT ON
     UPDATE
         CASCADE;
-

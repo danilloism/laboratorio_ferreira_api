@@ -78,4 +78,3 @@ DROP TYPE "role";
 -- DropEnum
 
 DROP TYPE "status_pagamento";
-

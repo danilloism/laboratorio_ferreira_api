@@ -10,4 +10,3 @@ DROP INDEX "telefone_contato_uid_key";
 -- CreateIndex
 
 CREATE UNIQUE INDEX "telefone_numero_contato_uid_key" ON "telefone" ("numero", "contato_uid");
-
