@@ -1,55 +1,35 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
-  ArrayMaxSize,
   ArrayMinSize,
-  ArrayNotEmpty,
   ArrayUnique,
   IsArray,
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
-  IsString,
-  Length,
+  MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { CategoriaEnum } from '../enums/categoria.enum';
-import { TelefoneHelper } from '../helpers/telefone.helper';
-import { CreateAccountDto } from './create-account.dto';
+import { Role } from '../enums/role.enum';
+import { CreateTelefoneDto } from './create-telefone.dto';
+import { CreateUsuarioDto } from './create-usuario.dto';
 
 export class CreateContatoDto {
-  @IsString()
-  @ApiProperty({ example: 'Danillo Silva' })
-  readonly nome: string;
+  @IsNotEmpty()
+  @MaxLength(80)
+  public readonly nome: string;
 
+  @IsArray()
   @ArrayMinSize(1)
-  @ArrayMaxSize(7)
   @ArrayUnique()
-  @IsEnum(CategoriaEnum, { each: true })
-  readonly categorias: CategoriaEnum[];
+  @IsEnum(Role, { each: true })
+  public readonly categorias: Role[];
 
-  @ApiProperty({
-    example: '62123456789',
-  })
-  @Length(11, 11, {
-    message:
-      'Tamanho da propriedade <telefone> deve ser exatamente 11 com DDD ocupando 2 espaços e o número ocupando os 9 restantes. ',
-  })
-  @IsNotEmpty({ message: 'Propriedade <telefone> deve conter algum valor.' })
-  @IsPhoneNumber('BR', {
-    message:
-      'Propriedade <telefone> inválida. Modelo válido: <ddd><numero>. Exemplo: 62123456789. Consulte a documentação para mais detalhes.',
-  })
-  @Transform(({ value }) => TelefoneHelper.format(value))
-  readonly telefone: string;
+  @ValidateNested({ each: true })
+  @Type(() => CreateTelefoneDto)
+  public readonly telefones: CreateTelefoneDto[];
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => CreateAccountDto)
-  readonly account?: CreateAccountDto;
-
-  @IsString()
-  @IsOptional()
-  readonly observacoes?: string;
+  @Type(() => CreateUsuarioDto)
+  public readonly usuario?: CreateUsuarioDto;
 }

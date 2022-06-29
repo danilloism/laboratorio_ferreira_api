@@ -1,16 +1,10 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateMarcaProdutoDto {
-  @IsString()
-  @IsNotEmpty()
-  readonly nome: string;
+	@IsNotEmpty()
+	readonly nome: string;
 
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  readonly descricao?: string;
-
-  @IsString()
-  @IsOptional()
-  readonly observacoes?: string;
+	@IsOptional()
+	@IsNotEmpty()
+	readonly descricao?: string;
 }
