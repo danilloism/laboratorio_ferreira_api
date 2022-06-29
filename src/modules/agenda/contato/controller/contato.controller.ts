@@ -2,47 +2,47 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  Delete,
   Get,
   HttpException,
   HttpStatus,
   NotFoundException,
   Param,
   ParseUUIDPipe,
-  Patch,
   Post,
   Put,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ResultDto } from '../../../common/dtos/result.dto';
-import { UpdateContatoDto } from '../dtos/update-contato.dto';
-import { CreateContatoDto } from '../dtos/create-contato.dto';
-import { ContatoService } from '../service/contato.service';
-import { CreateAccountDto } from '../dtos/create-account.dto';
-import { UpdateAccountDto } from '../dtos/update-account.dto';
-import { Contato } from '../entities/contato.entity';
-import { Account } from '../entities/account.entity';
+import { Contato, Usuario } from '@prisma/client';
 import { IsPublic } from '../../../auth/decorators/is-public.decorator';
+import { ResultDto } from '../../../common/dtos/result.dto';
+import { CreateContatoDto } from '../dtos/create-contato.dto';
+import { CreateUsuarioDto } from '../dtos/create-usuario.dto';
+import { UpdateContatoDto } from '../dtos/update-contato.dto';
+import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
+import { ContatoService } from '../services/contato.service';
 
 @IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
-// @UseInterceptors(new RoleInterceptor())
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('contatos')
 export class ContatoController {
-  constructor(private readonly contatoService: ContatoService) {}
-
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Get()
-  async get(): Promise<Contato[]> {
-    return await this.contatoService.find();
+  constructor(private readonly contatoService: ContatoService) {
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Get()
+  async get(
+    @Query('take') take?: number,
+    @Query('skip') skip?: number,
+  ): Promise<Contato[]> {
+    return await this.contatoService.find(take, skip);
+  }
+
   @Get(':id/account')
-  async getAccount(@Param('id', ParseUUIDPipe) id: string): Promise<Account> {
+  async getAccount(@Param('id', ParseUUIDPipe) id: string): Promise<Usuario> {
     const account = await this.contatoService
-      .findAccountByContatoId(id)
+      .procurarUsuarioPorContatoUid(id)
       .catch(err => {
         throw new HttpException(
           new ResultDto({
@@ -52,7 +52,7 @@ export class ContatoController {
           }),
           err instanceof HttpException
             ? err.getStatus()
-            : HttpStatus.BAD_REQUEST,
+            : HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
 
@@ -69,10 +69,9 @@ export class ContatoController {
     return account;
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   async getById(@Param('id', ParseUUIDPipe) id: string): Promise<Contato> {
-    const contato = await this.contatoService.findById(id);
+    const contato = await this.contatoService.findByUid(id);
 
     if (!contato) {
       const result = new ResultDto({
@@ -98,11 +97,10 @@ export class ContatoController {
 
       throw new HttpException(
         result,
-        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
+        err instanceof HttpException ? err.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
       );
     });
 
-    delete contato.account?.senha;
     return new ResultDto({
       sucesso: true,
       mensagem: 'Contato criado com sucesso.',
@@ -110,7 +108,6 @@ export class ContatoController {
     });
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   async put(
     @Body() atualizarContatoDto: UpdateContatoDto,
@@ -129,7 +126,7 @@ export class ContatoController {
           result,
           err instanceof HttpException
             ? err.getStatus()
-            : HttpStatus.BAD_REQUEST,
+            : HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
 
@@ -140,11 +137,10 @@ export class ContatoController {
     });
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Post(':id/account')
   async createAccount(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() createAccountDto: CreateAccountDto,
+    @Body() createAccountDto: CreateUsuarioDto,
   ) {
     const account = await this.contatoService
       .createAccount(id, createAccountDto)
@@ -159,7 +155,7 @@ export class ContatoController {
           result,
           err instanceof HttpException
             ? err.getStatus()
-            : HttpStatus.BAD_REQUEST,
+            : HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
 
@@ -170,11 +166,10 @@ export class ContatoController {
     });
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id/account')
   async updateAccount(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateAccountDto: UpdateAccountDto,
+    @Body() updateAccountDto: UpdateUsuarioDto,
   ) {
     const account = await this.contatoService
       .updateAccount(id, updateAccountDto)
@@ -189,7 +184,7 @@ export class ContatoController {
           result,
           err instanceof HttpException
             ? err.getStatus()
-            : HttpStatus.BAD_REQUEST,
+            : HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
 
@@ -200,46 +195,46 @@ export class ContatoController {
     });
   }
 
-  @Delete(':id/account')
-  async deleteAccount(@Param('id', ParseUUIDPipe) id: string) {
-    await this.contatoService.deleteAccount(id).catch(err => {
-      const result = new ResultDto({
-        sucesso: false,
-        mensagem: 'Erro ao deletar conta de usuário.',
-        erro: err.message,
-      });
+  // @Delete(':id/account')
+  // async deleteAccount(@Param('id', ParseUUIDPipe) id: string) {
+  // 	await this.contatoService.deleteAccount(id).catch(err => {
+  // 		const result = new ResultDto({
+  // 			sucesso: false,
+  // 			mensagem: 'Erro ao deletar conta de usuário.',
+  // 			erro: err.message,
+  // 		});
+  //
+  // 		throw new HttpException(
+  // 			result,
+  // 			err instanceof HttpException ? err.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
+  // 		);
+  // 	});
+  //
+  // 	return new ResultDto({
+  // 		sucesso: true,
+  // 		mensagem: 'Conta de usuário deletada com sucesso.',
+  // 	});
+  // }
 
-      throw new HttpException(
-        result,
-        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
-      );
-    });
 
-    return new ResultDto({
-      sucesso: true,
-      mensagem: 'Conta de usuário deletada com sucesso.',
-    });
-  }
-
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Patch(':id/account/recover')
-  async recoverAccount(@Param('id', ParseUUIDPipe) id: string) {
-    await this.contatoService.restoreAccount(id).catch(err => {
-      const result = new ResultDto({
-        sucesso: false,
-        mensagem: 'Erro ao recuperar conta de usuário.',
-        erro: err.message,
-      });
-
-      throw new HttpException(
-        result,
-        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
-      );
-    });
-
-    return new ResultDto({
-      sucesso: true,
-      mensagem: 'Conta de usuário recuperada com sucesso.',
-    });
-  }
+  // @Patch(':id/account/recover')
+  // async recoverAccount(@Param('id', ParseUUIDPipe) id: string) {
+  // 	await this.contatoService.restoreAccount(id).catch(err => {
+  // 		const result = new ResultDto({
+  // 			sucesso: false,
+  // 			mensagem: 'Erro ao recuperar conta de usuário.',
+  // 			erro: err.message,
+  // 		});
+  //
+  // 		throw new HttpException(
+  // 			result,
+  // 			err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
+  // 		);
+  // 	});
+  //
+  // 	return new ResultDto({
+  // 		sucesso: true,
+  // 		mensagem: 'Conta de usuário recuperada com sucesso.',
+  // 	});
+  // }
 }
