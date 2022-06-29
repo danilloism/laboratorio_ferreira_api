@@ -1,31 +1,26 @@
 import { Module } from '@nestjs/common';
-import { ProdutoService } from './services/produto.service';
-import { ProdutoController } from './controllers/produto.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Produto } from './entities/produto.entity';
-import { TipoProduto } from './entities/tipo-produto.entity';
-import { ValorProduto } from './entities/valor-produto.entity';
-import { MarcaProduto } from './entities/marca-produto.entity';
-import { TipoProdutoController } from './controllers/tipo-produto.controller';
-import { TipoProdutoService } from './services/tipo-produto.service';
+import { DataModule } from '../data/data.module';
+import { PrismaService } from '../data/services/prisma.service';
 import { MarcaProdutoController } from './controllers/marca-produto.controller';
+import { ProdutoController } from './controllers/produto.controller';
+import { TipoProdutoController } from './controllers/tipo-produto.controller';
 import { MarcaProdutoService } from './services/marca-produto.service';
+import { ProdutoService } from './services/produto.service';
+import { TipoProdutoService } from './services/tipo-produto.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Produto,
-      TipoProduto,
-      ValorProduto,
-      MarcaProduto,
-    ]),
-  ],
-  controllers: [
-    ProdutoController,
-    TipoProdutoController,
-    MarcaProdutoController,
-  ],
-  providers: [ProdutoService, TipoProdutoService, MarcaProdutoService],
-  exports: [ProdutoService],
+	imports: [ DataModule ],
+	controllers: [
+		ProdutoController,
+		TipoProdutoController,
+		MarcaProdutoController,
+	],
+	providers: [
+		PrismaService,
+		ProdutoService,
+		TipoProdutoService,
+		MarcaProdutoService,
+	],
+	exports: [ ProdutoService ],
 })
 export class EstoqueModule {}

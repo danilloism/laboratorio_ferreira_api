@@ -1,29 +1,23 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../data/services/prisma.service';
 import { CreateTipoProdutoDto } from '../dtos/create-tipo-produto.dto';
 import { UpdateTipoProdutoDto } from '../dtos/update-tipo-produto.dto';
-import { TipoProduto } from '../entities/tipo-produto.entity';
 
 @Injectable()
 export class TipoProdutoService {
   constructor(
-    @InjectRepository(TipoProduto)
-    private readonly tipoProdutoRepository: Repository<TipoProduto>,
-  ) {}
+    private readonly prismaService: PrismaService,
+  ) {
+  }
 
-  async find() {
+  async find(): Promise<string[]> {
     return (
-      await this.tipoProdutoRepository.find({ select: { nome: true } })
+      await this.prismaService.tipoProduto.findMany({ select: { nome: true } })
     ).map(tipo => tipo.nome);
   }
 
   async findByNome(nome: string) {
-    return await this.tipoProdutoRepository.findOne({ where: { nome } });
+    return await this.prismaService.tipoProduto.findUnique({ where: { nome } });
   }
 
   async update(nome: string, updateTipoDto: UpdateTipoProdutoDto) {
@@ -35,28 +29,30 @@ export class TipoProdutoService {
 
     Object.assign(tipo, updateTipoDto);
 
-    return await this.tipoProdutoRepository.save(tipo);
+    return await this.prismaService.tipoProduto.update({
+      where: { nome },
+      data: tipo,
+    });
   }
 
   async create(createTipoDto: CreateTipoProdutoDto) {
-    const jaExisteTipo = await this.findByNome(createTipoDto.nome);
+    const tipo = await this.findByNome(createTipoDto.nome);
 
-    if (jaExisteTipo) {
-      throw new ConflictException('Nome de marca já existe.');
+    if (tipo) {
+      throw new ConflictException('Nome de tipo já existe.');
     }
 
-    return await this.tipoProdutoRepository.save(createTipoDto);
+    return await this.prismaService.tipoProduto.create({ data: createTipoDto });
   }
 
-  async delete(nome: string) {
+  async delete(nome: string): Promise<boolean> {
     const tipo = await this.findByNome(nome);
 
     if (!tipo) {
       throw new NotFoundException('Tipo de produto não encontrado.');
     }
 
-    tipo.ativo = false;
-
+    await this.update(nome, { ativo: false });
     return true;
   }
 }

@@ -1,24 +1,18 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, HttpException, HttpStatus, Injectable, NestInterceptor } from '@nestjs/common';
+import { RoleEnum } from '@prisma/client';
 import { Observable } from 'rxjs';
-import { ResultDto } from '../../common/dtos/result.dto';
 import { JwtPayload } from '..';
-import { CategoriaEnum } from '../../agenda/contato/enums/categoria.enum';
+import { Role } from '../../agenda/contato/enums/role.enum';
+import { ResultDto } from '../../common/dtos/result.dto';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {
-  constructor(...roles: CategoriaEnum[]) {
+  constructor(...roles: Role[]) {
     this.roles = roles;
-    roles.push(CategoriaEnum.ADMIN);
+    roles.push(Role.ADMIN);
   }
 
-  private readonly roles: CategoriaEnum[];
+  private readonly roles: RoleEnum[];
 
   intercept(
     context: ExecutionContext,
@@ -28,7 +22,10 @@ export class RoleInterceptor implements NestInterceptor {
     const temRole = payload.roles.every(role => this.roles.includes(role));
     if (!temRole) {
       throw new HttpException(
-        new ResultDto({ sucesso: false, mensagem: 'Acesso proibido.' }),
+        new ResultDto({
+          sucesso: false,
+          mensagem: 'Acesso proibido.',
+        }),
         HttpStatus.FORBIDDEN,
       );
     }

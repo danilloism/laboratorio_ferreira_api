@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '../payload/jwt-payload.interface';
+import { RoleEnum, Usuario } from '@prisma/client';
+import { ContatoService } from '../../agenda/contato/services/contato.service';
 import { PasswordHelper } from '../../common/helpers/password.helper';
-import { ContatoService } from '../../agenda/contato/service/contato.service';
-import { Account } from '../../agenda/contato/entities/account.entity';
-import { CategoriaEnum } from '../../agenda/contato/enums/categoria.enum';
+import { JwtPayload } from '../payload/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly contatoService: ContatoService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) {
+  }
 
   createToken(payload: JwtPayload) {
     return this.jwtService.sign(payload);
@@ -24,20 +24,23 @@ export class AuthService {
   async authenticate(
     emailOrUsername: string,
     senha: string,
-  ): Promise<{ info: Account; roles: CategoriaEnum[] }> {
+  ): Promise<{ info: Usuario; roles: RoleEnum[] }> {
     const account =
-      (await this.contatoService.findAccountByEmail(emailOrUsername)) ||
-      (await this.contatoService.findAccountByUsername(emailOrUsername));
+            (await this.contatoService.findAccountByEmail(emailOrUsername)) ||
+            (await this.contatoService.findAccountByUsername(emailOrUsername));
 
     if (account) {
       const senhaValida = await new PasswordHelper(senha).compare(
         account.senha,
       );
 
-      const roles = await this.contatoService.getRoles(account.contato.id);
+      const roles = await this.contatoService.getRoles(account.contato.uid);
 
       if (senhaValida) {
-        return { info: account, roles };
+        return {
+          info: account,
+          roles,
+        };
       }
     }
   }

@@ -1,0 +1,282 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["metrics", "interactiveTransactions", "fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Contato {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  nome                 String            @db.VarChar(80)
+  servicosComoDentista Servico[]
+  servicosComoPaciente Servico[]         @relation("servico_paciente")
+  usuario              Usuario?
+  lancamentosRecebidos LancamentoSaida[]
+  categorias           RoleEnum[]
+  telefones            Telefone[]
+
+
+  @@map("contato")
+}
+
+model Telefone {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+
+  contatoUid String  @map("contato_uid") @db.Uuid
+  ddd        Int?    @db.SmallInt
+  numero     Int
+  whatsapp   Boolean @default(true)
+
+  contato Contato @relation(fields: [contatoUid], references: [uid])
+
+  @@unique([ddd, numero])
+  @@unique([numero, contatoUid])
+  @@map("telefone")
+}
+
+model Usuario {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+
+  email      String  @unique @db.VarChar(100)
+  username   String? @unique @db.VarChar(50)
+  senha      String  @db.VarChar(200)
+  contatoUid String  @unique @map("contato_uid") @db.Uuid
+
+  contato Contato @relation(fields: [contatoUid], references: [uid])
+
+  @@map("usuario")
+}
+
+model Produto {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  nome             String           @db.VarChar(50)
+  descricao        String?          @db.Text
+  tipo             String           @db.VarChar(30)
+  marca            String           @db.VarChar(30)
+  historicoValores ValorProduto[]
+  servicos         ProdutoServico[]
+
+  tipoProduto  TipoProduto  @relation(fields: [tipo], references: [nome])
+  marcaProduto MarcaProduto @relation(fields: [marca], references: [nome])
+
+  @@unique([nome, tipo, marca])
+  @@map("produto")
+}
+
+model TipoProduto {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  nome      String    @unique @db.VarChar(30)
+  descricao String?   @db.Text
+  produtos  Produto[]
+
+  @@map("tipo_produto")
+}
+
+model MarcaProduto {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  nome      String    @unique @db.VarChar(30)
+  descricao String?   @db.Text
+  produtos  Produto[]
+
+  @@map("marca_produto")
+}
+
+model ValorProduto {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  espOdont     Boolean   @map("esp_odont")
+  valorEmCents Int       @map("valor_em_cents")
+  dtFim        DateTime? @map("dt_fim") @db.Timestamp()
+  produtoUid   String    @map("produto_uid") @db.Uuid
+
+  produto Produto @relation(fields: [produtoUid], references: [uid])
+
+  @@map("valor_produto")
+}
+
+model Servico {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  dentistaUid String                 @map("dentista_uid") @db.Uuid
+  descricao   String?                @db.Text
+  observacoes String?                @db.Text
+  espOdont    Boolean                @map("esp_odont")
+  itens       ProdutoServico[]
+  lancamentos LancamentoFinanceiro[]
+
+  pacientes Contato[] @relation("servico_paciente")
+  dentista  Contato   @relation(fields: [dentistaUid], references: [uid])
+
+  @@map("servico")
+}
+
+model ProdutoServico {
+  uid          String   @unique @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  produtoUid      String  @map("produto_uid") @db.Uuid
+  servicoUid      String  @map("servico_uid") @db.Uuid
+  quantidade      Int     @default(1) @db.SmallInt
+  descontoEmCents Int?    @map("desconto_em_cents")
+  descricao       String? @db.Text
+  observacoes     String? @db.Text
+  etapa           String  @db.VarChar(30)
+
+  produto         Produto         @relation(fields: [produtoUid], references: [uid])
+  servico         Servico         @relation(fields: [servicoUid], references: [uid])
+  etapaFabricacao EtapaFabricacao @relation(fields: [etapa], references: [nome])
+
+  @@id([produtoUid, servicoUid])
+  @@map("produto_servico")
+}
+
+model EtapaFabricacao {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  nome      String           @unique @db.VarChar(30)
+  descricao String?          @db.Text
+  produtos  ProdutoServico[]
+
+  @@map("etapa_fabricacao")
+}
+
+model LancamentoFinanceiro {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+  ativo        Boolean  @default(true)
+
+  qtdParcelas                Int                @default(1) @map("qtd_parcelas") @db.SmallInt
+  dtLancamento               DateTime           @default(now()) @map("dt_lancamento") @db.Timestamp()
+  dtPrimeiroVencimento       DateTime?          @map("dt_primeiro_vencimento") @db.Timestamp()
+  intervaloDiasEntreParcelas Int?               @map("intervalo_dias_entre_parcelas") @db.SmallInt
+  valorEntradaEmCents        Int?               @map("valor_entrada_em_cents")
+  descricao                  String?            @db.Text
+  observacoes                String?            @db.Text
+  saida                      LancamentoSaida?
+  servicoUid                 String?            @map("servico_uid") @db.Uuid
+  parcelas                   Parcela[]
+  formaDePagamento           FormaPagamentoEnum @default(dinheiro) @map("forma_pagamento")
+
+  servico Servico? @relation(fields: [servicoUid], references: [uid])
+
+  @@map("lancamento_financeiro")
+}
+
+model LancamentoSaida {
+  uid                  String               @id @map("uid") @db.Uuid
+  paraQuemUid          String               @map("contato_uid") @db.Uuid
+  finalidade           FinalidadeSaidaEnum
+  paraQuem             Contato              @relation(fields: [paraQuemUid], references: [uid])
+  lancamentoFinanceiro LancamentoFinanceiro @relation(fields: [uid], references: [uid])
+
+  @@map("lancamento_saida")
+}
+
+model Parcela {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+
+  valorEmCents            Int                 @map("valor_em_cents")
+  numParcela              Int                 @default(1) @map("num_parcela") @db.SmallInt
+  status                  StatusPagamentoEnum
+  pagamentos              Pagamento[]
+  lancamentoFinanceiroUid String              @map("lancamento_financeiro_uid") @db.Uuid
+
+  lancamento LancamentoFinanceiro @relation(fields: [lancamentoFinanceiroUid], references: [uid])
+
+  @@map("parcela")
+}
+
+model Pagamento {
+  uid          String   @id @default(uuid()) @db.Uuid
+  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
+  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
+
+  dt           DateTime @default(now()) @db.Timestamp()
+  valorEmCents Int      @map("valor_em_cents")
+  parcelaUid   String   @map("parcela_uid") @db.Uuid
+
+  parcela Parcela @relation(fields: [parcelaUid], references: [uid])
+
+  @@map("pagamento")
+}
+
+enum RoleEnum {
+  admin
+  gerente
+  colaborador
+  dentista
+  cliente
+  fornecedor
+  entregador
+
+  @@map("role_enum")
+}
+
+enum FinalidadeSaidaEnum {
+  agua
+  energia
+  gas
+  salario
+  repasse_dent_esp_odont
+  pgmnt_fornecedor
+  outro
+
+  @@map("finalidade_saida_enum")
+}
+
+enum StatusPagamentoEnum {
+  aberto
+  quitado
+  vencido
+  renegociado
+
+  @@map("status_pagamento_enum")
+}
+
+enum FormaPagamentoEnum {
+  dinheiro
+  cheque
+  cartao
+
+  @@map("forma_pagamento_enum")
+}

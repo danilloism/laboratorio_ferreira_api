@@ -2,35 +2,37 @@ import * as bcrypt from 'bcrypt';
 import { v5 } from 'uuid';
 
 export class PasswordHelper {
-  constructor(private readonly senha: string) {}
-  private uuid = v5(process.env.UUID_NAME, process.env.UUID_NAMESPACE);
+	constructor(private readonly senha: string) {}
 
-  async encrypt() {
-    const encrypted = await bcrypt.hash(
-      this.senha + this.uuid,
-      parseInt(process.env.SALT_KEY),
-    );
+	private uuid = v5(process.env.UUID_NAME, process.env.UUID_NAMESPACE);
 
-    return encrypted;
-  }
+	async encrypt() {
+		const encrypted = await bcrypt.hash(
+			this.senha + this.uuid,
+			parseInt(process.env.SALT_KEY),
+		);
 
-  async compare(senhaEncriptada: string) {
-    return await bcrypt.compare(this.senha + this.uuid, senhaEncriptada);
-  }
+		return encrypted;
+	}
+
+	async compare(senhaEncriptada: string) {
+		return await bcrypt.compare(this.senha + this.uuid, senhaEncriptada);
+	}
 }
 
 export class PasswordHelperV2 {
-  private readonly uuid = v5(process.env.UUID_NAME, process.env.UUID_NAMESPACE);
+	private constructor() {}
 
-  static async encrypt(senha: string) {
-    const encrypted = await bcrypt.hash(
-      senha + new PasswordHelperV2().uuid,
-      parseInt(process.env.SALT_KEY),
-    );
+	static async encrypt(senha: string) {
+		return bcrypt.hash(
+			senha + this.uuid(),
+			parseInt(process.env.SALT_KEY),
+		);
+	}
 
-    return encrypted;
-  }
+	static async compare(senha: string, senhaEncriptada: string): Promise<boolean> {
+		return bcrypt.compare(senha + this.uuid(), senhaEncriptada);
+	};
 
-  static readonly compare = async (senha: string, senhaEncriptada: string) =>
-    await bcrypt.compare(senha + new PasswordHelperV2().uuid, senhaEncriptada);
+	private static readonly uuid = () => v5(process.env.UUID_NAME, process.env.UUID_NAMESPACE);
 }

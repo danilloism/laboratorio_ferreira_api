@@ -1,244 +1,194 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Not, Repository } from 'typeorm';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '../../data/services/prisma.service';
+
 import { CreateProdutoDto } from '../dtos/create-produto.dto';
 import { UpdateProdutoDto } from '../dtos/update-produto.dto';
-import { MarcaProduto } from '../entities/marca-produto.entity';
-import { Produto } from '../entities/produto.entity';
-import { TipoProduto } from '../entities/tipo-produto.entity';
-import { ValorProduto } from '../entities/valor-produto.entity';
 
 @Injectable()
 export class ProdutoService {
   constructor(
-    @InjectRepository(Produto)
-    private readonly produtoRepository: Repository<Produto>,
-    @InjectRepository(TipoProduto)
-    private readonly tipoProdutoRepository: Repository<TipoProduto>,
-    @InjectRepository(MarcaProduto)
-    private readonly marcaProdutoRepository: Repository<MarcaProduto>,
-    @InjectRepository(ValorProduto)
-    private readonly valorProdutoRepository: Repository<ValorProduto>,
-    private readonly dataSource: DataSource,
-  ) {}
+    private readonly prismaService: PrismaService,
+  ) {
+  }
 
-  async findById(id: string) {
-    return await this.produtoRepository.findOne({
-      where: { id },
-      relationLoadStrategy: 'query',
+  private readonly include: Prisma.ProdutoInclude = {
+    tipoProduto: true,
+    marcaProduto: true,
+    historicoValores: {
+      take: 10,
+      orderBy: {
+        ativo: 'desc',
+        dtFim: 'desc',
+      },
+    },
+  };
+
+  async findById(uid: string) {
+    return this.prismaService.produto.findUnique({
+      where: { uid },
+      include: this.include,
     });
   }
 
-  async create(createProdutoDto: CreateProdutoDto) {
-    const produtoEntity = new Produto();
-
-    const { valorCliente, valorEspOdont, marca, tipo, ...produto } =
-      createProdutoDto;
-
-    const valorEspOdontEntity = this.valorProdutoRepository.create({
-      valor: valorEspOdont,
-      espOdont: true,
-    });
-    const valorClienteEntity = this.valorProdutoRepository.create({
-      valor: valorCliente,
-      espOdont: false,
-    });
-
-    produtoEntity.historicoValores = [valorEspOdontEntity, valorClienteEntity];
-
-    const existeTipo = await this.tipoProdutoRepository.findOne({
-      where: { nome: tipo },
-    });
-    let existeMarca: MarcaProduto;
-    let marcaProduto: MarcaProduto;
-
-    if (marca) {
-      existeMarca = await this.marcaProdutoRepository.findOne({
-        where: { nome: marca },
-      });
-
-      marcaProduto = this.marcaProdutoRepository.create(
-        existeMarca ?? { nome: marca },
-      );
-    }
-
-    const tipoProduto = this.tipoProdutoRepository.create(
-      existeTipo ?? { nome: tipo },
-    );
-
-    Object.assign(produtoEntity, { tipoProduto, marcaProduto, ...produto });
-
-    const existeProduto = await this.produtoRepository.findOne({
-      where: {
-        nome: produto.nome,
-        marcaProduto: marcaProduto ? { id: marcaProduto.id } : null,
-        tipoProduto: { id: tipoProduto.id },
+  async create({
+    valorCliente,
+    valorEspOdont,
+    marca,
+    tipo,
+    nome,
+    descricao,
+  }: CreateProdutoDto) {
+    return this.prismaService.produto.create({
+      data: {
+        nome: nome,
+        descricao: descricao,
+        marcaProduto: {
+          connectOrCreate: {
+            where: { nome: marca },
+            create: { nome: marca },
+          },
+        },
+        tipoProduto: {
+          connectOrCreate: {
+            where: { nome: tipo },
+            create: { nome: tipo },
+          },
+        },
+        historicoValores: {
+          createMany: {
+            data: [
+              {
+                espOdont: true,
+                valorEmCents: valorEspOdont.cents(),
+              },
+              {
+                espOdont: false,
+                valorEmCents: valorCliente.cents(),
+              },
+            ],
+          },
+        },
+      },
+      include: {
+        ...this.include,
+        historicoValores: true,
       },
     });
-
-    if (existeProduto) {
-      throw new ConflictException('Produto já existe.');
-    }
-
-    return await this.produtoRepository.save(produtoEntity);
   }
 
   async findAll() {
-    return await this.produtoRepository.find();
-  }
-
-  async getHistoricoValores(id: string, espOdont?: boolean, cliente?: boolean) {
-    const produto = await this.findById(id);
-    if (!produto) {
-      throw new NotFoundException('Produto não encontrado.');
-    }
-
-    if ((espOdont && cliente) || (!espOdont && !cliente)) {
-      return await this.valorProdutoRepository.find({
-        order: { dtFim: 'DESC' },
-        where: { produto: { id } },
-      });
-    }
-
-    if (espOdont) {
-      return await this.valorProdutoRepository.find({
-        order: { dtFim: 'DESC' },
-        where: { produto: { id }, espOdont: true },
-      });
-    }
-
-    return await this.valorProdutoRepository.find({
-      order: { dtFim: 'DESC' },
-      where: { produto: { id }, espOdont: false },
+    return this.prismaService.produto.findMany({
+      include: this.include,
     });
   }
 
-  async update(id: string, updateProdutoDto: UpdateProdutoDto) {
-    const produto = await this.findById(id);
-    const { valorCliente, valorEspOdont, marca, tipo, ...dados } =
-      updateProdutoDto;
+  async getHistoricoValores(produtoUid: string, espOdont?: boolean, cliente?: boolean) {
+    const produto = await this.findById(produtoUid);
+    if (!produto) {
+      throw new NotFoundException('Produto não encontrado.');
+    }
+
+    return await this.prismaService.valorProduto.findMany({
+      where: {
+        produtoUid,
+        espOdont: (espOdont && cliente) || (!espOdont && !espOdont) ? undefined : cliente != true,
+      },
+      orderBy: this.include['historicoValores']['orderBy'],
+    });
+  }
+
+  async update(uid: string, {
+    valorCliente,
+    valorEspOdont,
+    marca,
+    tipo,
+    nome,
+    descricao,
+    ativo,
+  }: UpdateProdutoDto) {
+    const produto = await this.findById(uid);
 
     if (!produto) {
       throw new NotFoundException('Produto não encontrado.');
     }
 
-    let marcaProduto: MarcaProduto;
-
-    if (marca) {
-      marcaProduto = await this.marcaProdutoRepository.findOne({
-        where: { nome: marca },
-      });
-
-      if (!marcaProduto) {
-        throw new NotFoundException('Marca de produto não encontrada.');
-      }
-    }
-
-    const tipoProduto = tipo
-      ? await this.tipoProdutoRepository.findOne({
-          where: { nome: tipo },
-        })
-      : produto.tipoProduto;
-
-    if (!tipoProduto) {
-      throw new NotFoundException('Tipo de produto não encontrado.');
-    }
-
-    const jaExisteProduto = await this.produtoRepository.findOne({
+    const constraint = await this.prismaService.produto.findFirst({
       where: {
-        id: Not(id),
-        marcaProduto: marca ? { id: marcaProduto.id } : null,
-        tipoProduto: { id: tipoProduto.id },
-        nome: dados.nome,
+        nome,
+        marca: marca ?? produto.marca ?? null,
+        tipo,
+        NOT: { uid },
       },
     });
 
-    if (jaExisteProduto) {
+    if (constraint) {
       throw new ConflictException(
         'Produto com nome, marca e tipo informados já existe.',
       );
     }
 
-    Object.assign(produto, { tipoProduto, marcaProduto, ...dados });
+    type valorInput = { espOdont: boolean, valorEmCents: number }
+    const inputValorEspOdont: valorInput = {
+      espOdont: true,
+      valorEmCents: valorEspOdont.cents(),
+    };
+    const inputValorCliente: valorInput = {
+      espOdont: false,
+      valorEmCents: valorCliente.cents(),
+    };
 
-    let valorClienteEntity: ValorProduto;
-    let valorEspOdontEntity: ValorProduto;
-
-    if (valorCliente) {
-      valorClienteEntity = this.valorProdutoRepository.create({
-        espOdont: false,
-        valor: valorCliente,
-      });
-    }
-
-    if (valorEspOdont) {
-      valorEspOdontEntity = this.valorProdutoRepository.create({
-        espOdont: true,
-        valor: valorEspOdont,
-      });
-    }
-
-    if (valorCliente && valorEspOdont) {
-      return await this.dataSource.manager.transaction(async manager => {
-        const valoresAtuais = await manager.find(ValorProduto, {
-          where: { dtFim: null },
-        });
-
-        for (const valor of valoresAtuais) {
-          valor.ativo = false;
-          valor.dtFim = new Date();
-        }
-
-        await manager.save(valoresAtuais);
-
-        produto.historicoValores.push(valorClienteEntity, valorEspOdontEntity);
-        return await manager.save(produto);
-      });
-    }
-
-    if (!valorCliente && !valorEspOdont) {
-      return await this.produtoRepository.save(produto);
-    }
-
-    if (valorCliente) {
-      return await this.dataSource.manager.transaction(async manager => {
-        const valorAtual = await manager.findOne(ValorProduto, {
-          where: { ativo: true, espOdont: false, produto: { id } },
-        });
-        valorAtual.dtFim = new Date();
-        valorAtual.ativo = false;
-        await manager.save(valorAtual);
-
-        produto.historicoValores.push(valorClienteEntity);
-        return await manager.save(produto);
-      });
-    }
-
-    return await this.dataSource.manager.transaction(async manager => {
-      const valorAtual = await manager.findOne(ValorProduto, {
-        where: { ativo: true, espOdont: true, produto: { id } },
-      });
-      valorAtual.dtFim = new Date();
-      valorAtual.ativo = false;
-      await manager.save(valorAtual);
-
-      produto.historicoValores.push(valorEspOdontEntity);
-      return await manager.save(produto);
+    return await this.prismaService.produto.update({
+      where: { uid },
+      data: {
+        nome: nome != null ? nome : undefined,
+        descricao,
+        ativo: ativo != null ? ativo : undefined,
+        marcaProduto: marca != null ? {
+          connectOrCreate: {
+            where: { nome: marca },
+            create: { nome: marca },
+          },
+        } : undefined,
+        tipoProduto: tipo != null ? {
+          connectOrCreate: {
+            where: { nome: tipo },
+            create: { nome: tipo },
+          },
+        } : undefined,
+        historicoValores: valorCliente || valorEspOdont ? {
+          updateMany: {
+            where: {
+              ativo: true,
+              espOdont: valorEspOdont && valorCliente ? undefined : !valorCliente,
+            },
+            data: {
+              ativo: false,
+              dtFim: new Date(),
+            },
+          },
+          createMany: {
+            data: valorCliente && valorEspOdont ? [
+              inputValorEspOdont,
+              inputValorCliente,
+            ] : valorCliente ? [ inputValorCliente ] : [ inputValorEspOdont ],
+          },
+        } : undefined,
+      },
     });
+
   }
 
-  async remove(id: string) {
-    const produto = await this.findById(id);
+  async remove(uid: string) {
+    const produto = await this.findById(uid);
     if (!produto) {
       throw new NotFoundException('Produto não encontrado.');
     }
 
-    produto.ativo = false;
-    await this.produtoRepository.save(produto);
+    await this.prismaService.produto.update({
+      where: { uid },
+      data: { ativo: false },
+    });
 
     return true;
   }

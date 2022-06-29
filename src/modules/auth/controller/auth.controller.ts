@@ -21,7 +21,8 @@ import { AuthService } from '../service/auth.service';
 @ApiTags('Auth')
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {
+  }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @IsPublic()
@@ -64,7 +65,8 @@ export class AuthController {
     }
 
     const dados: JwtPayload = {
-      sub: account.info.contato.id,
+      sub: account.info.uid,
+      contatoUid: account.info.contatoUid,
       username: account.info.username,
       email: account.info.email,
       roles: account.roles,
@@ -79,9 +81,6 @@ export class AuthController {
       mensagem: 'Token gerado com sucesso.',
       dados: {
         access_token: token,
-        // roles: dados.roles,
-        // id: dados.sub,
-        // login: { email, username },
         info: this.authService.decodeToken(token),
       },
     });
@@ -90,9 +89,9 @@ export class AuthController {
   @Post('refresh')
   async refreshToken(@Req() request) {
     const payload: JwtPayload = request.user;
-    console.log(payload);
     const token = this.authService.createToken({
       sub: payload.sub,
+      contatoUid: payload.contatoUid,
       email: payload.email,
       roles: payload.roles,
       username: payload.username,
