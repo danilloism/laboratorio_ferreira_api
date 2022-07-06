@@ -5,30 +5,34 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "command": "pnpm start:dev",
+            "name": "Run pnpm start:dev",
+            "request": "launch",
+            "type": "node-terminal",
+        },
+        {
+            "command": "pnpm start:debug",
+            "name": "Run pnpm start:debug",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
             "type": "node",
             "request": "attach",
             "name": "NestJS: Attach Debugger",
             "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "args": [
-                "${workspaceFolder}/src/main.ts"
-            ],
-            "runtimeArgs": [
-                "--no-lazy",
-                "-r",
-                "ts-node/register",
-                "-r",
-                "tsconfig-paths/register"
+                "<node_internals>/**",
+                "node_modules/**"
             ],
             "sourceMaps": true,
             "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "protocol": "inspector",
-            "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
-            ]
+            ],
+            "attachExistingChildren": true,
+            "envFile": "${workspaceFolder}/.env",
+            "restart": true,
+            "port": 9229,
         },
         {
             "type": "node",
@@ -37,12 +41,23 @@
             "runtimeArgs": [
                 "--nolazy",
                 "-r",
-                "ts-node/register"
+                "ts-node/register",
+                "-r",
+                "tsconfig-paths/register"
             ],
             "args": [
+                "--inspect",
                 "${workspaceFolder}/src/main.ts"
             ],
-            "autoAttachChildProcesses": true
+            "skipFiles": [
+                "<node_internals>/**",
+                "node_modules/**"
+            ],
+            "envFile": "${workspaceFolder}/.env",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "sourceMaps": true,
+            "autoAttachChildProcesses": true,
         }
     ]
 }
