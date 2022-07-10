@@ -8,13 +8,13 @@
             "type": "node",
             "request": "launch",
             "name": "run + debug",
-            "runtimeExecutable": "pnpm",
+            "runtimeExecutable": "/home/danilloism/.local/share/pnpm/pnpm",
             "runtimeArgs": [
                 "start:debug",
                 "--",
                 "--inspect-brk"
             ],
-            "console": "internalConsole",
+            "console": "integratedTerminal",
             "restart": true,
             "autoAttachChildProcesses": true,
             "cwd": "${workspaceFolder}",

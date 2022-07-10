@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/modules/data/services/prisma.service';
 import { PasswordHelperV2 } from '../../../common/helpers/password.helper';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
@@ -9,8 +13,7 @@ import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
 
 @Injectable()
 export class ContatoService {
-  constructor(private readonly prismaService: PrismaService) {
-  }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findByUid(uid: string) {
     return await this.prismaService.contato.findUnique({
@@ -23,38 +26,41 @@ export class ContatoService {
   }
 
   async findByTelefone(ddd: number, numero: number) {
-    return await this.prismaService.telefone.findUnique({
-      where: {
-        ddd_numero: {
-          ddd,
-          numero,
+    return await this.prismaService.telefone
+      .findUnique({
+        where: {
+          ddd_numero: {
+            ddd,
+            numero,
+          },
         },
-      },
-      include: { contato: true },
-    }).contato();
+        include: { contato: true },
+      })
+      .contato();
   }
 
   async find(take?: number, skip?: number) {
     const contatos = await this.prismaService.contato.findMany({
       include: {
-        usuario: true,
+        usuario: {
+          select: {
+            email: true,
+            username: true,
+            criadoEm: true,
+            atualizadoEm: true,
+            uid: true,
+          },
+        },
         telefones: true,
       },
       take: Number.isNaN(take) ? undefined : take,
       skip: Number.isNaN(skip) ? undefined : skip,
     });
-    contatos.forEach(contato => {
-      delete contato.usuario.senha;
-    });
+
     return contatos;
   }
 
-  async create({
-    nome,
-    telefones,
-    usuario,
-    categorias,
-  }: CreateContatoDto) {
+  async create({ nome, telefones, usuario, categorias }: CreateContatoDto) {
     const novoUsuario = {
       email: usuario?.email,
       username: usuario?.username,
@@ -62,10 +68,7 @@ export class ContatoService {
     };
 
     if (usuario) {
-      const {
-              email,
-              username,
-            } = usuario;
+      const { email, username } = usuario;
 
       const emailExiste = await this.prismaService.usuario.findUnique({
         where: { email },
@@ -85,7 +88,7 @@ export class ContatoService {
     }
 
     const telefoneExiste = async (telefones: CreateTelefoneDto[]) => {
-      for (let telefone of telefones) {
+      for (const telefone of telefones) {
         const existe = await this.prismaService.telefone.findUnique({
           where: {
             ddd_numero: {
@@ -129,22 +132,24 @@ export class ContatoService {
     });
   }
 
-  async update(
-    uid: string,
-    atualizarContatoDto: UpdateContatoDto,
-  ) {
+  async update(uid: string, atualizarContatoDto: UpdateContatoDto) {
     const contato = await this.findByUid(uid);
     if (!contato) {
       throw new NotFoundException('Contato não encontrado.');
     }
 
-
     return await this.prismaService.contato.update({
       where: { uid: uid },
       data: {
         nome: atualizarContatoDto.nome != null ? contato.nome : undefined,
-        categorias: atualizarContatoDto.categorias != null ? atualizarContatoDto.categorias : undefined,
-        ativo: atualizarContatoDto.ativo != null ? atualizarContatoDto.ativo : undefined,
+        categorias:
+          atualizarContatoDto.categorias != null
+            ? atualizarContatoDto.categorias
+            : undefined,
+        ativo:
+          atualizarContatoDto.ativo != null
+            ? atualizarContatoDto.ativo
+            : undefined,
       },
       include: {
         usuario: true,
@@ -177,7 +182,9 @@ export class ContatoService {
   }
 
   async updateAccount(contatoUid: string, updateAccountDto: UpdateUsuarioDto) {
-    const account = await this.prismaService.usuario.findUnique({ where: { contatoUid } });
+    const account = await this.prismaService.usuario.findUnique({
+      where: { contatoUid },
+    });
 
     if (!account) {
       throw new NotFoundException('Conta de usuário não encontrada.');
@@ -229,7 +236,6 @@ export class ContatoService {
   // 	await this.prismaService.usuario.delete({ where: { contatoUid: contatoId } });
   // 	return true;
   // }
-
 
   async getRoles(id: string) {
     const contato = await this.findByUid(id);
