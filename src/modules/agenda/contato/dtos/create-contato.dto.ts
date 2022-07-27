@@ -1,3 +1,4 @@
+import { RoleEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -9,7 +10,6 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { Role } from '../enums/role.enum';
 import { CreateTelefoneDto } from './create-telefone.dto';
 import { CreateUsuarioDto } from './create-usuario.dto';
 
@@ -21,8 +21,8 @@ export class CreateContatoDto {
   @IsArray()
   @ArrayMinSize(1)
   @ArrayUnique()
-  @IsEnum(Role, { each: true })
-  public readonly categorias: Role[];
+  @IsEnum(RoleEnum, { each: true })
+  public readonly categorias: RoleEnum[];
 
   @ValidateNested({ each: true })
   @Type(() => CreateTelefoneDto)

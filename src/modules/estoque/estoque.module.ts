@@ -9,18 +9,18 @@ import { ProdutoService } from './services/produto.service';
 import { TipoProdutoService } from './services/tipo-produto.service';
 
 @Module({
-	imports: [ DataModule ],
-	controllers: [
-		ProdutoController,
-		TipoProdutoController,
-		MarcaProdutoController,
-	],
-	providers: [
-		PrismaService,
-		ProdutoService,
-		TipoProdutoService,
-		MarcaProdutoService,
-	],
-	exports: [ ProdutoService ],
+  imports: [DataModule],
+  controllers: [
+    ProdutoController,
+    TipoProdutoController,
+    MarcaProdutoController,
+  ],
+  providers: [
+    PrismaService,
+    ProdutoService,
+    TipoProdutoService,
+    MarcaProdutoService,
+  ],
+  exports: [ProdutoService],
 })
 export class EstoqueModule {}

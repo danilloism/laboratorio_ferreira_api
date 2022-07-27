@@ -21,8 +21,7 @@ import { AuthService } from '../service/auth.service';
 @ApiTags('Auth')
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {
-  }
+  constructor(private readonly authService: AuthService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
   @IsPublic()
@@ -73,8 +72,6 @@ export class AuthController {
     };
 
     const token = this.authService.createToken(dados);
-
-    // const { email, username } = dados;
 
     return new ResultDto({
       sucesso: true,

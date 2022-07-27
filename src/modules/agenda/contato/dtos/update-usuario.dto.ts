@@ -3,9 +3,9 @@ import { IsBoolean, IsOptional } from 'class-validator';
 import { CreateUsuarioDto } from './create-usuario.dto';
 
 export class UpdateUsuarioDto extends PartialType(
-	OmitType(CreateUsuarioDto, [ 'senha' ] as const),
+  OmitType(CreateUsuarioDto, ['senha'] as const),
 ) {
-	@IsBoolean()
-	@IsOptional()
-	readonly ativo?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  readonly ativo?: boolean;
 }

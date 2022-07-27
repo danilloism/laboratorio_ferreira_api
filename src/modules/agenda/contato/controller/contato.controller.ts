@@ -28,8 +28,7 @@ import { ContatoService } from '../services/contato.service';
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('contatos')
 export class ContatoController {
-  constructor(private readonly contatoService: ContatoService) {
-  }
+  constructor(private readonly contatoService: ContatoService) {}
 
   @Get()
   async get(
@@ -97,7 +96,9 @@ export class ContatoController {
 
       throw new HttpException(
         result,
-        err instanceof HttpException ? err.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
+        err instanceof HttpException
+          ? err.getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR,
       );
     });
 
@@ -194,47 +195,4 @@ export class ContatoController {
       dados: account,
     });
   }
-
-  // @Delete(':id/account')
-  // async deleteAccount(@Param('id', ParseUUIDPipe) id: string) {
-  // 	await this.contatoService.deleteAccount(id).catch(err => {
-  // 		const result = new ResultDto({
-  // 			sucesso: false,
-  // 			mensagem: 'Erro ao deletar conta de usuário.',
-  // 			erro: err.message,
-  // 		});
-  //
-  // 		throw new HttpException(
-  // 			result,
-  // 			err instanceof HttpException ? err.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
-  // 		);
-  // 	});
-  //
-  // 	return new ResultDto({
-  // 		sucesso: true,
-  // 		mensagem: 'Conta de usuário deletada com sucesso.',
-  // 	});
-  // }
-
-
-  // @Patch(':id/account/recover')
-  // async recoverAccount(@Param('id', ParseUUIDPipe) id: string) {
-  // 	await this.contatoService.restoreAccount(id).catch(err => {
-  // 		const result = new ResultDto({
-  // 			sucesso: false,
-  // 			mensagem: 'Erro ao recuperar conta de usuário.',
-  // 			erro: err.message,
-  // 		});
-  //
-  // 		throw new HttpException(
-  // 			result,
-  // 			err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
-  // 		);
-  // 	});
-  //
-  // 	return new ResultDto({
-  // 		sucesso: true,
-  // 		mensagem: 'Conta de usuário recuperada com sucesso.',
-  // 	});
-  // }
 }

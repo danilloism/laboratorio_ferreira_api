@@ -1,4 +1,9 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import * as newrelic from 'newrelic';
 import { Observable } from 'rxjs';
 
@@ -9,21 +14,14 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class NewrelicInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    return newrelic.startWebTransaction(context.getHandler().name, function () {
+      // this.logger.log(
+      // 	'Web transaction started.',
+      // );
+      const transaction = newrelic.getTransaction();
 
-
-	intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-
-
-		return newrelic.startWebTransaction(context.getHandler().name, function() {
-			// this.logger.log(
-			// 	'Web transaction started.',
-			// );
-			const transaction = newrelic.getTransaction();
-
-			return next.handle()
-				.pipe(
-					() => transaction.end(),
-				);
-		});
-	}
+      return next.handle().pipe(() => transaction.end());
+    });
+  }
 }

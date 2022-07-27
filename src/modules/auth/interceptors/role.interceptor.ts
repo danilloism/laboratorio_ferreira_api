@@ -1,15 +1,21 @@
-import { CallHandler, ExecutionContext, HttpException, HttpStatus, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { RoleEnum } from '@prisma/client';
 import { Observable } from 'rxjs';
 import { JwtPayload } from '..';
-import { Role } from '../../agenda/contato/enums/role.enum';
 import { ResultDto } from '../../common/dtos/result.dto';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {
-  constructor(...roles: Role[]) {
+  constructor(...roles: RoleEnum[]) {
     this.roles = roles;
-    roles.push(Role.ADMIN);
+    roles.push(RoleEnum.ADMIN);
   }
 
   private readonly roles: RoleEnum[];

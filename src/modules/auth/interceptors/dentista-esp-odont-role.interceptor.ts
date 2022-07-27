@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Role } from '../../agenda/contato/enums/role.enum';
+import { RoleEnum } from '@prisma/client';
 import { RoleInterceptor } from './role.interceptor';
 
 @Injectable()
 export class DentistaEspOdontRoleInterceptor extends RoleInterceptor {
   constructor() {
-    super(Role.DENTISTA, Role.COLABORADOR);
+    super(RoleEnum.DENTISTA, RoleEnum.COLABORADOR);
   }
 }

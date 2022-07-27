@@ -40,7 +40,7 @@ export class ContatoService {
   }
 
   async find(take?: number, skip?: number) {
-    const contatos = await this.prismaService.contato.findMany({
+    return await this.prismaService.contato.findMany({
       include: {
         usuario: {
           select: {
@@ -56,8 +56,6 @@ export class ContatoService {
       take: Number.isNaN(take) ? undefined : take,
       skip: Number.isNaN(skip) ? undefined : skip,
     });
-
-    return contatos;
   }
 
   async create({ nome, telefones, usuario, categorias }: CreateContatoDto) {
