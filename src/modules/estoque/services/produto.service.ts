@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../data/services/prisma.service';
 
@@ -7,10 +11,7 @@ import { UpdateProdutoDto } from '../dtos/update-produto.dto';
 
 @Injectable()
 export class ProdutoService {
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) {
-  }
+  constructor(private readonly prismaService: PrismaService) {}
 
   private readonly include: Prisma.ProdutoInclude = {
     tipoProduto: true,
@@ -83,7 +84,11 @@ export class ProdutoService {
     });
   }
 
-  async getHistoricoValores(produtoUid: string, espOdont?: boolean, cliente?: boolean) {
+  async getHistoricoValores(
+    produtoUid: string,
+    espOdont?: boolean,
+    cliente?: boolean,
+  ) {
     const produto = await this.findById(produtoUid);
     if (!produto) {
       throw new NotFoundException('Produto não encontrado.');
@@ -92,21 +97,27 @@ export class ProdutoService {
     return await this.prismaService.valorProduto.findMany({
       where: {
         produtoUid,
-        espOdont: (espOdont && cliente) || (!espOdont && !espOdont) ? undefined : cliente != true,
+        espOdont:
+          (espOdont && cliente) || (!espOdont && !espOdont)
+            ? undefined
+            : cliente != true,
       },
       orderBy: this.include['historicoValores']['orderBy'],
     });
   }
 
-  async update(uid: string, {
-    valorCliente,
-    valorEspOdont,
-    marca,
-    tipo,
-    nome,
-    descricao,
-    ativo,
-  }: UpdateProdutoDto) {
+  async update(
+    uid: string,
+    {
+      valorCliente,
+      valorEspOdont,
+      marca,
+      tipo,
+      nome,
+      descricao,
+      ativo,
+    }: UpdateProdutoDto,
+  ) {
     const produto = await this.findById(uid);
 
     if (!produto) {
@@ -128,7 +139,7 @@ export class ProdutoService {
       );
     }
 
-    type valorInput = { espOdont: boolean, valorEmCents: number }
+    type valorInput = { espOdont: boolean; valorEmCents: number };
     const inputValorEspOdont: valorInput = {
       espOdont: true,
       valorEmCents: valorEspOdont.cents(),
@@ -144,39 +155,50 @@ export class ProdutoService {
         nome: nome != null ? nome : undefined,
         descricao,
         ativo: ativo != null ? ativo : undefined,
-        marcaProduto: marca != null ? {
-          connectOrCreate: {
-            where: { nome: marca },
-            create: { nome: marca },
-          },
-        } : undefined,
-        tipoProduto: tipo != null ? {
-          connectOrCreate: {
-            where: { nome: tipo },
-            create: { nome: tipo },
-          },
-        } : undefined,
-        historicoValores: valorCliente || valorEspOdont ? {
-          updateMany: {
-            where: {
-              ativo: true,
-              espOdont: valorEspOdont && valorCliente ? undefined : !valorCliente,
-            },
-            data: {
-              ativo: false,
-              dtFim: new Date(),
-            },
-          },
-          createMany: {
-            data: valorCliente && valorEspOdont ? [
-              inputValorEspOdont,
-              inputValorCliente,
-            ] : valorCliente ? [ inputValorCliente ] : [ inputValorEspOdont ],
-          },
-        } : undefined,
+        marcaProduto:
+          marca != null
+            ? {
+                connectOrCreate: {
+                  where: { nome: marca },
+                  create: { nome: marca },
+                },
+              }
+            : undefined,
+        tipoProduto:
+          tipo != null
+            ? {
+                connectOrCreate: {
+                  where: { nome: tipo },
+                  create: { nome: tipo },
+                },
+              }
+            : undefined,
+        historicoValores:
+          valorCliente || valorEspOdont
+            ? {
+                updateMany: {
+                  where: {
+                    ativo: true,
+                    espOdont:
+                      valorEspOdont && valorCliente ? undefined : !valorCliente,
+                  },
+                  data: {
+                    ativo: false,
+                    dtFim: new Date(),
+                  },
+                },
+                createMany: {
+                  data:
+                    valorCliente && valorEspOdont
+                      ? [inputValorEspOdont, inputValorCliente]
+                      : valorCliente
+                      ? [inputValorCliente]
+                      : [inputValorEspOdont],
+                },
+              }
+            : undefined,
       },
     });
-
   }
 
   async remove(uid: string) {

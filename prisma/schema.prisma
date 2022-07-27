@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["metrics", "interactiveTransactions", "fullTextSearch"]
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -183,17 +183,17 @@ model LancamentoFinanceiro {
   atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
   ativo        Boolean  @default(true)
 
-  qtdParcelas                Int                @default(1) @map("qtd_parcelas") @db.SmallInt
-  dtLancamento               DateTime           @default(now()) @map("dt_lancamento") @db.Timestamp()
-  dtPrimeiroVencimento       DateTime?          @map("dt_primeiro_vencimento") @db.Timestamp()
-  intervaloDiasEntreParcelas Int?               @map("intervalo_dias_entre_parcelas") @db.SmallInt
-  valorEntradaEmCents        Int?               @map("valor_entrada_em_cents")
-  descricao                  String?            @db.Text
-  observacoes                String?            @db.Text
+  qtdParcelas                Int              @default(1) @map("qtd_parcelas") @db.SmallInt
+  dtLancamento               DateTime         @default(now()) @map("dt_lancamento") @db.Timestamp()
+  dtPrimeiroVencimento       DateTime?        @map("dt_primeiro_vencimento") @db.Timestamp()
+  intervaloDiasEntreParcelas Int?             @map("intervalo_dias_entre_parcelas") @db.SmallInt
+  valorEntradaEmCents        Int?             @map("valor_entrada_em_cents")
+  descricao                  String?          @db.Text
+  observacoes                String?          @db.Text
   saida                      LancamentoSaida?
-  servicoUid                 String?            @map("servico_uid") @db.Uuid
+  servicoUid                 String?          @map("servico_uid") @db.Uuid
   parcelas                   Parcela[]
-  formaDePagamento           FormaPagamentoEnum @default(dinheiro) @map("forma_pagamento")
+  formaDePagamento           FormaPagamentoEnum   @default(DINHEIRO) @map("forma_pagamento")
 
   servico Servico? @relation(fields: [servicoUid], references: [uid])
 
@@ -215,11 +215,11 @@ model Parcela {
   criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
   atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
 
-  valorEmCents            Int                 @map("valor_em_cents")
-  numParcela              Int                 @default(1) @map("num_parcela") @db.SmallInt
+  valorEmCents            Int             @map("valor_em_cents")
+  numParcela              Int             @default(1) @map("num_parcela") @db.SmallInt
   status                  StatusPagamentoEnum
   pagamentos              Pagamento[]
-  lancamentoFinanceiroUid String              @map("lancamento_financeiro_uid") @db.Uuid
+  lancamentoFinanceiroUid String          @map("lancamento_financeiro_uid") @db.Uuid
 
   lancamento LancamentoFinanceiro @relation(fields: [lancamentoFinanceiroUid], references: [uid])
 
@@ -241,42 +241,42 @@ model Pagamento {
 }
 
 enum RoleEnum {
-  admin
-  gerente
-  colaborador
-  dentista
-  cliente
-  fornecedor
-  entregador
+  ADMIN
+  GERENTE
+  COLABORADOR
+  DENTISTA
+  CLIENTE
+  FORNECEDOR
+  ENTREGADOR
 
   @@map("role_enum")
 }
 
 enum FinalidadeSaidaEnum {
-  agua
-  energia
-  gas
-  salario
-  repasse_dent_esp_odont
-  pgmnt_fornecedor
-  outro
+  AGUA
+  ENERGIA
+  GAS
+  SALARIO
+  REPASSE_DENT_ESP_ODONT
+  PGMNT_FONECEDOR
+  OUTRO
 
   @@map("finalidade_saida_enum")
 }
 
 enum StatusPagamentoEnum {
-  aberto
-  quitado
-  vencido
-  renegociado
+  ABERTO
+  QUITADO
+  VENCIDO
+  RENEGOCIADO
 
   @@map("status_pagamento_enum")
 }
 
 enum FormaPagamentoEnum {
-  dinheiro
-  cheque
-  cartao
+  DINHEIRO
+  CHEQUE
+  CARTAO
 
   @@map("forma_pagamento_enum")
 }

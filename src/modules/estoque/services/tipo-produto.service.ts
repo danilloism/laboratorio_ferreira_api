@@ -1,14 +1,15 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../data/services/prisma.service';
 import { CreateTipoProdutoDto } from '../dtos/create-tipo-produto.dto';
 import { UpdateTipoProdutoDto } from '../dtos/update-tipo-produto.dto';
 
 @Injectable()
 export class TipoProdutoService {
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) {
-  }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async find(): Promise<string[]> {
     return (

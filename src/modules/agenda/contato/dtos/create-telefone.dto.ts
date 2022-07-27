@@ -3,7 +3,6 @@ import { ValidarDDDTelefone } from '../decorators/validar-ddd-telefone.decorator
 import { ValidarNumeroTelefone } from '../decorators/validar-numero-telefone.decorator';
 
 export class CreateTelefoneDto {
-
   @IsInt()
   @ValidarDDDTelefone()
   public readonly ddd: number;

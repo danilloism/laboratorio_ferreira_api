@@ -1,14 +1,15 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../data/services/prisma.service';
 import { CreateMarcaProdutoDto } from '../dtos/create-marca-produto.dto';
 import { UpdateMarcaProdutoDto } from '../dtos/update-marca-produto.dto';
 
 @Injectable()
 export class MarcaProdutoService {
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) {
-  }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async find(): Promise<string[]> {
     return (
@@ -17,7 +18,9 @@ export class MarcaProdutoService {
   }
 
   async findByNome(nome: string) {
-    return await this.prismaService.marcaProduto.findUnique({ where: { nome } });
+    return await this.prismaService.marcaProduto.findUnique({
+      where: { nome },
+    });
   }
 
   async update(nome: string, updateMarcaDto: UpdateMarcaProdutoDto) {
@@ -42,7 +45,9 @@ export class MarcaProdutoService {
       throw new ConflictException('Nome de marca já existe.');
     }
 
-    return await this.prismaService.marcaProduto.create({ data: createMarcaDto });
+    return await this.prismaService.marcaProduto.create({
+      data: createMarcaDto,
+    });
   }
 
   async delete(nome: string): Promise<boolean> {

@@ -10,8 +10,7 @@ export class AuthService {
   constructor(
     private readonly contatoService: ContatoService,
     private readonly jwtService: JwtService,
-  ) {
-  }
+  ) {}
 
   createToken(payload: JwtPayload) {
     return this.jwtService.sign(payload);
@@ -26,8 +25,8 @@ export class AuthService {
     senha: string,
   ): Promise<{ info: Usuario; roles: RoleEnum[] }> {
     const account =
-            (await this.contatoService.findAccountByEmail(emailOrUsername)) ||
-            (await this.contatoService.findAccountByUsername(emailOrUsername));
+      (await this.contatoService.findAccountByEmail(emailOrUsername)) ||
+      (await this.contatoService.findAccountByUsername(emailOrUsername));
 
     if (account) {
       const senhaValida = await new PasswordHelper(senha).compare(
