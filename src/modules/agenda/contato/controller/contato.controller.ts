@@ -34,6 +34,8 @@ import { AccountType } from '../types/account.type';
 export class ContatoController {
   constructor(private readonly contatoService: ContatoService) {}
 
+  //#region CONTATOS
+
   @ApiQuery({ name: 'take', required: false })
   @ApiQuery({ name: 'skip', required: false })
   @ApiQuery({ name: 'nome', required: false })
@@ -44,38 +46,6 @@ export class ContatoController {
     @Query('nome') nome?: string,
   ): Promise<Contato[]> {
     return await this.contatoService.findContatos(take, skip, nome);
-  }
-
-  @Get(':id/account')
-  async getAccount(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<AccountType> {
-    const account = await this.contatoService
-      .findAccountByContatoUid(id)
-      .catch(err => {
-        throw new HttpException(
-          new ResultDto({
-            sucesso: false,
-            mensagem: 'Erro ao procurar por conta de usuário.',
-            erro: err.message,
-          }),
-          err instanceof HttpException
-            ? err.getStatus()
-            : HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      });
-
-    if (!account) {
-      throw new NotFoundException(
-        new ResultDto({
-          sucesso: false,
-          mensagem: 'Erro ao procurar por conta de usuário.',
-          erro: 'Conta de usuário não encontrada.',
-        }),
-      );
-    }
-
-    return account;
   }
 
   @Get(':id')
@@ -152,11 +122,47 @@ export class ContatoController {
     });
   }
 
+  //#endregion CONTATOS
+
+  //#region ACCOUNT
+
+  @Get(':id/account')
+  async getAccount(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<AccountType> {
+    const account = await this.contatoService
+      .findAccountByContatoUid(id)
+      .catch(err => {
+        throw new HttpException(
+          new ResultDto({
+            sucesso: false,
+            mensagem: 'Erro ao procurar por conta de usuário.',
+            erro: err.message,
+          }),
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
+
+    if (!account) {
+      throw new NotFoundException(
+        new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao procurar por conta de usuário.',
+          erro: 'Conta de usuário não encontrada.',
+        }),
+      );
+    }
+
+    return account;
+  }
+
   @Post(':id/account')
   async createAccount(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() createAccountDto: CreateUsuarioDto,
-  ) {
+  ): Promise<ResultDto> {
     const account = await this.contatoService
       .createAccount(id, createAccountDto)
       .catch(err => {
@@ -185,7 +191,7 @@ export class ContatoController {
   async updateAccount(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateAccountDto: UpdateUsuarioDto,
-  ) {
+  ): Promise<ResultDto> {
     const account = await this.contatoService
       .updateAccount(id, updateAccountDto)
       .catch(err => {
@@ -211,7 +217,9 @@ export class ContatoController {
   }
 
   @Delete(':id/account')
-  async deleteAccount(@Param('id', ParseUUIDPipe) id: string) {
+  async deleteAccount(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ResultDto> {
     const deletado = await this.contatoService.deleteAccount(id);
 
     if (!deletado) {
@@ -229,4 +237,6 @@ export class ContatoController {
       mensagem: 'Conta de usuário excluída com sucesso.',
     });
   }
+
+  //#endregion ACCOUNT
 }
