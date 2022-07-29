@@ -64,8 +64,7 @@ export class AuthController {
     }
 
     const dados: JwtPayload = {
-      sub: account.info.uid,
-      contatoUid: account.info.contatoUid,
+      sub: account.info.contatoUid,
       username: account.info.username,
       email: account.info.email,
       roles: account.roles,
@@ -88,7 +87,6 @@ export class AuthController {
     const payload: JwtPayload = request.user;
     const token = this.authService.createToken({
       sub: payload.sub,
-      contatoUid: payload.contatoUid,
       email: payload.email,
       roles: payload.roles,
       username: payload.username,

@@ -13,7 +13,7 @@ export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
     const responseBody = exception.getResponse();
-    if (responseBody['sucesso'] == undefined) {
+    if (!(responseBody instanceof ResultDto)) {
       return response.status(exception.getStatus()).json(
         new ResultDto({
           sucesso: false,

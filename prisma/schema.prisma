@@ -23,38 +23,19 @@ model Contato {
   usuario              Usuario?
   lancamentosRecebidos LancamentoSaida[]
   categorias           RoleEnum[]
-  telefones            Telefone[]
-
+  telefones            String[]
 
   @@map("contato")
 }
 
-model Telefone {
-  uid          String   @id @default(uuid()) @db.Uuid
-  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
-  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
-
-  contatoUid String  @map("contato_uid") @db.Uuid
-  ddd        Int?    @db.SmallInt
-  numero     Int
-  whatsapp   Boolean @default(true)
-
-  contato Contato @relation(fields: [contatoUid], references: [uid])
-
-  @@unique([ddd, numero])
-  @@unique([numero, contatoUid])
-  @@map("telefone")
-}
-
 model Usuario {
-  uid          String   @id @default(uuid()) @db.Uuid
   criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
   atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
 
+  contatoUid String  @id @map("contato_uid") @db.Uuid
   email      String  @unique @db.VarChar(100)
   username   String? @unique @db.VarChar(50)
   senha      String  @db.VarChar(200)
-  contatoUid String  @unique @map("contato_uid") @db.Uuid
 
   contato Contato @relation(fields: [contatoUid], references: [uid])
 
@@ -183,17 +164,17 @@ model LancamentoFinanceiro {
   atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
   ativo        Boolean  @default(true)
 
-  qtdParcelas                Int              @default(1) @map("qtd_parcelas") @db.SmallInt
-  dtLancamento               DateTime         @default(now()) @map("dt_lancamento") @db.Timestamp()
-  dtPrimeiroVencimento       DateTime?        @map("dt_primeiro_vencimento") @db.Timestamp()
-  intervaloDiasEntreParcelas Int?             @map("intervalo_dias_entre_parcelas") @db.SmallInt
-  valorEntradaEmCents        Int?             @map("valor_entrada_em_cents")
-  descricao                  String?          @db.Text
-  observacoes                String?          @db.Text
+  qtdParcelas                Int                @default(1) @map("qtd_parcelas") @db.SmallInt
+  dtLancamento               DateTime           @default(now()) @map("dt_lancamento") @db.Timestamp()
+  dtPrimeiroVencimento       DateTime?          @map("dt_primeiro_vencimento") @db.Timestamp()
+  intervaloDiasEntreParcelas Int?               @map("intervalo_dias_entre_parcelas") @db.SmallInt
+  valorEntradaEmCents        Int?               @map("valor_entrada_em_cents")
+  descricao                  String?            @db.Text
+  observacoes                String?            @db.Text
   saida                      LancamentoSaida?
-  servicoUid                 String?          @map("servico_uid") @db.Uuid
+  servicoUid                 String?            @map("servico_uid") @db.Uuid
   parcelas                   Parcela[]
-  formaDePagamento           FormaPagamentoEnum   @default(DINHEIRO) @map("forma_pagamento")
+  formaDePagamento           FormaPagamentoEnum @default(DINHEIRO) @map("forma_pagamento")
 
   servico Servico? @relation(fields: [servicoUid], references: [uid])
 
@@ -215,11 +196,11 @@ model Parcela {
   criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
   atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
 
-  valorEmCents            Int             @map("valor_em_cents")
-  numParcela              Int             @default(1) @map("num_parcela") @db.SmallInt
+  valorEmCents            Int                 @map("valor_em_cents")
+  numParcela              Int                 @default(1) @map("num_parcela") @db.SmallInt
   status                  StatusPagamentoEnum
   pagamentos              Pagamento[]
-  lancamentoFinanceiroUid String          @map("lancamento_financeiro_uid") @db.Uuid
+  lancamentoFinanceiroUid String              @map("lancamento_financeiro_uid") @db.Uuid
 
   lancamento LancamentoFinanceiro @relation(fields: [lancamentoFinanceiroUid], references: [uid])
 

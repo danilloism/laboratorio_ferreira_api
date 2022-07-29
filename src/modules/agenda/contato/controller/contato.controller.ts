@@ -2,19 +2,22 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
+  InternalServerErrorException,
   NotFoundException,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Post,
   Put,
   Query,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { Contato, Usuario } from '@prisma/client';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Contato } from '@prisma/client';
 import { IsPublic } from '../../../auth/decorators/is-public.decorator';
 import { ResultDto } from '../../../common/dtos/result.dto';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
@@ -22,6 +25,7 @@ import { CreateUsuarioDto } from '../dtos/create-usuario.dto';
 import { UpdateContatoDto } from '../dtos/update-contato.dto';
 import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
 import { ContatoService } from '../services/contato.service';
+import { AccountType } from '../types/account.type';
 
 @IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
@@ -30,18 +34,24 @@ import { ContatoService } from '../services/contato.service';
 export class ContatoController {
   constructor(private readonly contatoService: ContatoService) {}
 
+  @ApiQuery({ name: 'take', required: false })
+  @ApiQuery({ name: 'skip', required: false })
+  @ApiQuery({ name: 'nome', required: false })
   @Get()
-  async get(
-    @Query('take') take?: number,
-    @Query('skip') skip?: number,
+  async getContatos(
+    @Query('take', ParseIntPipe) take?: number,
+    @Query('skip', ParseIntPipe) skip?: number,
+    @Query('nome') nome?: string,
   ): Promise<Contato[]> {
-    return await this.contatoService.find(take, skip);
+    return await this.contatoService.findContatos(take, skip, nome);
   }
 
   @Get(':id/account')
-  async getAccount(@Param('id', ParseUUIDPipe) id: string): Promise<Usuario> {
+  async getAccount(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<AccountType> {
     const account = await this.contatoService
-      .procurarUsuarioPorContatoUid(id)
+      .findAccountByContatoUid(id)
       .catch(err => {
         throw new HttpException(
           new ResultDto({
@@ -69,8 +79,10 @@ export class ContatoController {
   }
 
   @Get(':id')
-  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<Contato> {
-    const contato = await this.contatoService.findByUid(id);
+  async getContatoById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<Contato> {
+    const contato = await this.contatoService.findContatoByUid(id);
 
     if (!contato) {
       const result = new ResultDto({
@@ -86,21 +98,23 @@ export class ContatoController {
   }
 
   @Post()
-  async create(@Body() model: CreateContatoDto): Promise<ResultDto> {
-    const contato = await this.contatoService.create(model).catch(err => {
-      const result = new ResultDto({
-        sucesso: false,
-        mensagem: 'Erro ao criar contato.',
-        erro: err.message,
-      });
+  async createContato(@Body() model: CreateContatoDto): Promise<ResultDto> {
+    const contato = await this.contatoService
+      .createContato(model)
+      .catch(err => {
+        const result = new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao criar contato.',
+          erro: err.message,
+        });
 
-      throw new HttpException(
-        result,
-        err instanceof HttpException
-          ? err.getStatus()
-          : HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    });
+        throw new HttpException(
+          result,
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
 
     return new ResultDto({
       sucesso: true,
@@ -110,12 +124,12 @@ export class ContatoController {
   }
 
   @Put(':id')
-  async put(
+  async updateContato(
     @Body() atualizarContatoDto: UpdateContatoDto,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ResultDto> {
     const contato = await this.contatoService
-      .update(id, atualizarContatoDto)
+      .updateContato(id, atualizarContatoDto)
       .catch(err => {
         const result = new ResultDto({
           sucesso: false,
@@ -193,6 +207,26 @@ export class ContatoController {
       sucesso: true,
       mensagem: 'Conta de usuário atualizada com sucesso.',
       dados: account,
+    });
+  }
+
+  @Delete(':id/account')
+  async deleteAccount(@Param('id', ParseUUIDPipe) id: string) {
+    const deletado = await this.contatoService.deleteAccount(id);
+
+    if (!deletado) {
+      throw new InternalServerErrorException(
+        new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao excluir conta de usuário',
+          erro: 'Erro desconhecido.',
+        }),
+      );
+    }
+
+    return new ResultDto({
+      sucesso: true,
+      mensagem: 'Conta de usuário excluída com sucesso.',
     });
   }
 }
