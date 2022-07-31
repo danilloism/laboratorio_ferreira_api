@@ -102,3 +102,4 @@ COMMIT;
 -- AlterTable
 
 ALTER TABLE "lancamento_financeiro" ALTER COLUMN "forma_pagamento" SET DEFAULT 'DINHEIRO';
+
