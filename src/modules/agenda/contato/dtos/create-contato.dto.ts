@@ -1,5 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { RoleEnum } from '@prisma/client';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   ArrayUnique,
@@ -7,14 +8,17 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
+  IsPhoneNumber,
+  IsString,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { CreateTelefoneDto } from './create-telefone.dto';
+import { TelefoneHelper } from '../helpers/telefone.helper';
 import { CreateUsuarioDto } from './create-usuario.dto';
 
 export class CreateContatoDto {
   @IsNotEmpty()
+  @IsString()
   @MaxLength(80)
   public readonly nome: string;
 
@@ -22,11 +26,18 @@ export class CreateContatoDto {
   @ArrayMinSize(1)
   @ArrayUnique()
   @IsEnum(RoleEnum, { each: true })
+  @IsNotEmpty()
+  @ApiProperty({ enum: RoleEnum, isArray: true })
   public readonly categorias: RoleEnum[];
 
-  @ValidateNested({ each: true })
-  @Type(() => CreateTelefoneDto)
-  public readonly telefones: CreateTelefoneDto[];
+  @IsNotEmpty()
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsPhoneNumber('BR', { each: true })
+  @Transform(({ value }) =>
+    value.map(telefone => TelefoneHelper.format(telefone)),
+  )
+  public readonly telefones: string[];
 
   @IsOptional()
   @ValidateNested()

@@ -37,22 +37,18 @@ export class AuthController {
       throw new BadRequestException(result);
     }
 
-    const account = await this.authService
-      .authenticate(login.username || login.email, login.senha)
-      .catch(err => {
-        const result = new ResultDto({
-          sucesso: false,
-          mensagem: 'Erro ao realizar login.',
-          erro: err.message,
-        });
-
-        throw new HttpException(
-          result,
-          err instanceof HttpException
-            ? err.getStatus()
-            : HttpStatus.BAD_REQUEST,
-        );
+    const account = await this.authService.authenticate(login).catch(err => {
+      const result = new ResultDto({
+        sucesso: false,
+        mensagem: 'Erro ao realizar login.',
+        erro: err.message,
       });
+
+      throw new HttpException(
+        result,
+        err instanceof HttpException ? err.getStatus() : HttpStatus.BAD_REQUEST,
+      );
+    });
 
     if (!account) {
       const result = new ResultDto({
@@ -64,8 +60,7 @@ export class AuthController {
     }
 
     const dados: JwtPayload = {
-      sub: account.info.uid,
-      contatoUid: account.info.contatoUid,
+      sub: account.info.contatoUid,
       username: account.info.username,
       email: account.info.email,
       roles: account.roles,
@@ -76,10 +71,7 @@ export class AuthController {
     return new ResultDto({
       sucesso: true,
       mensagem: 'Token gerado com sucesso.',
-      dados: {
-        access_token: token,
-        info: this.authService.decodeToken(token),
-      },
+      dados: { access_token: token },
     });
   }
 
@@ -88,7 +80,6 @@ export class AuthController {
     const payload: JwtPayload = request.user;
     const token = this.authService.createToken({
       sub: payload.sub,
-      contatoUid: payload.contatoUid,
       email: payload.email,
       roles: payload.roles,
       username: payload.username,
@@ -102,7 +93,7 @@ export class AuthController {
         // roles: payload.roles,
         // id: payload.sub,
         // login: { email: payload.email, username: payload.username },
-        data: this.authService.decodeToken(token),
+        // data: this.authService.decodeToken(token),
       },
     });
   }

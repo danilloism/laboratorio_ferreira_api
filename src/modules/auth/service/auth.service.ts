@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RoleEnum, Usuario } from '@prisma/client';
 import { ContatoService } from '../../agenda/contato/services/contato.service';
 import { PasswordHelper } from '../../common/helpers/password.helper';
+import { LoginDto } from '../dto/login.dto';
 import { JwtPayload } from '../payload/jwt-payload.interface';
 
 @Injectable()
@@ -21,19 +22,21 @@ export class AuthService {
   }
 
   async authenticate(
-    emailOrUsername: string,
-    senha: string,
+    login: LoginDto,
   ): Promise<{ info: Usuario; roles: RoleEnum[] }> {
-    const account =
-      (await this.contatoService.findAccountByEmail(emailOrUsername)) ||
-      (await this.contatoService.findAccountByUsername(emailOrUsername));
+    let account: Usuario;
+    if (login.username) {
+      account = await this.contatoService.findAccountByUsername(login.username);
+    } else if (login.email) {
+      account = await this.contatoService.findAccountByEmail(login.email);
+    }
 
     if (account) {
-      const senhaValida = await new PasswordHelper(senha).compare(
+      const senhaValida = await new PasswordHelper(login.senha).compare(
         account.senha,
       );
 
-      const roles = await this.contatoService.getRoles(account.contato.uid);
+      const roles = await this.contatoService.getRoles(account.contatoUid);
 
       if (senhaValida) {
         return {

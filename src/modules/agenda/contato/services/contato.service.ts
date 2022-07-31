@@ -6,7 +6,6 @@ import {
 import { PrismaService } from 'src/modules/data/services/prisma.service';
 import { PasswordHelperV2 } from '../../../common/helpers/password.helper';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
-import { CreateTelefoneDto } from '../dtos/create-telefone.dto';
 import { CreateUsuarioDto } from '../dtos/create-usuario.dto';
 import { UpdateContatoDto } from '../dtos/update-contato.dto';
 import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
@@ -15,50 +14,51 @@ import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
 export class ContatoService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findByUid(uid: string) {
+  private readonly usuarioSelect = {
+    email: true,
+    username: true,
+    criadoEm: true,
+    atualizadoEm: true,
+  };
+
+  async findContatoByUid(uid: string) {
     return await this.prismaService.contato.findUnique({
       where: { uid },
       include: {
-        usuario: true,
-        telefones: true,
+        usuario: {
+          select: this.usuarioSelect,
+        },
       },
     });
   }
 
-  async findByTelefone(ddd: number, numero: number) {
-    return await this.prismaService.telefone
-      .findUnique({
-        where: {
-          ddd_numero: {
-            ddd,
-            numero,
-          },
-        },
-        include: { contato: true },
-      })
-      .contato();
+  async findByTelefone(numero: string) {
+    return await this.prismaService.contato.findMany({
+      where: { telefones: { hasSome: numero } },
+    });
   }
 
-  async find(take?: number, skip?: number) {
+  async findContatos(take?: number, skip?: number, nome?: string) {
     return await this.prismaService.contato.findMany({
       include: {
         usuario: {
-          select: {
-            email: true,
-            username: true,
-            criadoEm: true,
-            atualizadoEm: true,
-            uid: true,
-          },
+          select: this.usuarioSelect,
         },
-        telefones: true,
       },
+      where: nome
+        ? { nome: { contains: nome, mode: 'insensitive' } }
+        : undefined,
       take: Number.isNaN(take) ? undefined : take,
       skip: Number.isNaN(skip) ? undefined : skip,
     });
   }
 
-  async create({ nome, telefones, usuario, categorias }: CreateContatoDto) {
+  async createContato({
+    nome,
+    telefones,
+    usuario,
+    categorias,
+  }: CreateContatoDto) {
     const novoUsuario = {
       email: usuario?.email,
       username: usuario?.username,
@@ -75,63 +75,45 @@ export class ContatoService {
         throw new ConflictException('Email informado já existe.');
       }
 
-      const usernameExiste = await this.prismaService.usuario.findUnique({
-        where: { username },
-      });
-      if (usernameExiste) {
-        throw new ConflictException('Username informado já existe.');
+      if (username) {
+        const usernameExiste = await this.prismaService.usuario.findUnique({
+          where: { username: username },
+        });
+        if (usernameExiste) {
+          throw new ConflictException('Username informado já existe.');
+        }
       }
 
       novoUsuario.senha = await PasswordHelperV2.encrypt(usuario.senha);
     }
 
-    const telefoneExiste = async (telefones: CreateTelefoneDto[]) => {
+    const telefoneExiste = async () => {
       for (const telefone of telefones) {
-        const existe = await this.prismaService.telefone.findUnique({
-          where: {
-            ddd_numero: {
-              ddd: telefone.ddd,
-              numero: telefone.numero,
-            },
-          },
-        });
+        const existe = (await this.findByTelefone(telefone)).length > 0;
         if (existe) return true;
       }
       return false;
     };
 
-    if (await telefoneExiste(telefones)) {
+    if (await telefoneExiste()) {
       throw new ConflictException('Telefone informado já existe.');
     }
 
     return await this.prismaService.contato.create({
       data: {
         nome,
-        telefones: {
-          createMany: {
-            data: telefones.map(telefone => {
-              return {
-                ddd: telefone.ddd,
-                numero: telefone.numero,
-                whatsapp: telefone.whatsapp,
-              };
-            }),
-          },
-        },
-        usuario: {
-          create: novoUsuario,
-        },
+        telefones,
+        usuario: usuario ? { create: novoUsuario } : undefined,
         categorias,
       },
       include: {
-        telefones: true,
-        usuario: !!usuario,
+        usuario: usuario ? { select: this.usuarioSelect } : undefined,
       },
     });
   }
 
-  async update(uid: string, atualizarContatoDto: UpdateContatoDto) {
-    const contato = await this.findByUid(uid);
+  async updateContato(uid: string, atualizarContatoDto: UpdateContatoDto) {
+    const contato = await this.findContatoByUid(uid);
     if (!contato) {
       throw new NotFoundException('Contato não encontrado.');
     }
@@ -139,7 +121,10 @@ export class ContatoService {
     return await this.prismaService.contato.update({
       where: { uid: uid },
       data: {
-        nome: atualizarContatoDto.nome != null ? contato.nome : undefined,
+        nome:
+          atualizarContatoDto.nome != null
+            ? atualizarContatoDto.nome
+            : undefined,
         categorias:
           atualizarContatoDto.categorias != null
             ? atualizarContatoDto.categorias
@@ -149,15 +134,12 @@ export class ContatoService {
             ? atualizarContatoDto.ativo
             : undefined,
       },
-      include: {
-        usuario: true,
-        telefones: true,
-      },
+      include: { usuario: true },
     });
   }
 
-  async procurarUsuarioPorContatoUid(uid: string) {
-    const contato = await this.findByUid(uid);
+  async findAccountByContatoUid(uid: string) {
+    const contato = await this.findContatoByUid(uid);
 
     if (!contato) {
       throw new NotFoundException('Contato não encontrado.');
@@ -193,6 +175,7 @@ export class ContatoService {
     return await this.prismaService.usuario.update({
       where: { contatoUid },
       data: account,
+      select: this.usuarioSelect,
     });
   }
 
@@ -217,26 +200,25 @@ export class ContatoService {
         senha,
         contato: { connect: { uid: contatoUid } },
       },
+      select: this.usuarioSelect,
     });
   }
 
-  // async deleteAccount(contatoId: string): Promise<boolean> {
-  // 	const account = await this.procurarUsuarioPorContatoUid(contatoId);
-  //
-  // 	if (!account) {
-  // 		throw new NotFoundException('Conta de usuário não encontrada.');
-  // 	}
-  //
-  // 	if (!account.ativo) {
-  // 		throw new ConflictException('Conta de usuário já foi deletada.');
-  // 	}
-  //
-  // 	await this.prismaService.usuario.delete({ where: { contatoUid: contatoId } });
-  // 	return true;
-  // }
+  async deleteAccount(contatoId: string): Promise<boolean> {
+    const account = await this.findAccountByContatoUid(contatoId);
+
+    if (!account) {
+      throw new NotFoundException('Conta de usuário não encontrada.');
+    }
+
+    await this.prismaService.usuario.delete({
+      where: { contatoUid: contatoId },
+    });
+    return true;
+  }
 
   async getRoles(id: string) {
-    const contato = await this.findByUid(id);
+    const contato = await this.findContatoByUid(id);
 
     if (!contato) {
       throw new NotFoundException('Contato não encontrado.');

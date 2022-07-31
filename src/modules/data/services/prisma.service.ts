@@ -45,7 +45,7 @@ export class PrismaService
       const duration = `Duration: ${e.duration}ms`;
       const target = `Target: ${e.target}`;
       const timestamp = `Date: ${e.timestamp}`;
-      this.logger.log(
+      this.logger.debug(
         `\n${query}\n${params}\n${duration}\n${target}\n${timestamp}`,
       );
     });
@@ -54,7 +54,7 @@ export class PrismaService
       const message = `Message: ${e.message}`;
       const target = `Target: ${e.target}`;
       const timestamp = `Date: ${e.timestamp}`;
-      this.logger.debug(`\n${message}\n${target}\n${timestamp}`);
+      this.logger.log(`\n${message}\n${target}\n${timestamp}`);
     });
 
     this.$on('warn', e => {
