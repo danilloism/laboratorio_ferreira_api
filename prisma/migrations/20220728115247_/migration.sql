@@ -15,4 +15,3 @@ ALTER TABLE "contato"
 -- DropTable
 
 DROP TABLE "telefone";
-

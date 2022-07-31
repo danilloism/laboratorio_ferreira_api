@@ -11,4 +11,3 @@ ALTER TABLE "produto"
     ADD CONSTRAINT "produto_marca_fkey" FOREIGN KEY ("marca") REFERENCES "marca_produto" ("nome") ON DELETE SET NULL ON
     UPDATE
         CASCADE;
-

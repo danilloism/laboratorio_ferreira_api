@@ -7,4 +7,3 @@
 -- AlterTable
 
 ALTER TABLE "usuario" DROP CONSTRAINT "usuario_pkey", DROP COLUMN "uid";
-
