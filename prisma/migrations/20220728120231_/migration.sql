@@ -6,4 +6,3 @@
 -- CreateIndex
 
 CREATE UNIQUE INDEX "contato_telefones_key" ON "contato" ("telefones");
-

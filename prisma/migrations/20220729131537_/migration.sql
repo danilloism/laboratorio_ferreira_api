@@ -5,4 +5,3 @@ DROP INDEX "usuario_contato_uid_key";
 
 ALTER TABLE "usuario"
     ADD CONSTRAINT "usuario_pkey" PRIMARY KEY ("contato_uid");
-
