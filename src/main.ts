@@ -12,6 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.use(helmet());
+  app.enableCors();
   app.use(compression());
   app.useGlobalPipes(
     new ValidationPipe({

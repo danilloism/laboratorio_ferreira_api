@@ -1,5 +1,4 @@
-import currency from 'currency.js';
-import { CurrencyTransformer } from '../transformers/currency.transformer';
+import * as currency from 'currency.js';
 
 export class CurrencyHelper {
   static readonly options = {
@@ -8,9 +7,7 @@ export class CurrencyHelper {
     errorOnInvalid: true as const,
     decimal: ',' as const,
     separator: '.' as const,
-  };
-
-  static readonly entityTransformer = new CurrencyTransformer();
+  } as const;
 
   static createCurrencyInstance(value: number | currency) {
     return currency(value, this.options);

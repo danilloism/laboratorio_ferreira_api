@@ -9,7 +9,6 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
-  ParseIntPipe,
   ParseUUIDPipe,
   Post,
   Put,
@@ -18,7 +17,6 @@ import {
 } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Contato } from '@prisma/client';
-import { IsPublic } from '../../../auth/decorators/is-public.decorator';
 import { ResultDto } from '../../../common/dtos/result.dto';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
 import { CreateUsuarioDto } from '../dtos/create-usuario.dto';
@@ -27,7 +25,7 @@ import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
 import { ContatoService } from '../services/contato.service';
 import { AccountType } from '../types/account.type';
 
-@IsPublic() //TODO: retirar isso aqui depois
+// @IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('contatos')
@@ -41,8 +39,8 @@ export class ContatoController {
   @ApiQuery({ name: 'nome', required: false })
   @Get()
   async getContatos(
-    @Query('take', ParseIntPipe) take?: number,
-    @Query('skip', ParseIntPipe) skip?: number,
+    @Query('take') take?: number,
+    @Query('skip') skip?: number,
     @Query('nome') nome?: string,
   ): Promise<Contato[]> {
     return await this.contatoService.findContatos(take, skip, nome);
