@@ -13,8 +13,8 @@ COPY package.json pnpm-lock.yaml tsconfig.json tsconfig.build.json ./
 COPY prisma ./prisma
 
 RUN pnpm install
-RUN pnpm build
 COPY . .
+RUN pnpm build
 
 ###################
 # BUILD FOR PRODUCTION
