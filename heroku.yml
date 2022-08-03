@@ -4,9 +4,9 @@ build:
   docker:
     web: Dockerfile
 release:
-  image: web
   config:
     env_file: .env
+  image: web
   command:
     - npx prisma migrate deploy
 run:
