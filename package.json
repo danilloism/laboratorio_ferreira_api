@@ -14,7 +14,7 @@
     "start:prod": "node dist/main",
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:prod": "prisma migrate dev",
-    "db:gen": "prisma generate",
+    "db:gen": "prisma generate --schema=./prisma/schema.prisma",
     "db": "pnpm db:migrate:dev && pnpm db:gen",
     "db:studio": "prisma studio",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
