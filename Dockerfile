@@ -27,6 +27,8 @@ RUN apk add --no-cache curl \
 WORKDIR /usr/app
 
 COPY --from=development /usr/app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=development /usr/app/dist ./dist
+COPY --from=development /usr/app/prisma ./prisma
 
 RUN pnpm fetch --prod
 
@@ -40,8 +42,8 @@ FROM node:18-alpine As production
 
 # Copy the bundled code from the build stage to the production image
 COPY --from=build /usr/app/node_modules ./node_modules
-COPY --from=development /usr/app/dist ./dist
-COPY --from=development /usr/app/prisma ./prisma
+COPY --from=build /usr/app/dist ./dist
+COPY --from=build /usr/app/prisma ./prisma
 
 # Start the server using the production build
 CMD [ "node", "dist/main.js" ]
