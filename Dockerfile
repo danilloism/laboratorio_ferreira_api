@@ -12,7 +12,7 @@ WORKDIR /usr/app
 COPY package.json pnpm-lock.yaml tsconfig.json tsconfig.build.json ./
 COPY prisma ./prisma
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 RUN pnpm build
 COPY . .
 
@@ -26,7 +26,7 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/app
 
-COPY --from=development /usr/app/package-lock.yaml ./package-lock.yaml
+COPY --from=development /usr/app/pnpm-lock.yaml ./pnpm-lock.yaml
 
 RUN pnpm fetch --prod
 
