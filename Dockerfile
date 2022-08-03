@@ -20,13 +20,19 @@ COPY . .
 ###################
 FROM node:18-alpine as build
 
-ENV NODE_ENV production
-COPY --from=development /usr/app/node_modules ./node_modules
-COPY --from=development /usr/app/prisma ./prisma
-COPY package.json ./
+WORKDIR /usr/app
+
+COPY --from=development /usr/app/package.json ./package.json
+COPY --from=development /usr/app/prisma/ ./prisma/
+
+RUN npm i
 COPY . .
+
+ENV NODE_ENV production
 RUN npm run build
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --omit=dev
+#RUN npm ci --omit=dev
+#RUN npm cache clean --force
 
 ###################
 # PRODUCTION
@@ -34,12 +40,9 @@ RUN npm ci --only=production && npm cache clean --force
 FROM node:18-alpine As production
 
 # Copy the bundled code from the build stage to the production image
-COPY --from=build /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/app/node_modules ./node_modules
+COPY --from=build /usr/app/dist ./dist
 COPY --from=build /usr/app/prisma ./prisma
-
-# Apply migrations to db
-RUN npx prisma migrate deploy
 
 # Start the server using the production build
 CMD [ "node", "dist/main.js" ]

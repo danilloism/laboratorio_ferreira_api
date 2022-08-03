@@ -1,0 +1,13 @@
+build:
+  config:
+    env_file: .env
+  docker:
+    web: Dockerfile
+release:
+  image: web
+  config:
+    env_file: .env
+  command:
+    - npx prisma migrate deploy
+run:
+  web: node dist/main.js
