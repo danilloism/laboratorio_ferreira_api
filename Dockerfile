@@ -3,7 +3,7 @@
 ###################
 FROM node:18-alpine as development
 
-RUN apk add --no-cache curl python \
+RUN apk add --no-cache curl \
     && curl -sL https://unpkg.com/@pnpm/self-installer | node
 
 # Create app directory
