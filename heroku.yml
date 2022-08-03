@@ -6,7 +6,7 @@ build:
     web: Dockerfile
 release:
   command:
-    - npx prisma migrate deploy
+    - npx prisma migrate deploy && npx prisma generate
   image: web
 run:
   web: node dist/main.js
