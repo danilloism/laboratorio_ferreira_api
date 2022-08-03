@@ -4,6 +4,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
+  binaryTargets   = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -48,12 +49,12 @@ model Produto {
   atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
   ativo        Boolean  @default(true)
 
-  nome             String            @db.VarChar(50)
-  descricao        String?           @db.Text
-  tipo             String            @db.VarChar(30)
-  marca            String?           @db.VarChar(30)
-  valores          ValorProduto[]
-  servicos         ProdutoServico[]
+  nome      String           @db.VarChar(50)
+  descricao String?          @db.Text
+  tipo      String           @db.VarChar(30)
+  marca     String?          @db.VarChar(30)
+  valores   ValorProduto[]
+  servicos  ProdutoServico[]
 
   tipoProduto  TipoProduto   @relation(fields: [tipo], references: [nome])
   marcaProduto MarcaProduto? @relation(fields: [marca], references: [nome])
