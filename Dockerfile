@@ -9,7 +9,7 @@ RUN apk add --no-cache curl \
 # Create app directory
 WORKDIR /usr/app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml tsconfig.json tsconfig.build.json ./
 COPY prisma ./prisma
 
 RUN pnpm install --frozen-lockfile
