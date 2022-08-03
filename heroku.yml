@@ -1,13 +1,12 @@
-build:
+setup:
   config:
     env_file: .env
+build:
   docker:
     web: Dockerfile
 release:
-  config:
-    env_file: .env
-  image: web
   command:
     - npx prisma migrate deploy
+  image: web
 run:
   web: node dist/main.js
