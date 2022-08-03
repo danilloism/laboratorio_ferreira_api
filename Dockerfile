@@ -28,6 +28,7 @@ COPY --from=development /usr/app/node_modules ./node_modules
 COPY --from=development /usr/app/package.json ./package.json
 COPY --from=development /usr/app/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=development /usr/app/prisma ./prisma
+COPY tsconfig.json tsconfig.build.json ./
 RUN pnpm build
 RUN pnpm prune --prod
 
