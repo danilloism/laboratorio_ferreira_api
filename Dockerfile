@@ -30,6 +30,7 @@ COPY --from=development /usr/app/dist ./dist
 COPY . .
 RUN #pnpm build
 RUN pnpm prune --prod
+COPY --from=development /usr/app/prisma ./prisma
 
 ###################
 # PRODUCTION
