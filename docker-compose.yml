@@ -13,11 +13,12 @@ services:
     ports:
       - "3000:3000"
       - "9229:9229"
+    tty: true
     volumes:
       - .:/usr/app
     links:
       - postgres
-    command: [sh, -cx, "pnpm db:migrate:dev && pnpm start:debug"]
+    command: [sh, -cx, "pnpm db:migrate:dev && npx nest start --debug 0.0.0.0:9229 --watch"]
   postgres:
     image: postgres:alpine
     container_name: postgres
