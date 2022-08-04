@@ -39,9 +39,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT || 3000, () => {
     const logger = new NestLogger(AppModule.name);
-    logger.log(
-      `Servidor iniciado em ${process.env.HOST}:${process.env.PORT || 3000}`,
-    );
+    logger.log(`Servidor iniciado em ${process.env.HOST}`);
   });
 }
 
