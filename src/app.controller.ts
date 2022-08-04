@@ -22,7 +22,7 @@ export class AppController {
   async healthCheck() {
     const result = await this.health.check([
       () => this.db.pingCheck('database'),
-      () => this.http.pingCheck('docs', `${process.env.SERVER_URL}/docs`),
+      () => this.http.pingCheck('docs', `${process.env.HOST}/docs`),
     ]);
 
     const status = result.status;
