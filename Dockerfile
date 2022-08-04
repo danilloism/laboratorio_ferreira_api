@@ -25,8 +25,10 @@ RUN apk add --no-cache curl \
 
 WORKDIR /usr/app
 COPY --from=development /usr/app/node_modules ./node_modules
+COPY --from=development /usr/app/prisma ./prisma
+COPY --from=development /usr/app/dist ./dist
 COPY . .
-RUN pnpm build
+RUN #pnpm build
 RUN pnpm prune --prod
 
 ###################
