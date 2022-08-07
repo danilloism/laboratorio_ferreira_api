@@ -95,11 +95,11 @@ export class ProdutoService {
       where: {
         produtoUid,
         espOdont:
-          (espOdont && cliente) || (!espOdont && !espOdont)
+          (espOdont && cliente) || (!espOdont && !cliente)
             ? undefined
             : cliente != true,
       },
-      orderBy: this.include.include.valores.orderBy,
+      orderBy: [{ ativo: 'desc' }, { dtFim: 'desc' }],
       take: Number.isNaN(take) ? undefined : take,
       skip: Number.isNaN(skip) ? undefined : skip,
     });

@@ -1,7 +1,7 @@
 /*
   Warnings:
 
-  - The `categorias` column on the `contato` table would be dropped and recreated. This will lead to data loss if there is data in the column.
+  - The `categorias` column on the `agenda` table would be dropped and recreated. This will lead to data loss if there is data in the column.
   - The `forma_pagamento` column on the `lancamento_financeiro` table would be dropped and recreated. This will lead to data loss if there is data in the column.
   - Changed the type of `finalidade` on the `lancamento_saida` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
   - Changed the type of `status` on the `parcela` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.

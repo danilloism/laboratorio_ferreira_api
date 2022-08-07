@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { DataModule } from '../data/data.module';
 import { PrismaService } from '../data/services/prisma.service';
 import { MarcaProdutoController } from './controllers/marca-produto.controller';
 import { ProdutoController } from './controllers/produto.controller';
@@ -9,7 +8,7 @@ import { ProdutoService } from './services/produto.service';
 import { TipoProdutoService } from './services/tipo-produto.service';
 
 @Module({
-  imports: [DataModule],
+  imports: [],
   controllers: [
     ProdutoController,
     TipoProdutoController,

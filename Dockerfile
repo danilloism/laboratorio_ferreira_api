@@ -1,7 +1,7 @@
 ###################
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
-FROM node:18-alpine as development
+FROM node:lts-alpine as development
 
 RUN apk add --no-cache curl \
     && curl -sL https://unpkg.com/@pnpm/self-installer | node
@@ -18,7 +18,7 @@ COPY . .
 ###################
 # BUILD FOR PRODUCTION
 ###################
-FROM node:18-alpine as build
+FROM node:lts-alpine as build
 
 RUN apk add --no-cache curl \
     && curl -sL https://unpkg.com/@pnpm/self-installer | node
@@ -35,7 +35,7 @@ COPY --from=development /usr/app/prisma ./prisma
 ###################
 # PRODUCTION
 ###################
-FROM node:18-alpine As production
+FROM node:lts-alpine As production
 
 ENV NODE_ENV production
 

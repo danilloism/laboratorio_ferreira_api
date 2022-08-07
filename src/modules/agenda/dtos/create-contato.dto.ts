@@ -14,7 +14,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { TelefoneHelper } from '../helpers/telefone.helper';
-import { CreateUsuarioDto } from './create-usuario.dto';
+import { CreateAccountDto } from './create-account.dto';
 
 export class CreateContatoDto {
   @IsNotEmpty()
@@ -41,6 +41,6 @@ export class CreateContatoDto {
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => CreateUsuarioDto)
-  public readonly usuario?: CreateUsuarioDto;
+  @Type(() => CreateAccountDto)
+  public readonly account?: CreateAccountDto;
 }

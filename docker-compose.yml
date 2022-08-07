@@ -1,27 +1,25 @@
 version: "3.9"
 
 services:
-  web:
-    container_name: api
-    depends_on:
-      - postgres
-    build:
-      context: .
-      target: development
-    env_file:
-      - .env
-    ports:
-      - "3000:3000"
-      - "9229:9229"
-    tty: true
-    volumes:
-      - .:/usr/app
-    links:
-      - postgres
-    command: [sh, -cx, "pnpm db:migrate:dev && npx nest start --debug 0.0.0.0:9229 --watch"]
+#  web:
+#    depends_on:
+#      - postgres
+#    build:
+#      context: .
+#      target: development
+#    env_file:
+#      - .env
+#    ports:
+#      - "3000:3000"
+#      - "9229:9229"
+#    tty: true
+#    volumes:
+#      - .:/usr/app
+#    links:
+#      - postgres
+#    command: [sh, -cx, "pnpm db:migrate:dev && npx nest start --debug 0.0.0.0:9229 --watch"]
   postgres:
-    image: postgres:alpine
-    container_name: postgres
+    image: postgres
     restart: always
     ports:
       - "5432:5432"

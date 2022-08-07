@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateUsuarioDto {
+export class CreateAccountDto {
   @IsOptional()
   @IsString()
   @Transform(({ value }) => value.toLowerCase())

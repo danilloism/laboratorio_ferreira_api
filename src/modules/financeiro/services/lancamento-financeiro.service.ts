@@ -1,47 +1,49 @@
 import { Injectable } from '@nestjs/common';
+import { FluxoLancamentoEnum } from '@prisma/client';
+import { PrismaService } from '../../data/services/prisma.service';
 
 @Injectable()
 export class LancamentoFinanceiroService {
-  //
-  // async find() {
-  //   await this.lancamentoFinanceiroRepository.find();
-  // }
-  //
-  // async findOne(id: string) {
-  //   await this.lancamentoFinanceiroRepository.findOne({ where: { id } });
-  // }
-  //
-  // async findByFluxo(fluxo: FluxoPagamentoEnum) {
-  //   await this.lancamentoFinanceiroRepository.find({
-  //     where: { fluxo },
-  //   });
-  // }
-  //
-  // async findByParaQuem(contatoId: string) {
-  //   await this.lancamentoFinanceiroRepository.find({
-  //     where: { paraQuem: { id: contatoId } },
-  //   });
-  // }
-  //
-  // async findByServico(servicoId: string) {
-  //   await this.lancamentoFinanceiroRepository.find({
-  //     where: { servico: { id: servicoId } },
-  //   });
-  // }
-  //
-  // async findEntradaByPaciente(pacienteId: string) {
-  //   const lancamentos = await this.dtSource
-  //   .createQueryBuilder()
-  //   .from(LancamentoFinanceiro, 'lancamento')
-  //   .leftJoin(Servico, 'servico', 'servico.id = lancamento.servicoId')
-  //   .leftJoin(ContatoEntity, 'paciente', 'servico.pacienteId = paciente.id')
-  //   .where('paciente.id = :id', { id: pacienteId })
-  //   .andWhere('lancamento.fluxo = "entrada"')
-  //   .getRawMany();
-  //
-  //   return lancamentos;
-  // }
-  //
+  constructor(private readonly prisma: PrismaService) {}
+
+  async find() {
+    await this.prisma.lancamentoFinanceiro.findMany({
+      include: { saida: true, parcelas: true, servico: true },
+    });
+  }
+
+  async findOne(uid: string) {
+    await this.prisma.lancamentoFinanceiro.findUnique({ where: { uid } });
+  }
+
+  async findByFluxo(fluxo: FluxoLancamentoEnum) {
+    await this.prisma.lancamentoFinanceiro.findMany({
+      where: { fluxo },
+      include: fluxo == FluxoLancamentoEnum.SAIDA ? { saida: true } : undefined,
+    });
+  }
+
+  async findByParaQuem(contatoUid: string) {
+    await this.prisma.lancamentoFinanceiro.findMany({
+      where: { saida: { paraQuemUid: contatoUid } },
+      include: { saida: { include: { paraQuem: true } } },
+    });
+  }
+
+  async findByServico(servicoUid: string) {
+    await this.prisma.lancamentoFinanceiro.findMany({ where: { servicoUid } });
+  }
+
+  async findEntradaByPaciente(pacienteUid: string) {
+    return await this.prisma.lancamentoFinanceiro.findMany({
+      where: {
+        fluxo: FluxoLancamentoEnum.ENTRADA,
+        servico: { pacientes: { some: { uid: pacienteUid } } },
+      },
+      include: { parcelas: { include: { pagamentos: true } } },
+    });
+  }
+
   // async createEntrada(createLancamentoEntradaDto: CreateLancamentoEntradaDto) {}
   //
   // async createSaida(createLancamentoSaidaDto: CreateLancamentoSaidaDto) {}

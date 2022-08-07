@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { AgendaModule } from '../agenda/agenda.module';
+import { AuthController } from './controller/auth.controller';
 import { AuthService } from './service/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './controller/auth.controller';
-import { ContatoModule } from '../agenda/contato/contato.module';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { ContatoModule } from '../agenda/contato/contato.module';
         };
       },
     }),
-    ContatoModule,
+    AgendaModule,
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

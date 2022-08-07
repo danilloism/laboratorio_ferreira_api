@@ -1,122 +1,121 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { RoleEnum } from '@prisma/client';
+import { ContatoService } from '../../agenda/services/contato.service';
+import { ContatoType } from '../../agenda/types/contato.type';
+import { Uuid } from '../../common/types/uid';
+import { PrismaService } from '../../data/services/prisma.service';
+import { CreateServicoDto } from '../dtos/create-servico.dto';
 
 @Injectable()
 export class ServicoService {
-  //
-  // async find() {
-  // 	return await this.servicoRepository.find();
-  // }
-  //
-  // async findById(id: string) {
-  // 	return await this.servicoRepository.findOne({ where: { id } });
-  // }
-  //
-  // async findByDentista(dentistaId: string) {
-  // 	const dentista = await this.contatoService.findByUid(dentistaId);
-  //
-  // 	if (!dentista) {
-  // 		throw new NotFoundException('Dentista não encontrado.');
-  // 	}
-  //
-  // 	return await this.servicoRepository.find({
-  // 		where: { dentista: { id: dentistaId } },
-  // 	});
-  // }
-  //
-  // async findByPaciente(pacienteId: string) {
-  // 	const paciente = await this.contatoService.findByUid(pacienteId);
-  //
-  // 	if (!paciente) {
-  // 		throw new NotFoundException('Paciente não encontrado.');
-  // 	}
-  //
-  // 	return await this.servicoRepository.find({
-  // 		where: { paciente: { id: pacienteId } },
-  // 	});
-  // }
-  //
-  // async create(createServicoDto: CreateServicoDto) {
-  // 	const servico = this.servicoRepository.create();
-  //
-  // 	const dentista = await this.contatoService.findByUid(
-  // 		createServicoDto.dentistaId,
-  // 	);
-  // 	if (!dentista) {
-  // 		throw new NotFoundException('Dentista não encontrado.');
-  // 	}
-  //
-  // 	if (
-  // 		!CategoriaHelper.isDentistaEspOdont(dentista) &&
-  // 		createServicoDto.espOdont
-  // 	) {
-  // 		throw new ConflictException(
-  // 			'Dentista informado não é colaborador do Espaço Odontológico.',
-  // 		);
-  // 	}
-  //
-  // 	servico.dentista = dentista;
-  //
-  // 	if (createServicoDto.pacienteId) {
-  // 		const paciente = await this.contatoService.findByUid(
-  // 			createServicoDto.pacienteId,
-  // 		);
-  // 		if (!paciente) {
-  // 			throw new NotFoundException('Paciente não encontrado.');
-  // 		}
-  // 		servico.paciente = paciente;
-  // 	}
-  //
-  // 	const valorTotal = CurrencyHelper.createCurrencyInstance(0);
-  //
-  // 	const itensServico = await Promise.all(
-  // 		createServicoDto.produtos.map(async itemServico => {
-  // 			const produto = await this.produtoService.findById(
-  // 				itemServico.produtoId,
-  // 			);
-  // 			if (!produto) {
-  // 				throw new NotFoundException('Produto não encontrado.');
-  // 			}
-  //
-  // 			const item = this.itemServicoRepository.create({
-  // 				produto,
-  // 				servico,
-  // 				quantidade: itemServico.quantidade,
-  // 				desconto: itemServico.desconto,
-  // 			});
-  //
-  // 			const valor = CurrencyHelper.createCurrencyInstance(0);
-  //
-  // 			if (createServicoDto.espOdont) {
-  // 				valor.add(produto.valor.espOdont);
-  // 			} else {
-  // 				valor.add(produto.valor.cliente);
-  // 			}
-  //
-  // 			valor.multiply(item.quantidade);
-  // 			valor.subtract(item.desconto ?? 0);
-  // 			valorTotal.add(valor);
-  //
-  // 			const etapa = await this.etapaFabricacaoRepository.findOne({
-  // 				where: { nome: 'recebido' },
-  // 			});
-  //
-  // 			item.etapaFabricacao =
-  // 				etapa ||
-  // 				(await this.etapaFabricacaoRepository.save({
-  // 					nome: 'recebido',
-  // 				}));
-  //
-  // 			return item;
-  // 		}),
-  // 	);
-  //
-  // 	servico.itensServico = itensServico;
-  // 	Object.assign(servico, {
-  // 		descricao: createServicoDto.descricao,
-  // 		observacoes: createServicoDto.observacoes,
-  // 		espOdont: createServicoDto.espOdont,
-  // 	});
-  //
-  // 	return await this.servicoRepository.save(servico);
-  // }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly contatoService: ContatoService,
+  ) {}
+
+  async find() {
+    return await this.prisma.servico.findMany();
+  }
+
+  async findById(uid: Uuid) {
+    return await this.prisma.servico.findUnique({ where: { uid } });
+  }
+
+  async findByDentista(dentistaUid: Uuid) {
+    const dentista = (await this.contatoService.findByRole(
+      { uid: dentistaUid, include: { servicosComoDentista: true } },
+      RoleEnum.DENTISTA,
+    )) as ContatoType;
+
+    if (!dentista) {
+      throw new NotFoundException('Dentista não encontrado.');
+    }
+
+    return dentista.servicosComoDentista;
+  }
+
+  async findByPaciente(pacienteUid: Uuid) {
+    const paciente = (await this.contatoService.findByRole(
+      { uid: pacienteUid, include: { servicosComoPaciente: true } },
+      RoleEnum.PACIENTE,
+    )) as ContatoType;
+
+    if (!paciente) {
+      throw new NotFoundException('Paciente não encontrado.');
+    }
+
+    return paciente.servicosComoPaciente;
+  }
+
+  async create({
+    espOdont,
+    dentistaUid,
+    uidPacientes,
+    itens,
+    observacoes,
+    descricao,
+  }: CreateServicoDto) {
+    const dentista = (await this.contatoService.findByRole(
+      { uid: dentistaUid },
+      RoleEnum.DENTISTA,
+    )) as ContatoType;
+
+    if (!dentista) {
+      throw new NotFoundException('Dentista não encontrado.');
+    }
+
+    for (const itemServico of itens) {
+      const produto = await this.prisma.produto.findUnique({
+        where: { uid: itemServico.produtoUid },
+      });
+
+      if (!produto) throw new NotFoundException('Produto não encontrado.');
+    }
+
+    if (uidPacientes) {
+      for (const pacienteUid of uidPacientes) {
+        const paciente = (await this.contatoService.findByRole(
+          { uid: pacienteUid },
+          RoleEnum.PACIENTE,
+        )) as ContatoType;
+
+        if (!paciente)
+          throw new NotFoundException(
+            `Paciente (uid: ${pacienteUid}) não encontrado.`,
+          );
+      }
+    }
+
+    await this.prisma.etapaFabricacao.upsert({
+      where: { nome: 'recebido' },
+      create: { nome: 'recebido' },
+      update: {},
+    });
+
+    return this.prisma.servico.create({
+      data: {
+        espOdont,
+        dentista: { connect: { uid: dentista.uid } },
+        pacientes: {
+          connect: uidPacientes?.map(uid => ({ uid })),
+        },
+        itens: {
+          createMany: {
+            data: itens.map(produto => {
+              const { produtoUid, desconto, quantidade } = produto;
+              return {
+                descontoEmCents: desconto?.intValue,
+                produtoUid,
+                quantidade,
+                etapa: 'recebido',
+              };
+            }),
+          },
+        },
+        descricao,
+        observacoes,
+      },
+      include: { itens: true, pacientes: true },
+    });
+  }
 }
