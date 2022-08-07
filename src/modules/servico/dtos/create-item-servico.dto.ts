@@ -1,18 +1,18 @@
-import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsUUID } from 'class-validator';
-import currency from 'currency.js';
+import { Transform, Type } from 'class-transformer';
+import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
+import * as currency from 'currency.js';
 import { CurrencyHelper } from 'src/modules/common/helpers/currency.helper';
 
 export class CreateItemServicoDto {
-  @IsInt()
   @IsOptional()
   readonly quantidade?: number;
 
-  @IsInt()
   @IsOptional()
   @Transform(({ value }) => CurrencyHelper.createCurrencyInstance(value))
+  @Type(() => currency)
   readonly desconto?: currency;
 
+  @IsNotEmpty()
   @IsUUID()
-  readonly produtoId?: string;
+  readonly produtoUid: string;
 }

@@ -17,13 +17,14 @@ import {
 } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Contato } from '@prisma/client';
-import { ResultDto } from '../../../common/dtos/result.dto';
+import { ResultDto } from '../../common/dtos/result.dto';
+import { CreateAccountDto } from '../dtos/create-account.dto';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
-import { CreateUsuarioDto } from '../dtos/create-usuario.dto';
 import { UpdateContatoDto } from '../dtos/update-contato.dto';
 import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
 import { ContatoService } from '../services/contato.service';
 import { AccountType } from '../types/account.type';
+import { ContatoType } from '../types/contato.type';
 
 // @IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
@@ -55,7 +56,7 @@ export class ContatoController {
     if (!contato) {
       const result = new ResultDto({
         sucesso: false,
-        mensagem: 'Erro ao procurar por contato.',
+        mensagem: 'Erro ao procurar por agenda.',
         erro: 'Contato não encontrado.',
       });
 
@@ -66,13 +67,15 @@ export class ContatoController {
   }
 
   @Post()
-  async createContato(@Body() model: CreateContatoDto): Promise<ResultDto> {
+  async createContato(
+    @Body() model: CreateContatoDto,
+  ): Promise<ResultDto<ContatoType>> {
     const contato = await this.contatoService
       .createContato(model)
       .catch(err => {
         const result = new ResultDto({
           sucesso: false,
-          mensagem: 'Erro ao criar contato.',
+          mensagem: 'Erro ao criar agenda.',
           erro: err.message,
         });
 
@@ -95,13 +98,13 @@ export class ContatoController {
   async updateContato(
     @Body() atualizarContatoDto: UpdateContatoDto,
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ResultDto> {
+  ): Promise<ResultDto<ContatoType>> {
     const contato = await this.contatoService
       .updateContato(id, atualizarContatoDto)
       .catch(err => {
         const result = new ResultDto({
           sucesso: false,
-          mensagem: 'Erro ao atualizar contato.',
+          mensagem: 'Erro ao atualizar agenda.',
           erro: err.message,
         });
 
@@ -159,8 +162,8 @@ export class ContatoController {
   @Post(':id/account')
   async createAccount(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() createAccountDto: CreateUsuarioDto,
-  ): Promise<ResultDto> {
+    @Body() createAccountDto: CreateAccountDto,
+  ): Promise<ResultDto<AccountType>> {
     const account = await this.contatoService
       .createAccount(id, createAccountDto)
       .catch(err => {
@@ -189,7 +192,7 @@ export class ContatoController {
   async updateAccount(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateAccountDto: UpdateUsuarioDto,
-  ): Promise<ResultDto> {
+  ): Promise<ResultDto<AccountType>> {
     const account = await this.contatoService
       .updateAccount(id, updateAccountDto)
       .catch(err => {

@@ -19,7 +19,7 @@ export class AppController {
 
   @Get('health')
   @HealthCheck()
-  async healthCheck() {
+  async healthCheck(): Promise<ResultDto> {
     const result = await this.health.check([
       () => this.db.pingCheck('database'),
       () => this.http.pingCheck('docs', `${process.env.HOST}/docs`),

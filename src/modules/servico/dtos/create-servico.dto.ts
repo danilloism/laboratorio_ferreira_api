@@ -1,10 +1,11 @@
 import { Optional } from '@nestjs/common';
+import { Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
   IsOptional,
-  IsString,
   IsUUID,
   ValidateNested,
 } from 'class-validator';
@@ -12,25 +13,27 @@ import { CreateItemServicoDto } from './create-item-servico.dto';
 
 export class CreateServicoDto {
   @Optional()
-  @IsString()
   readonly descricao?: string;
 
   @Optional()
-  @IsString()
   readonly observacoes?: string;
 
   @IsUUID()
-  readonly dentistaId: string;
+  readonly dentistaUid: string;
 
   @IsOptional()
-  @IsUUID()
-  readonly pacienteId?: string;
+  @IsUUID(undefined, { each: true })
+  @IsArray()
+  @ArrayNotEmpty()
+  readonly uidPacientes?: string[];
 
   @IsBoolean()
   readonly espOdont: boolean;
 
   @IsArray()
   @ArrayNotEmpty()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
-  readonly produtos: CreateItemServicoDto[];
+  @Type(() => CreateItemServicoDto)
+  readonly itens: CreateItemServicoDto[];
 }

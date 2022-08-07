@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RoleEnum, Usuario } from '@prisma/client';
-import { ContatoService } from '../../agenda/contato/services/contato.service';
+import { Account, RoleEnum } from '@prisma/client';
+import { ContatoService } from '../../agenda/services/contato.service';
 import { PasswordHelper } from '../../common/helpers/password.helper';
 import { LoginDto } from '../dto/login.dto';
 import { JwtPayload } from '../payload/jwt-payload.interface';
@@ -23,8 +23,8 @@ export class AuthService {
 
   async authenticate(
     login: LoginDto,
-  ): Promise<{ info: Usuario; roles: RoleEnum[] }> {
-    let account: Usuario;
+  ): Promise<{ info: Account; roles: RoleEnum[] }> {
+    let account: Account;
     if (login.username) {
       account = await this.contatoService.findAccountByUsername(login.username);
     } else if (login.email) {

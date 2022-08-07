@@ -1,8 +1,10 @@
-export class ResultDto {
+import { OmitType } from '@nestjs/swagger';
+
+export class ResultDto<T = any> {
   constructor(info: {
     sucesso: boolean;
     mensagem?: string;
-    dados?: any;
+    dados?: T;
     erro?: any;
   }) {
     this.sucesso = info.sucesso;
@@ -13,6 +15,8 @@ export class ResultDto {
 
   readonly sucesso: boolean;
   readonly mensagem?: string;
-  readonly dados?: any;
+  readonly dados?: T;
   readonly erro?: any;
 }
+
+export class NotFoundResultDto extends OmitType(ResultDto, ['dados']) {}

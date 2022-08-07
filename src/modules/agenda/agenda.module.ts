@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ContatoModule } from './contato/contato.module';
+import { PrismaService } from '../data/services/prisma.service';
+import { ContatoController } from './controllers/contato.controller';
+import { ContatoService } from './services/contato.service';
 
 @Module({
-  imports: [ContatoModule],
-  controllers: [],
-  providers: [],
+  imports: [],
+  controllers: [ContatoController],
+  providers: [PrismaService, ContatoService],
+  exports: [ContatoService],
 })
 export class AgendaModule {}
