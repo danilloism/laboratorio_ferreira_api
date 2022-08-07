@@ -16,10 +16,6 @@ datasource db {
 // ENTIDADES
 ///////////////////
 
-////
-// CONTATO E FILHOS
-////
-
 model Contato {
   uid          String   @id @default(uuid()) @db.Uuid
   criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
@@ -28,52 +24,14 @@ model Contato {
 
   nome       String     @db.VarChar(80)
   account    Account?
-  categorias RoleEnum[]
   telefones  String[]
+  categorias RoleEnum[]
 
-  dentista    Dentista?
-  paciente    Paciente?
-  colaborador Colaborador?
+  servicosComoDentista Servico[]
+  servicosComoPaciente Servico[]             @relation("servico_paciente")
+  lancamentosRecebidos LancamentoSaidaInfo[]
 
   @@map("contato")
-}
-
-model Dentista {
-  uid          String   @id @db.Uuid
-  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
-  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
-  ativo        Boolean  @default(true)
-
-  espOdont Boolean   @map("esp_odont")
-  servicos Servico[]
-  contato  Contato   @relation(fields: [uid], references: [uid])
-
-  @@map("dentista")
-}
-
-model Paciente {
-  uid          String   @id @db.Uuid
-  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
-  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
-  ativo        Boolean  @default(true)
-
-  espOdont Boolean?  @map("esp_odont")
-  servicos Servico[]
-  contato  Contato   @relation(fields: [uid], references: [uid])
-
-  @@map("paciente")
-}
-
-model Colaborador {
-  uid          String   @id @db.Uuid
-  criadoEm     DateTime @default(now()) @map("criado_em") @db.Timestamp()
-  atualizadoEm DateTime @updatedAt @map("atualizado_em") @db.Timestamp()
-  ativo        Boolean  @default(true)
-
-  lancamentosRecebidos LancamentoSaidaInfo[]
-  contato              Contato               @relation(fields: [uid], references: [uid])
-
-  @@map("colaborador")
 }
 
 model Account {
@@ -165,8 +123,8 @@ model Servico {
   itens       ProdutoServico[]
   lancamentos LancamentoFinanceiro[]
 
-  pacientes Paciente[]
-  dentista  Dentista   @relation(fields: [dentistaUid], references: [uid])
+  pacientes Contato[] @relation("servico_paciente")
+  dentista  Contato   @relation(fields: [dentistaUid], references: [uid])
 
   @@map("servico")
 }
@@ -234,7 +192,7 @@ model LancamentoSaidaInfo {
   uid                  String               @id @map("uid") @db.Uuid
   paraQuemUid          String               @map("contato_uid") @db.Uuid
   finalidade           FinalidadeSaidaEnum
-  paraQuem             Colaborador?         @relation(fields: [paraQuemUid], references: [uid])
+  paraQuem             Contato?             @relation(fields: [paraQuemUid], references: [uid])
   lancamentoFinanceiro LancamentoFinanceiro @relation(fields: [uid], references: [uid])
 
   @@map("lancamento_saida")
@@ -275,7 +233,7 @@ enum RoleEnum {
   GERENTE
   COLABORADOR
   DENTISTA
-  CLIENTE
+  PACIENTE
   FORNECEDOR
   ENTREGADOR
 

@@ -1,7 +1,7 @@
 /*
   Warnings:
 
-  - You are about to drop the column `telefone` on the `contato` table. All the data in the column will be lost.
+  - You are about to drop the column `telefone` on the `agenda` table. All the data in the column will be lost.
 
 */
 -- DropIndex
