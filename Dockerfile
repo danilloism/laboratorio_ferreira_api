@@ -21,8 +21,9 @@ COPY --from=development /usr/app/node_modules ./node_modules
 COPY --from=development /usr/app/prisma ./prisma
 COPY --from=development /usr/app/dist ./dist
 COPY . .
+ENV NODE_ENV production
 RUN yarn run build
-RUN pnpm prune --prod && yarn cache clean
+RUN yarn install && yarn cache clean
 COPY --from=development /usr/app/prisma ./prisma
 
 ###################
