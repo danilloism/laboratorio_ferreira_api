@@ -111,8 +111,5 @@
     "node_modules",
     "dist",
     "coverage"
-  ],
-  "engines": {
-    "node": "^18"
-  }
+  ]
 }
