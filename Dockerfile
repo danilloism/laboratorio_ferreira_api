@@ -2,17 +2,13 @@
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
 FROM node:lts-alpine as development
-
-RUN apk add --no-cache curl \
-    && curl -sL https://unpkg.com/@pnpm/self-installer | node
-
 # Create app directory
 WORKDIR /usr/app
 
-COPY package.json pnpm-lock.yaml tsconfig.json tsconfig.build.json ./
+COPY package.json yarn.lock tsconfig.json tsconfig.build.json ./
 COPY prisma ./prisma
 
-RUN pnpm i --frozen-lockfile
+RUN yarn install --frozen-lockfile
 COPY . .
 
 ###################
@@ -20,16 +16,14 @@ COPY . .
 ###################
 FROM node:lts-alpine as build
 
-RUN apk add --no-cache curl \
-    && curl -sL https://unpkg.com/@pnpm/self-installer | node
-
 WORKDIR /usr/app
 COPY --from=development /usr/app/node_modules ./node_modules
 COPY --from=development /usr/app/prisma ./prisma
 COPY --from=development /usr/app/dist ./dist
 COPY . .
-RUN #pnpm build
-RUN pnpm prune --prod
+ENV NODE_ENV production
+RUN yarn run build
+RUN yarn install && yarn cache clean
 COPY --from=development /usr/app/prisma ./prisma
 
 ###################
