@@ -9,6 +9,15 @@
     <envs />
     <method v="2">
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="up" run_configuration_type="docker-deploy" />
+      <option name="NpmBeforeRunTask" enabled="true">
+        <package-json value="$PROJECT_DIR$/package.json" />
+        <command value="run" />
+        <scripts>
+          <script value="db:migrate:dev" />
+        </scripts>
+        <node-interpreter value="project" />
+        <envs />
+      </option>
     </method>
   </configuration>
 </component>

@@ -8,7 +8,7 @@ import * as Winston from 'winston';
 import { AppController } from './app.controller';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { AuthModule, JwtAuthGuard } from './modules/auth';
-import { HttpExceptionFilter } from './modules/common/exception-filters/http-exception.filter';
+import { HttpExceptionFilter } from './modules/common/filters/http-exception.filter';
 import { DataModule } from './modules/data/data.module';
 import { EstoqueModule } from './modules/estoque/estoque.module';
 import { FinanceiroModule } from './modules/financeiro/financeiro.module';

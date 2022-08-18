@@ -18,13 +18,12 @@ FROM node:lts-alpine as build
 
 WORKDIR /usr/app
 COPY --from=development /usr/app/node_modules ./node_modules
-#COPY --from=development /usr/app/prisma ./prisma
-#COPY --from=development /usr/app/dist ./dist
 COPY . .
 ENV NODE_ENV production
 RUN yarn run build
+RUN npx prisma migrate deploy
 RUN yarn install && yarn cache clean
-COPY --from=development /usr/app/prisma ./prisma
+#COPY --from=development /usr/app/prisma ./prisma
 
 ###################
 # PRODUCTION
@@ -36,7 +35,7 @@ ENV NODE_ENV production
 # Copy the bundled code from the build stage to the production image
 COPY --from=build /usr/app/node_modules ./node_modules
 COPY --from=build /usr/app/dist ./dist
-COPY --from=build /usr/app/prisma ./prisma
+COPY --from=development /usr/app/prisma ./prisma
 
 # Start the server using the production build
 CMD [ "node", "dist/main.js" ]
