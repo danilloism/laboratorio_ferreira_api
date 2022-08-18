@@ -21,7 +21,7 @@ COPY --from=development /usr/app/node_modules ./node_modules
 COPY . .
 ENV NODE_ENV production
 RUN yarn run build
-RUN npx prisma migrate deploy
+RUN yarn run prisma migrate deploy
 RUN yarn install && yarn cache clean
 #COPY --from=development /usr/app/prisma ./prisma
 
