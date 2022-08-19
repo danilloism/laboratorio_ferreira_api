@@ -19,6 +19,7 @@ FROM node:lts-alpine as build
 WORKDIR /usr/app
 COPY --from=development /usr/app/node_modules ./node_modules
 COPY . .
+RUN yarn run prisma generate
 RUN yarn run prisma migrate deploy
 ENV NODE_ENV production
 RUN yarn run build

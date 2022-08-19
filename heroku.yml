@@ -4,9 +4,9 @@ setup:
 build:
   docker:
     web: Dockerfile
-release:
-  command:
-    - npx prisma migrate deploy
-  image: web
+#release:
+#  command:
+#    - npx prisma migrate deploy
+#  image: web
 run:
   web: node dist/main.js

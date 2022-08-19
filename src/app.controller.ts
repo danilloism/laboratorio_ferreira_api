@@ -4,6 +4,7 @@ import {
   HealthCheckService,
   HttpHealthIndicator,
 } from '@nestjs/terminus';
+import { join } from 'path';
 import { PrismaHealthIndicator } from 'src/modules/data/services/prisma.health-indicator';
 import { IsPublic } from './modules/auth/decorators/is-public.decorator';
 import { ResultDto } from './modules/common/dtos/result.dto';
@@ -22,7 +23,7 @@ export class AppController {
   async healthCheck(): Promise<ResultDto> {
     const result = await this.health.check([
       () => this.db.pingCheck('database'),
-      () => this.http.pingCheck('docs', `${process.env.HOST}/docs`),
+      () => this.http.pingCheck('docs', join(process.env.HOST, 'docs')),
     ]);
 
     const status = result.status;
