@@ -1,5 +1,9 @@
 import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
-import { HealthCheck, HealthCheckService, HttpHealthIndicator } from '@nestjs/terminus';
+import {
+  HealthCheck,
+  HealthCheckService,
+  HttpHealthIndicator,
+} from '@nestjs/terminus';
 import { join } from 'path';
 import { PrismaHealthIndicator } from 'src/modules/data/services/prisma.health-indicator';
 import { IsPublic } from './modules/auth/decorators/is-public.decorator';
