@@ -1,9 +1,5 @@
 import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
-import {
-  HealthCheck,
-  HealthCheckService,
-  HttpHealthIndicator,
-} from '@nestjs/terminus';
+import { HealthCheck, HealthCheckService, HttpHealthIndicator } from '@nestjs/terminus';
 import { join } from 'path';
 import { PrismaHealthIndicator } from 'src/modules/data/services/prisma.health-indicator';
 import { IsPublic } from './modules/auth/decorators/is-public.decorator';
@@ -21,9 +17,11 @@ export class AppController {
   @Get('health')
   @HealthCheck()
   async healthCheck(): Promise<ResultDto> {
+    console.log(join(process.env.HOST, 'docs'));
+
     const result = await this.health.check([
       () => this.db.pingCheck('database'),
-      () => this.http.pingCheck('docs', join(process.env.HOST, 'docs')),
+      // () => this.http.pingCheck('docs', join(process.env.HOST, 'docs')),
     ]);
 
     const status = result.status;
