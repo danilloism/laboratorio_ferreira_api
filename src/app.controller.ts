@@ -25,7 +25,7 @@ export class AppController {
 
     const result = await this.health.check([
       () => this.db.pingCheck('database'),
-      // () => this.http.pingCheck('docs', join(process.env.HOST, 'docs')),
+      // () => this.http.pingCheck('docs', join(process.env.HOST, 'docs')), //TODO: resolver essa bosta
     ]);
 
     const status = result.status;

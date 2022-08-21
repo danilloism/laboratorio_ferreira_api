@@ -18,7 +18,7 @@ export class AuthService {
   }
 
   decodeToken(token: string) {
-    return this.jwtService.decode(token);
+    return this.jwtService.decode(token) as JwtPayload;
   }
 
   async authenticate(

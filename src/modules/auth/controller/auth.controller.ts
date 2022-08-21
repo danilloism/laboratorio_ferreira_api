@@ -8,11 +8,14 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  Patch,
   Post,
   Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+import { ContatoService } from 'src/modules/agenda/services/contato.service';
 import { ResultDto } from '../../common/dtos/result.dto';
 import { IsPublic } from '../decorators/is-public.decorator';
 import { LoginDto } from '../dto/login.dto';
@@ -22,10 +25,13 @@ import { AuthService } from '../service/auth.service';
 @ApiTags('Auth')
 @Controller('user')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly contatoService: ContatoService,
+  ) {}
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @IsPublic()
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() login: LoginDto) {
@@ -76,21 +82,28 @@ export class AuthController {
     });
   }
 
-  @Get('refresh')
-  async refreshToken(@Req() request) {
-    const payload: JwtPayload = request.user;
-    const token = this.authService.createToken(payload);
+  @Patch('refresh')
+  async refreshToken(@Req() request: Request & { user: JwtPayload }) {
+    const payload = request.user;
+
+    const newToken = this.authService.createToken({
+      email: payload.email,
+      username: payload.username,
+      roles: payload.roles,
+      sub: payload.sub,
+    });
 
     return new ResultDto({
       sucesso: true,
       mensagem: 'Token atualizado com sucesso.',
-      dados: {
-        access_token: token,
-        roles: payload.roles,
-        // id: payload.sub,
-        // login: { email: payload.email, username: payload.username },
-        // data: this.authService.decodeToken(token),
-      },
+      dados: { access_token: newToken, roles: payload.roles },
     });
+  }
+
+  @Get('me')
+  async userProfile(@Req() request: Request & { user: JwtPayload }) {
+    const payload = request.user;
+
+    return this.contatoService.findContatoByUid(payload.sub);
   }
 }
