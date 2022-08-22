@@ -78,7 +78,7 @@ export class AuthController {
     return new ResultDto({
       sucesso: true,
       mensagem: 'Token gerado com sucesso.',
-      dados: { access_token: token, roles: dados.roles },
+      dados: { accessToken: token },
     });
   }
 
@@ -96,7 +96,7 @@ export class AuthController {
     return new ResultDto({
       sucesso: true,
       mensagem: 'Token atualizado com sucesso.',
-      dados: { access_token: newToken, roles: payload.roles },
+      dados: { accessToken: newToken },
     });
   }
 
