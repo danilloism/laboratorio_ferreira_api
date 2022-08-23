@@ -1,6 +1,7 @@
 import { Transform } from 'class-transformer';
 import {
   IsEmail,
+  IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
@@ -8,15 +9,12 @@ import {
 } from 'class-validator';
 
 export class CreateAccountDto {
-  @IsOptional()
-  @IsString()
-  @Transform(({ value }) => value.toLowerCase())
-  public readonly username?: string;
-
+  @IsNotEmpty()
   @IsEmail()
   @Transform(({ value }) => value.toLowerCase())
   public readonly email: string;
 
+  @IsNotEmpty()
   @IsString()
   @MinLength(4)
   @MaxLength(20)

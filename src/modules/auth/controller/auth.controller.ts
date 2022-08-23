@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -35,15 +34,6 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() login: LoginDto) {
-    if (!login.email && !login.username) {
-      const result = new ResultDto({
-        sucesso: false,
-        mensagem: 'Erro ao realizar login.',
-        erro: 'Deve ser informado pelo menos username ou email.',
-      });
-      throw new BadRequestException(result);
-    }
-
     const account = await this.authService.authenticate(login).catch(err => {
       const result = new ResultDto({
         sucesso: false,
@@ -67,10 +57,9 @@ export class AuthController {
     }
 
     const dados: JwtPayload = {
-      sub: account.info.contatoUid,
-      username: account.info.username,
-      email: account.info.email,
-      roles: account.roles,
+      sub: account.contatoUid,
+      email: account.email,
+      roles: account.contato.categorias,
     };
 
     const token = this.authService.createToken(dados);
@@ -78,7 +67,7 @@ export class AuthController {
     return new ResultDto({
       sucesso: true,
       mensagem: 'Token gerado com sucesso.',
-      dados: { accessToken: token },
+      dados: { accessToken: token, contato: account.contato },
     });
   }
 
@@ -88,7 +77,6 @@ export class AuthController {
 
     const newToken = this.authService.createToken({
       email: payload.email,
-      username: payload.username,
       roles: payload.roles,
       sub: payload.sub,
     });

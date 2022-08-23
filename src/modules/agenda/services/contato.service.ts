@@ -25,17 +25,7 @@ export class ContatoService {
   };
 
   async findContatoByUid(uid: string, options?: { showPassword: boolean }) {
-    return await this.prismaService.contato.findUnique({
-      where: { uid },
-      include: {
-        account: {
-          select: {
-            ...this.usuarioSelect,
-            senha: !!options?.showPassword,
-          },
-        },
-      },
-    });
+    return await this.prismaService.contato.findUnique({ where: { uid } });
   }
 
   async findByTelefone(numero: string) {
@@ -72,11 +62,6 @@ export class ContatoService {
 
   async findContatos(take?: number, skip?: number, nome?: string) {
     return await this.prismaService.contato.findMany({
-      include: {
-        account: {
-          select: this.usuarioSelect,
-        },
-      },
       where: nome
         ? { nome: { contains: nome, mode: 'insensitive' } }
         : undefined,
@@ -93,12 +78,11 @@ export class ContatoService {
   }: CreateContatoDto) {
     const novoUsuario = {
       email: account?.email,
-      username: account?.username,
       senha: account?.senha,
     };
 
     if (account) {
-      const { email, username } = account;
+      const { email, senha } = account;
 
       const emailExiste = await this.prismaService.account.findUnique({
         where: { email },
@@ -107,16 +91,7 @@ export class ContatoService {
         throw new ConflictException('Email informado já existe.');
       }
 
-      if (username) {
-        const usernameExiste = await this.prismaService.account.findUnique({
-          where: { username: username },
-        });
-        if (usernameExiste) {
-          throw new ConflictException('Username informado já existe.');
-        }
-      }
-
-      novoUsuario.senha = await PasswordHelperV2.encrypt(account.senha);
+      novoUsuario.senha = await PasswordHelperV2.encrypt(senha);
     }
 
     const telefoneExiste = async () => {
@@ -139,9 +114,7 @@ export class ContatoService {
         categorias,
       },
       include: account
-        ? {
-            account: { select: this.usuarioSelect },
-          }
+        ? { account: { select: this.usuarioSelect } }
         : undefined,
     });
   }
@@ -168,17 +141,13 @@ export class ContatoService {
             ? atualizarContatoDto.ativo
             : undefined,
       },
-      include: { account: true },
     });
   }
 
   async findAccountByContatoUid(uid: string) {
-    const contato = await this.findContatoByUid(uid);
-
-    if (!contato) {
-      throw new NotFoundException('Contato não encontrado.');
-    }
-    return contato.account;
+    return await this.prismaService.account.findUnique({
+      where: { contatoUid: uid },
+    });
   }
 
   async findAccountByEmail(email: string) {
@@ -188,10 +157,13 @@ export class ContatoService {
     });
   }
 
-  async findAccountByUsername(username: string) {
-    return await this.prismaService.account.findUnique({
-      where: { username },
-      include: { contato: true },
+  async findUniqueContatoByWhere(
+    where: Prisma.ContatoWhereUniqueInput,
+    options?: { include?: Prisma.ContatoInclude },
+  ) {
+    return await this.prismaService.contato.findUnique({
+      where,
+      include: options?.include,
     });
   }
 
@@ -230,7 +202,7 @@ export class ContatoService {
     const senha = await PasswordHelperV2.encrypt(createAccountDto.senha);
     return await this.prismaService.account.create({
       data: {
-        ...createAccountDto,
+        email: createAccountDto.email,
         senha,
         contato: { connect: { uid: contatoUid } },
       },
@@ -238,15 +210,15 @@ export class ContatoService {
     });
   }
 
-  async deleteAccount(contatoId: string): Promise<boolean> {
-    const account = await this.findAccountByContatoUid(contatoId);
+  async deleteAccount(contatoUid: string): Promise<boolean> {
+    const account = await this.findAccountByContatoUid(contatoUid);
 
     if (!account) {
       throw new NotFoundException('Conta de usuário não encontrada.');
     }
 
     await this.prismaService.account.delete({
-      where: { contatoUid: contatoId },
+      where: { contatoUid: contatoUid },
     });
     return true;
   }
