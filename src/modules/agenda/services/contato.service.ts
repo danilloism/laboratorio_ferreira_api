@@ -18,6 +18,7 @@ export class ContatoService {
   constructor(private readonly prismaService: PrismaService) {}
 
   private readonly usuarioSelect = {
+    contatoUid: true,
     email: true,
     criadoEm: true,
     atualizadoEm: true,
@@ -220,15 +221,5 @@ export class ContatoService {
       where: { contatoUid: contatoUid },
     });
     return true;
-  }
-
-  async getRoles(id: string) {
-    const contato = await this.findContatoByUid(id);
-
-    if (!contato) {
-      throw new NotFoundException('Contato não encontrado.');
-    }
-
-    return contato.categorias;
   }
 }
