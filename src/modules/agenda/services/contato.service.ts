@@ -19,7 +19,6 @@ export class ContatoService {
 
   private readonly usuarioSelect = {
     email: true,
-    username: true,
     criadoEm: true,
     atualizadoEm: true,
   };
