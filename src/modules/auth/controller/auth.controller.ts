@@ -34,7 +34,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() login: LoginDto) {
-    const account = await this.authService.authenticate(login).catch(err => {
+    const contato = await this.authService.authenticate(login).catch(err => {
       const result = new ResultDto({
         sucesso: false,
         mensagem: 'Erro ao realizar login.',
@@ -47,7 +47,7 @@ export class AuthController {
       );
     });
 
-    if (!account) {
+    if (!contato) {
       const result = new ResultDto({
         sucesso: false,
         mensagem: 'Erro ao realizar login.',
@@ -57,9 +57,9 @@ export class AuthController {
     }
 
     const dados: JwtPayload = {
-      sub: account.contatoUid,
-      email: account.email,
-      roles: account.contato.categorias,
+      sub: contato.uid,
+      email: contato.account.email,
+      roles: contato.categorias,
     };
 
     const token = this.authService.createToken(dados);
@@ -67,7 +67,7 @@ export class AuthController {
     return new ResultDto({
       sucesso: true,
       mensagem: 'Token gerado com sucesso.',
-      dados: { accessToken: token, contato: account.contato },
+      dados: { accessToken: token, contato },
     });
   }
 
@@ -92,6 +92,8 @@ export class AuthController {
   async userProfile(@Req() request: Request & { user: JwtPayload }) {
     const payload = request.user;
 
-    return this.contatoService.findContatoByUid(payload.sub);
+    return this.contatoService.findContatoByUid(payload.sub, {
+      includeAccount: true,
+    });
   }
 }

@@ -24,13 +24,21 @@ export class ContatoService {
     atualizadoEm: true,
   };
 
-  async findContatoByUid(uid: string, options?: { showPassword: boolean }) {
-    return await this.prismaService.contato.findUnique({ where: { uid } });
+  async findContatoByUid(uid: string, options?: { includeAccount?: boolean }) {
+    return await this.prismaService.contato.findUnique({
+      where: { uid },
+      include: options?.includeAccount
+        ? { account: { select: this.usuarioSelect } }
+        : undefined,
+    });
   }
 
-  async findByTelefone(numero: string) {
+  async findByTelefone(numero: string, options?: { includeAccount?: boolean }) {
     return await this.prismaService.contato.findFirst({
       where: { telefones: { hasSome: numero } },
+      include: options?.includeAccount
+        ? { account: { select: this.usuarioSelect } }
+        : undefined,
     });
   }
 
@@ -154,6 +162,20 @@ export class ContatoService {
     return await this.prismaService.account.findUnique({
       where: { email },
       include: { contato: true },
+    });
+  }
+
+  async findContatoByEmail(
+    email: string,
+    options?: { mostrarSenha?: boolean },
+  ) {
+    return await this.prismaService.contato.findFirst({
+      where: { account: { email } },
+      include: {
+        account: {
+          select: { ...this.usuarioSelect, senha: options?.mostrarSenha },
+        },
+      },
     });
   }
 

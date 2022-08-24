@@ -21,15 +21,17 @@ export class AuthService {
     return this.jwtService.decode(token) as JwtPayload;
   }
 
-  async authenticate(login: LoginDto): Promise<Account & { contato: Contato }> {
-    const account = await this.contatoService.findAccountByEmail(login.email);
+  async authenticate(login: LoginDto): Promise<Contato & { account: Account }> {
+    const contato = await this.contatoService.findContatoByEmail(login.email, {
+      mostrarSenha: true,
+    });
 
-    if (account) {
+    if (contato) {
       const senhaValida = await new PasswordHelper(login.senha).compare(
-        account.senha,
+        contato.account.senha,
       );
 
-      if (senhaValida) return account;
+      if (senhaValida) return contato;
     }
   }
 
