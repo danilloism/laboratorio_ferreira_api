@@ -21,7 +21,9 @@ export class AuthService {
     return this.jwtService.decode(token) as JwtPayload;
   }
 
-  async authenticate(login: LoginDto): Promise<Contato & { account: Account }> {
+  async authenticate(
+    login: LoginDto,
+  ): Promise<Contato & { account: Partial<Account> }> {
     const contato = await this.contatoService.findContatoByEmail(login.email, {
       mostrarSenha: true,
     });
@@ -33,8 +35,9 @@ export class AuthService {
 
       if (senhaValida) {
         const { senha, ...accountSemSenha } = contato.account;
+        contato.account = accountSemSenha;
 
-        return { account: accountSemSenha, ...contato };
+        return contato;
       }
     }
   }

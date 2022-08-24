@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, RoleEnum } from '@prisma/client';
+import { Account, Contato, Prisma, RoleEnum } from '@prisma/client';
 import { PrismaService } from 'src/modules/data/services/prisma.service';
 import { PasswordHelperV2 } from '../../common/helpers/password.helper';
 import { Uuid } from '../../common/types/uid';
@@ -168,7 +168,7 @@ export class ContatoService {
   async findContatoByEmail(
     email: string,
     options?: { mostrarSenha?: boolean },
-  ) {
+  ): Promise<Contato & { account: Partial<Account> }> {
     return await this.prismaService.contato.findFirst({
       where: { account: { email } },
       include: {
