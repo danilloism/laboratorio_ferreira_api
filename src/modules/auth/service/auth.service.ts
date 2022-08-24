@@ -31,7 +31,11 @@ export class AuthService {
         contato.account.senha,
       );
 
-      if (senhaValida) return contato;
+      if (senhaValida) {
+        const { senha, ...accountSemSenha } = contato.account;
+
+        return { account: accountSemSenha, ...contato };
+      }
     }
   }
 
