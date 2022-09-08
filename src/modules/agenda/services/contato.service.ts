@@ -102,15 +102,7 @@ export class ContatoService {
       novoUsuario.senha = await PasswordHelperV2.encrypt(senha);
     }
 
-    const telefoneExiste = async () => {
-      for (const telefone of telefones) {
-        const existe = await this.findByTelefone(telefone);
-        if (existe) return true;
-      }
-      return false;
-    };
-
-    if (await telefoneExiste()) {
+    if (await this.telefoneExiste(telefones)) {
       throw new ConflictException('Telefone informado já existe.');
     }
 
@@ -124,6 +116,29 @@ export class ContatoService {
       include: account
         ? { account: { select: this.usuarioSelect } }
         : undefined,
+    });
+  }
+
+  private async telefoneExiste(telefones: string[]) {
+    for (const telefone of telefones) {
+      const existe = await this.findByTelefone(telefone);
+      if (existe) return true;
+    }
+    return false;
+  }
+
+  async adicionarTelefones(uid: string, telefones: string[]) {
+    const contato = await this.findContatoByUid(uid);
+
+    if (!contato)
+      throw new NotFoundException('Contato informado não encontrado.');
+
+    if (await this.telefoneExiste(telefones))
+      throw new ConflictException('Telefone informado já está cadastrado.');
+
+    return await this.prismaService.contato.update({
+      where: { uid },
+      data: { telefones: { push: telefones } },
     });
   }
 

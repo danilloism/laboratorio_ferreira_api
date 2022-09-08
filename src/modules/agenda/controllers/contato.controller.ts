@@ -19,6 +19,7 @@ import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Contato } from '@prisma/client';
 import { IsPublic } from '../../auth/decorators/is-public.decorator';
 import { ResultDto } from '../../common/dtos/result.dto';
+import { AdicionarTelefonesDto } from '../dtos/add-telefones.dto';
 import { CreateAccountDto } from '../dtos/create-account.dto';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
 import { UpdateContatoDto } from '../dtos/update-contato.dto';
@@ -124,6 +125,35 @@ export class ContatoController {
       mensagem: 'Contato atualizado com sucesso.',
       sucesso: true,
       dados: contato,
+    });
+  }
+
+  @Post(':id/telefones')
+  async adicionarTelefones(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() adicionarTelefonesDto: AdicionarTelefonesDto,
+  ) {
+    const contato = await this.contatoService
+      .adicionarTelefones(id, adicionarTelefonesDto.telefones)
+      .catch(err => {
+        const result = new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao adicionar telefones.',
+          erro: err.message,
+        });
+
+        throw new HttpException(
+          result,
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
+
+    return new ResultDto({
+      mensagem: 'Telefones adicionados com sucesso.',
+      sucesso: true,
+      dados: contato.telefones,
     });
   }
 
