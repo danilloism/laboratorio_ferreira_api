@@ -10,6 +10,7 @@ import { HttpExceptionFilter } from './modules/common/filters/http-exception.fil
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.setGlobalPrefix('api');
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.use(helmet());
   app.enableCors();
@@ -30,16 +31,16 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document, {
+  SwaggerModule.setup('api/docs', app, document, {
     customSiteTitle: 'Documentação da API RESTful do Laboratório Ferreira.',
   });
 
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
 
-  await app.listen(process.env.PORT || 3000, () => {
+  await app.listen(process.env.PORT || 3000, async () => {
     const logger = new NestLogger(AppModule.name);
-    logger.log(`Servidor iniciado em ${process.env.HOST}`);
+    logger.log(`Servidor iniciado em: ${await app.getUrl()}`);
   });
 }
 

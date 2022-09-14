@@ -34,6 +34,7 @@ export class AuthService {
       );
 
       if (senhaValida) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { senha, ...accountSemSenha } = contato.account;
         contato.account = accountSemSenha;
 

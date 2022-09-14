@@ -1,17 +1,15 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { TerminusModule } from '@nestjs/terminus';
 import { utilities as NestWinstonUtilities, WinstonModule } from 'nest-winston';
 import * as Winston from 'winston';
-import { AppController } from './app.controller';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { AuthModule, JwtAuthGuard } from './modules/auth';
 import { HttpExceptionFilter } from './modules/common/filters/http-exception.filter';
-import { DataModule } from './modules/data/data.module';
 import { EstoqueModule } from './modules/estoque/estoque.module';
 import { FinanceiroModule } from './modules/financeiro/financeiro.module';
+import { HealthModule } from './modules/health/health.module';
+import { MailModule } from './modules/mail/mail.module';
 import { ServicoModule } from './modules/servico/servico.module';
 
 @Module({
@@ -38,16 +36,14 @@ import { ServicoModule } from './modules/servico/servico.module';
         }),
       ],
     }),
-    DataModule,
-    TerminusModule,
-    HttpModule,
+    HealthModule,
     AuthModule,
     AgendaModule,
     EstoqueModule,
     ServicoModule,
     FinanceiroModule,
+    MailModule,
   ],
-  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,

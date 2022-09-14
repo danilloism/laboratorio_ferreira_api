@@ -10,6 +10,7 @@ import { RoleEnum } from '@prisma/client';
 import { Observable } from 'rxjs';
 import { JwtPayload } from '..';
 import { ResultDto } from '../../common/dtos/result.dto';
+import { RequestWithUser } from '../../common/types/request-with-user.type';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {
@@ -24,7 +25,9 @@ export class RoleInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
-    const payload: JwtPayload = context.switchToHttp().getRequest().user;
+    const payload: JwtPayload = context
+      .switchToHttp()
+      .getRequest<RequestWithUser>().user;
     const temRole = payload.roles.every(role => this.roles.includes(role));
     if (!temRole) {
       throw new HttpException(

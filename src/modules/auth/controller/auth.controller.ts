@@ -13,9 +13,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
 import { ContatoService } from 'src/modules/agenda/services/contato.service';
 import { ResultDto } from '../../common/dtos/result.dto';
+import { RequestWithUser } from '../../common/types/request-with-user.type';
 import { IsPublic } from '../decorators/is-public.decorator';
 import { LoginDto } from '../dto/login.dto';
 import { JwtPayload } from '../payload/jwt-payload.interface';
@@ -72,7 +72,7 @@ export class AuthController {
   }
 
   @Patch('refresh')
-  async refreshToken(@Req() request: Request & { user: JwtPayload }) {
+  async refreshToken(@Req() request: RequestWithUser) {
     const payload = request.user;
 
     const newToken = this.authService.createToken({
@@ -89,7 +89,7 @@ export class AuthController {
   }
 
   @Get('me')
-  async userProfile(@Req() request: Request & { user: JwtPayload }) {
+  async userProfile(@Req() request: RequestWithUser) {
     const payload = request.user;
 
     return this.contatoService.findContatoByUid(payload.sub, {

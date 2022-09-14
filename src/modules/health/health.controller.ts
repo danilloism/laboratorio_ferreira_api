@@ -1,31 +1,32 @@
 import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
 import {
+  DiskHealthIndicator,
   HealthCheck,
   HealthCheckService,
   HttpHealthIndicator,
+  MemoryHealthIndicator,
 } from '@nestjs/terminus';
-import { join } from 'path';
-import { PrismaHealthIndicator } from 'src/modules/data/services/prisma.health-indicator';
-import { IsPublic } from './modules/auth/decorators/is-public.decorator';
-import { ResultDto } from './modules/common/dtos/result.dto';
+import { IsPublic } from '../auth/decorators/is-public.decorator';
+import { ResultDto } from '../common/dtos/result.dto';
+import { PrismaHealthIndicator } from '../data/services/prisma.health-indicator';
 
 @IsPublic()
-@Controller()
-export class AppController {
+@Controller('health')
+export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
     private readonly http: HttpHealthIndicator,
     private readonly db: PrismaHealthIndicator,
+    private readonly disk: DiskHealthIndicator,
+    private readonly memory: MemoryHealthIndicator,
   ) {}
 
-  @Get('health')
+  @Get()
   @HealthCheck()
   async healthCheck(): Promise<ResultDto> {
-    console.log(join(process.env.HOST, 'docs'));
-
     const result = await this.health.check([
       () => this.db.pingCheck('database'),
-      // () => this.http.pingCheck('docs', join(process.env.HOST, 'docs')), //TODO: resolver essa bosta
+      //TODO: aplicar os outros health indicators
     ]);
 
     const status = result.status;
