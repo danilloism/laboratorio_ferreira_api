@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import ContatoEntity from '../../agenda/entities/contato.entity';
 import { ContatoService } from '../../agenda/services/contato.service';
-import { PasswordHelper } from '../../common/helpers/password.helper';
+import { PasswordService } from '../../common/services/password.service';
 import { LoginDto } from '../dto/login.dto';
 import { JwtPayload } from '../payload/jwt-payload.interface';
 
@@ -11,6 +11,7 @@ export class AuthService {
   constructor(
     private readonly contatoService: ContatoService,
     private readonly jwtService: JwtService,
+    private readonly passwordService: PasswordService,
   ) {}
 
   createToken(payload: JwtPayload) {
@@ -25,7 +26,7 @@ export class AuthService {
     const contato = await this.contatoService.findContatoByEmail(login.email);
 
     if (contato) {
-      const senhaValida = await PasswordHelper.compare(
+      const senhaValida = await this.passwordService.compare(
         login.senha,
         contato.account.senha,
       );

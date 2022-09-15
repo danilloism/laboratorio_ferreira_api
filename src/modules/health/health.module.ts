@@ -5,7 +5,8 @@ import { DataModule } from '../data/data.module';
 import { HealthController } from './health.controller';
 
 @Module({
-  imports: [DataModule, TerminusModule, HttpModule],
+  imports: [TerminusModule, HttpModule, DataModule],
+  providers: [],
   controllers: [HealthController],
 })
 export class HealthModule {}

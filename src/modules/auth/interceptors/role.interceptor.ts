@@ -33,7 +33,8 @@ export class RoleInterceptor implements NestInterceptor {
       throw new HttpException(
         new ResultDto({
           sucesso: false,
-          mensagem: 'Acesso proibido.',
+          mensagem: 'Erro ao realizar operação.',
+          erro: 'Acesso proibido.',
         }),
         HttpStatus.FORBIDDEN,
       );

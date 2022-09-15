@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../data/services/prisma.service';
+import { DataModule } from '../data/data.module';
 import { MarcaProdutoController } from './controllers/marca-produto.controller';
 import { ProdutoController } from './controllers/produto.controller';
 import { TipoProdutoController } from './controllers/tipo-produto.controller';
@@ -8,18 +8,13 @@ import { ProdutoService } from './services/produto.service';
 import { TipoProdutoService } from './services/tipo-produto.service';
 
 @Module({
-  imports: [],
+  imports: [DataModule],
   controllers: [
     ProdutoController,
     TipoProdutoController,
     MarcaProdutoController,
   ],
-  providers: [
-    PrismaService,
-    ProdutoService,
-    TipoProdutoService,
-    MarcaProdutoService,
-  ],
+  providers: [ProdutoService, TipoProdutoService, MarcaProdutoService],
   exports: [ProdutoService],
 })
 export class EstoqueModule {}
