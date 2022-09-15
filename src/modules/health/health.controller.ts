@@ -24,8 +24,14 @@ export class HealthController {
   @Get()
   @HealthCheck()
   async healthCheck(): Promise<ResultDto> {
+    // const serverUrl = await app.getUrl();
+
     const result = await this.health.check([
       () => this.db.pingCheck('database'),
+      // () =>
+      //   this.http.pingCheck('docs', join(serverUrl, 'api', 'docs'), {
+      //     method: 'GET',
+      //   }),
       //TODO: aplicar os outros health indicators
     ]);
 

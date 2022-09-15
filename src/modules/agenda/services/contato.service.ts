@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, RoleEnum } from '@prisma/client';
 import { PrismaService } from 'src/modules/data/services/prisma.service';
-import { PasswordHelper } from '../../common/helpers/password.helper';
+import { PasswordService } from '../../common/services/password.service';
 import { Uuid } from '../../common/types/uid';
 import { CreateAccountDto } from '../dtos/create-account.dto';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
@@ -16,7 +16,10 @@ import ContatoEntity from '../entities/contato.entity';
 
 @Injectable()
 export class ContatoService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly passwordService: PasswordService,
+  ) {}
 
   async findContatoByUid(uid: string): Promise<ContatoEntity> {
     const contato = await this.prismaService.contato.findUnique({
@@ -107,7 +110,7 @@ export class ContatoService {
         throw new ConflictException('Email informado já existe.');
       }
 
-      novoUsuario.senha = await PasswordHelper.encrypt(senha);
+      novoUsuario.senha = await this.passwordService.encrypt(senha);
     }
 
     if (await this.telefoneExiste(telefones)) {
@@ -255,7 +258,7 @@ export class ContatoService {
       );
     }
 
-    const senha = await PasswordHelper.encrypt(createAccountDto.senha);
+    const senha = await this.passwordService.encrypt(createAccountDto.senha);
     return await this.prismaService.account.create({
       data: {
         email: createAccountDto.email,

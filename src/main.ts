@@ -1,4 +1,5 @@
 import { Logger as NestLogger, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as compression from 'compression';
@@ -38,7 +39,7 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
 
-  await app.listen(process.env.PORT || 3000, async () => {
+  await app.listen(app.get(ConfigService).get('node.port'), async () => {
     const logger = new NestLogger(AppModule.name);
     logger.log(`Servidor iniciado em: ${await app.getUrl()}`);
   });

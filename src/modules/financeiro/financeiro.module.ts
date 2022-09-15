@@ -4,6 +4,6 @@ import { LancamentoFinanceiroService } from './services/lancamento-financeiro.se
 
 @Module({
   imports: [],
-  providers: [PrismaService, LancamentoFinanceiroService],
+  providers: [LancamentoFinanceiroService, PrismaService],
 })
 export class FinanceiroModule {}
