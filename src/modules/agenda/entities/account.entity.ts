@@ -3,8 +3,8 @@ import { Exclude } from 'class-transformer';
 import ContatoEntity from './contato.entity';
 
 export default class AccountEntity {
-  constructor(params: Partial<AccountEntity>) {
-    Object.assign(this, params);
+  constructor(params?: Partial<AccountEntity>) {
+    if (params) Object.assign(this, params);
   }
 
   public criadoEm: Date;
@@ -20,7 +20,7 @@ export default class AccountEntity {
   static fromPrisma(
     account?: Account & { contato?: Contato },
   ): AccountEntity | undefined {
-    if (!account) return undefined;
+    if (!account) return;
     return new AccountEntity({
       ...account,
       contato: ContatoEntity.fromPrisma(account.contato),

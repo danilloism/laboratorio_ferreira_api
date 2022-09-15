@@ -1,9 +1,10 @@
 import { Account, Contato, RoleEnum, Servico } from '@prisma/client';
+import { Exclude } from 'class-transformer';
 import AccountEntity from './account.entity';
 
 export default class ContatoEntity {
-  constructor(params: Partial<ContatoEntity>) {
-    Object.assign(this, params);
+  constructor(params?: Partial<ContatoEntity>) {
+    if (params) Object.assign(this, params);
   }
 
   public uid: string;
@@ -15,7 +16,10 @@ export default class ContatoEntity {
   public categorias: RoleEnum[];
 
   public account?: AccountEntity;
+
+  @Exclude()
   public servicosComoDentista?: Servico[];
+  @Exclude()
   public servicosComoPaciente?: Servico[];
 
   static fromPrisma(
@@ -25,7 +29,7 @@ export default class ContatoEntity {
       servicosComoPaciente?: Servico[];
     },
   ): ContatoEntity | undefined {
-    if (!contato) return undefined;
+    if (!contato) return;
     return new ContatoEntity({
       ...contato,
       account: AccountEntity.fromPrisma(contato.account),

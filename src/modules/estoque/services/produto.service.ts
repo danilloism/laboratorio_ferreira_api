@@ -8,35 +8,33 @@ import { PrismaService } from '../../data/services/prisma.service';
 
 import { CreateProdutoDto } from '../dtos/create-produto.dto';
 import { UpdateProdutoDto } from '../dtos/update-produto.dto';
+import { ProdutoEntity } from '../entities/produto.entity';
+import { ValorProdutoEntity } from '../entities/valor-produto.entity';
 
 @Injectable()
 export class ProdutoService {
   constructor(private readonly prismaService: PrismaService) {}
 
   private readonly include = Prisma.validator<Prisma.ProdutoArgs>()({
-    include: {
-      valores: {
-        select: { espOdont: true, valorEmCents: true },
-        where: { ativo: true },
-        orderBy: { ativo: 'desc' },
-      },
-    },
+    include: { valores: { where: { ativo: true } } },
   });
 
-  async findById(uid: string) {
-    return this.prismaService.produto.findUnique({
+  async findById(uid: string): Promise<ProdutoEntity | undefined> {
+    const produto = await this.prismaService.produto.findUnique({
       where: { uid },
       ...this.include,
     });
+
+    return ProdutoEntity.fromPrisma(produto);
   }
 
-  async create(dto: CreateProdutoDto) {
+  async create(dto: CreateProdutoDto): Promise<ProdutoEntity> {
     const jaExiste = await this.produtoExiste(dto, 'create');
     if (jaExiste) throw new ConflictException('Produto já existe.');
 
     const { valorCliente, valorEspOdont, marca, tipo, nome, descricao } = dto;
 
-    return await this.prismaService.produto.create({
+    const produto = await this.prismaService.produto.create({
       data: {
         nome: nome,
         descricao: descricao,
@@ -71,12 +69,16 @@ export class ProdutoService {
       },
       ...this.include,
     });
+
+    return ProdutoEntity.fromPrisma(produto);
   }
 
-  async findAll() {
-    return this.prismaService.produto.findMany({
+  async findAll(): Promise<ProdutoEntity[]> {
+    const produtos = await this.prismaService.produto.findMany({
       ...this.include,
     });
+
+    return produtos.map(produto => ProdutoEntity.fromPrisma(produto));
   }
 
   async getHistoricoValores(
@@ -85,7 +87,7 @@ export class ProdutoService {
     cliente?: boolean,
     take?: number,
     skip?: number,
-  ) {
+  ): Promise<ValorProdutoEntity[]> {
     const produto = await this.findById(produtoUid);
     if (!produto) {
       throw new NotFoundException('Produto não encontrado.');
@@ -105,7 +107,7 @@ export class ProdutoService {
     });
   }
 
-  async update(uid: string, dto: UpdateProdutoDto) {
+  async update(uid: string, dto: UpdateProdutoDto): Promise<ProdutoEntity> {
     const jaExiste = await this.produtoExiste(dto, 'update', uid);
     if (jaExiste) throw new ConflictException('Produto já existe.');
 
@@ -122,7 +124,7 @@ export class ProdutoService {
       valorEmCents: valorCliente?.intValue,
     };
 
-    return await this.prismaService.produto.update({
+    const produto = await this.prismaService.produto.update({
       where: { uid },
       data: {
         nome: nome != null ? nome : undefined,
@@ -173,9 +175,11 @@ export class ProdutoService {
       },
       ...this.include,
     });
+
+    return ProdutoEntity.fromPrisma(produto);
   }
 
-  async remove(uid: string) {
+  async remove(uid: string): Promise<boolean> {
     const produto = await this.findById(uid);
     if (!produto) {
       throw new NotFoundException('Produto não encontrado.');
@@ -193,7 +197,7 @@ export class ProdutoService {
     dto: UpdateProdutoDto | CreateProdutoDto,
     metodo: 'create' | 'update',
     uid?: string,
-  ) {
+  ): Promise<boolean> {
     const { nome, marca, tipo } = dto;
     let produto: Produto;
     if (metodo == 'create') {
