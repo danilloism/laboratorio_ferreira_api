@@ -1,12 +1,14 @@
-import { ValorProduto } from '@prisma/client';
+export class ValorProdutoEntity {
+  constructor(params: Partial<ValorProdutoEntity>) {
+    Object.assign(this, params);
+  }
 
-export class ValorProdutoEntity implements ValorProduto {
-  uid: string;
-  criadoEm: Date;
-  atualizadoEm: Date;
-  ativo: boolean;
-  espOdont: boolean;
-  valorEmCents: number;
-  dtFim: Date | null;
-  produtoUid: string;
+  public uid: string;
+  public criadoEm: Date;
+  public atualizadoEm: Date;
+  public ativo: boolean;
+  public espOdont: boolean;
+  public valorEmCents: number;
+  public dtFim: Date | null;
+  public produtoUid: string;
 }

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, RoleEnum } from '@prisma/client';
 import { PrismaService } from 'src/modules/data/services/prisma.service';
-import { PasswordHelperV2 } from '../../common/helpers/password.helper';
+import { PasswordHelper } from '../../common/helpers/password.helper';
 import { Uuid } from '../../common/types/uid';
 import { CreateAccountDto } from '../dtos/create-account.dto';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
@@ -107,7 +107,7 @@ export class ContatoService {
         throw new ConflictException('Email informado já existe.');
       }
 
-      novoUsuario.senha = await PasswordHelperV2.encrypt(senha);
+      novoUsuario.senha = await PasswordHelper.encrypt(senha);
     }
 
     if (await this.telefoneExiste(telefones)) {
@@ -197,22 +197,25 @@ export class ContatoService {
   }
 
   async findContatoByEmail(email: string): Promise<ContatoEntity> {
-    return await this.prismaService.contato.findFirst({
+    const contato = await this.prismaService.contato.findFirst({
       where: { account: { email } },
       include: {
         account: true,
       },
     });
+    return ContatoEntity.fromPrisma(contato);
   }
 
   async findUniqueContatoByWhere(
     where: Prisma.ContatoWhereUniqueInput,
     options?: { include?: Prisma.ContatoInclude },
   ): Promise<ContatoEntity> {
-    return await this.prismaService.contato.findUnique({
+    const contato = await this.prismaService.contato.findUnique({
       where,
       include: options?.include,
     });
+
+    return ContatoEntity.fromPrisma(contato);
   }
 
   async updateAccount(
@@ -252,7 +255,7 @@ export class ContatoService {
       );
     }
 
-    const senha = await PasswordHelperV2.encrypt(createAccountDto.senha);
+    const senha = await PasswordHelper.encrypt(createAccountDto.senha);
     return await this.prismaService.account.create({
       data: {
         email: createAccountDto.email,

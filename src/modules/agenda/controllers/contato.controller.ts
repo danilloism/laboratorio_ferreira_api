@@ -16,7 +16,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { IsPublic } from '../../auth/decorators/is-public.decorator';
+import { DentistaEspOdontRoleInterceptor } from '../../auth/interceptors/dentista-esp-odont-role.interceptor';
+import { GerenteRoleInterceptor } from '../../auth/interceptors/gerente-role.interceptor';
 import { ResultDto } from '../../common/dtos/result.dto';
 import { AdicionarTelefonesDto } from '../dtos/add-telefones.dto';
 import { CreateAccountDto } from '../dtos/create-account.dto';
@@ -27,7 +28,6 @@ import AccountEntity from '../entities/account.entity';
 import ContatoEntity from '../entities/contato.entity';
 import { ContatoService } from '../services/contato.service';
 
-@IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('contatos')
@@ -40,6 +40,7 @@ export class ContatoController {
   @ApiQuery({ name: 'skip', required: false })
   @ApiQuery({ name: 'nome', required: false })
   @Get()
+  @UseInterceptors(GerenteRoleInterceptor, DentistaEspOdontRoleInterceptor)
   async getContatos(
     @Query('take') take?: number,
     @Query('skip') skip?: number,
