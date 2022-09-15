@@ -92,8 +92,6 @@ export class AuthController {
   async userProfile(@Req() request: RequestWithUser) {
     const payload = request.user;
 
-    return this.contatoService.findContatoByUid(payload.sub, {
-      includeAccount: true,
-    });
+    return this.contatoService.findContatoByUid(payload.sub);
   }
 }
