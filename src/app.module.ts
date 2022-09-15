@@ -9,7 +9,7 @@ import encryptionConfig from './config/encryption.config';
 import nodeConfig from './config/node.config';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { AuthModule, JwtAuthGuard } from './modules/auth';
-import { ChatModule } from './modules/chat/chat.module';
+// import { ChatModule } from './modules/chat/chat.module';
 import { CommonModule } from './modules/common/common.module';
 import { HttpExceptionFilter } from './modules/common/filters/http-exception.filter';
 import { EstoqueModule } from './modules/estoque/estoque.module';
@@ -71,7 +71,7 @@ import { NodeEnvironment } from './types';
     ServicoModule,
     FinanceiroModule,
     MailModule,
-    ChatModule,
+    // ChatModule,
   ],
   providers: [
     {
