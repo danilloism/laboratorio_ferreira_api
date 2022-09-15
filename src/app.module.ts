@@ -11,6 +11,7 @@ import { FinanceiroModule } from './modules/financeiro/financeiro.module';
 import { HealthModule } from './modules/health/health.module';
 import { MailModule } from './modules/mail/mail.module';
 import { ServicoModule } from './modules/servico/servico.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ServicoModule } from './modules/servico/servico.module';
     ServicoModule,
     FinanceiroModule,
     MailModule,
+    ChatModule,
   ],
   providers: [
     {
