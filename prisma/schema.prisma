@@ -24,7 +24,7 @@ model Contato {
 
   nome       String     @db.VarChar(80)
   account    Account?
-  telefones  String[]
+  telefones  String[]   @db.VarChar(11)
   categorias RoleEnum[]
 
   servicosComoDentista Servico[]
@@ -45,6 +45,17 @@ model Account {
   contato Contato @relation(fields: [contatoUid], references: [uid])
 
   @@map("account")
+}
+
+model SolicitacaoCadastro {
+  uid          String     @id @default(uuid()) @db.Uuid
+  solicitadoEm DateTime   @default(now()) @map("solicitado_em") @db.Timestamp()
+  email        String     @db.VarChar(100)
+  nome         String     @db.VarChar(80)
+  telefone     String     @db.VarChar(11)
+  categorias   RoleEnum[]
+  observacoes  String?    @db.Text
+  aceito       Boolean    @default(false)
 }
 
 model Produto {
