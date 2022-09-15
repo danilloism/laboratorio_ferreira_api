@@ -19,7 +19,11 @@ export class LancamentoFinanceiroService {
   async findByFluxo(fluxo: FluxoLancamentoEnum) {
     await this.prisma.lancamentoFinanceiro.findMany({
       where: { fluxo },
-      include: fluxo == FluxoLancamentoEnum.SAIDA ? { saida: true } : undefined,
+      include: {
+        parcelas: true,
+        servico: true,
+        saida: fluxo == FluxoLancamentoEnum.SAIDA,
+      },
     });
   }
 
