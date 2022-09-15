@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Account, Contato } from '@prisma/client';
+import ContatoEntity from '../../agenda/entities/contato.entity';
 import { ContatoService } from '../../agenda/services/contato.service';
 import { PasswordHelper } from '../../common/helpers/password.helper';
 import { LoginDto } from '../dto/login.dto';
@@ -21,12 +21,8 @@ export class AuthService {
     return this.jwtService.decode(token) as JwtPayload;
   }
 
-  async authenticate(
-    login: LoginDto,
-  ): Promise<Contato & { account: Partial<Account> }> {
-    const contato = await this.contatoService.findContatoByEmail(login.email, {
-      mostrarSenha: true,
-    });
+  async authenticate(login: LoginDto): Promise<ContatoEntity> {
+    const contato = await this.contatoService.findContatoByEmail(login.email);
 
     if (contato) {
       const senhaValida = await new PasswordHelper(login.senha).compare(
@@ -34,10 +30,6 @@ export class AuthService {
       );
 
       if (senhaValida) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { senha, ...accountSemSenha } = contato.account;
-        contato.account = accountSemSenha;
-
         return contato;
       }
     }
@@ -45,5 +37,10 @@ export class AuthService {
 
   async validateUsuario(payload: JwtPayload) {
     return payload;
+  }
+
+  async getUserFromJwt(jwt: string) {
+    const payload: JwtPayload = this.jwtService.verify(jwt);
+    return await this.contatoService.findAccountByContatoUid(payload.sub);
   }
 }

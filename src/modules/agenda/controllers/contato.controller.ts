@@ -16,7 +16,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { Contato } from '@prisma/client';
 import { IsPublic } from '../../auth/decorators/is-public.decorator';
 import { ResultDto } from '../../common/dtos/result.dto';
 import { AdicionarTelefonesDto } from '../dtos/add-telefones.dto';
@@ -24,8 +23,9 @@ import { CreateAccountDto } from '../dtos/create-account.dto';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
 import { UpdateContatoDto } from '../dtos/update-contato.dto';
 import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
+import AccountEntity from '../entities/account.entity';
+import ContatoEntity from '../entities/contato.entity';
 import { ContatoService } from '../services/contato.service';
-import { AccountType } from '../types/account.type';
 
 @IsPublic() //TODO: retirar isso aqui depois
 @ApiTags('Contatos')
@@ -44,7 +44,7 @@ export class ContatoController {
     @Query('take') take?: number,
     @Query('skip') skip?: number,
     @Query('nome') nome?: string,
-  ): Promise<ResultDto<Contato[]>> {
+  ): Promise<ResultDto<ContatoEntity[]>> {
     const contatos = await this.contatoService.findContatos(take, skip, nome);
     return new ResultDto({ sucesso: true, dados: contatos });
   }
@@ -52,7 +52,7 @@ export class ContatoController {
   @Get(':id')
   async getContatoById(
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ResultDto<Contato>> {
+  ): Promise<ResultDto<ContatoEntity>> {
     const contato = await this.contatoService.findContatoByUid(id);
 
     if (!contato) {
@@ -74,7 +74,7 @@ export class ContatoController {
   @Post()
   async createContato(
     @Body() model: CreateContatoDto,
-  ): Promise<ResultDto<Contato>> {
+  ): Promise<ResultDto<ContatoEntity>> {
     const contato = await this.contatoService
       .createContato(model)
       .catch(err => {
@@ -103,7 +103,7 @@ export class ContatoController {
   async updateContato(
     @Body() atualizarContatoDto: UpdateContatoDto,
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ResultDto<Contato>> {
+  ): Promise<ResultDto<ContatoEntity>> {
     const contato = await this.contatoService
       .updateContato(id, atualizarContatoDto)
       .catch(err => {
@@ -164,7 +164,7 @@ export class ContatoController {
   @Get(':id/account')
   async getAccount(
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<AccountType> {
+  ): Promise<AccountEntity> {
     const account = await this.contatoService
       .findAccountByContatoUid(id)
       .catch(err => {
@@ -197,7 +197,7 @@ export class ContatoController {
   async createAccount(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() createAccountDto: CreateAccountDto,
-  ): Promise<ResultDto<AccountType>> {
+  ): Promise<ResultDto<AccountEntity>> {
     const account = await this.contatoService
       .createAccount(id, createAccountDto)
       .catch(err => {
@@ -226,7 +226,7 @@ export class ContatoController {
   async updateAccount(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateAccountDto: UpdateUsuarioDto,
-  ): Promise<ResultDto<AccountType>> {
+  ): Promise<ResultDto<AccountEntity>> {
     const account = await this.contatoService
       .updateAccount(id, updateAccountDto)
       .catch(err => {

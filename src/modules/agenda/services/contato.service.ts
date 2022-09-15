@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Account, Contato, Prisma, RoleEnum } from '@prisma/client';
+import { Prisma, RoleEnum } from '@prisma/client';
 import { PrismaService } from 'src/modules/data/services/prisma.service';
 import { PasswordHelperV2 } from '../../common/helpers/password.helper';
 import { Uuid } from '../../common/types/uid';
@@ -11,43 +11,39 @@ import { CreateAccountDto } from '../dtos/create-account.dto';
 import { CreateContatoDto } from '../dtos/create-contato.dto';
 import { UpdateContatoDto } from '../dtos/update-contato.dto';
 import { UpdateUsuarioDto } from '../dtos/update-usuario.dto';
-import { ContatoType } from '../types/contato.type';
+import AccountEntity from '../entities/account.entity';
+import ContatoEntity from '../entities/contato.entity';
 
 @Injectable()
 export class ContatoService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  private readonly usuarioSelect = {
-    contatoUid: true,
-    email: true,
-    criadoEm: true,
-    atualizadoEm: true,
-  };
-
-  async findContatoByUid(uid: string, options?: { includeAccount?: boolean }) {
-    return await this.prismaService.contato.findUnique({
+  async findContatoByUid(uid: string): Promise<ContatoEntity> {
+    const contato = await this.prismaService.contato.findUnique({
       where: { uid },
-      include: options?.includeAccount
-        ? { account: { select: this.usuarioSelect } }
-        : undefined,
+      include: { account: true },
     });
+
+    if (!contato) return;
+
+    return ContatoEntity.fromPrisma(contato);
   }
 
-  async findByTelefone(numero: string, options?: { includeAccount?: boolean }) {
-    return await this.prismaService.contato.findFirst({
+  async findByTelefone(numero: string): Promise<ContatoEntity | undefined> {
+    const contato = await this.prismaService.contato.findFirst({
       where: { telefones: { hasSome: numero } },
-      include: options?.includeAccount
-        ? { account: { select: this.usuarioSelect } }
-        : undefined,
+      include: { account: true },
     });
+
+    return ContatoEntity.fromPrisma(contato);
   }
 
   async findByRole(
     options?: { uid?: Uuid; include?: Prisma.ContatoInclude },
     ...roles: RoleEnum[]
-  ): Promise<ContatoType | ContatoType[]> {
+  ): Promise<(ContatoEntity | undefined) | ContatoEntity[]> {
     if (options?.uid) {
-      return this.prismaService.contato.findFirst({
+      const contato = await this.prismaService.contato.findFirst({
         where: {
           uid: options.uid,
           categorias: {
@@ -56,9 +52,10 @@ export class ContatoService {
         },
         include: options.include,
       });
+      return ContatoEntity.fromPrisma(contato);
     }
 
-    return this.prismaService.contato.findMany({
+    const contatos = await this.prismaService.contato.findMany({
       where: {
         categorias: {
           hasEvery: roles,
@@ -66,16 +63,27 @@ export class ContatoService {
       },
       include: options.include,
     });
+
+    return contatos.map(contato => ContatoEntity.fromPrisma(contato));
   }
 
-  async findContatos(take?: number, skip?: number, nome?: string) {
-    return await this.prismaService.contato.findMany({
+  async findContatos(
+    take?: number,
+    skip?: number,
+    nome?: string,
+  ): Promise<ContatoEntity[]> {
+    const contatos = await this.prismaService.contato.findMany({
       where: nome
         ? { nome: { contains: nome, mode: 'insensitive' } }
         : undefined,
-      take: Number.isNaN(take) ? undefined : take,
-      skip: Number.isNaN(skip) ? undefined : skip,
+      take: Number.isNaN(take) || !take ? undefined : take,
+      skip: Number.isNaN(skip) || !skip ? undefined : skip,
+      include: {
+        account: true,
+      },
     });
+
+    return contatos.map(contato => ContatoEntity.fromPrisma(contato));
   }
 
   async createContato({
@@ -83,7 +91,7 @@ export class ContatoService {
     telefones,
     account,
     categorias,
-  }: CreateContatoDto) {
+  }: CreateContatoDto): Promise<ContatoEntity> {
     const novoUsuario = {
       email: account?.email,
       senha: account?.senha,
@@ -106,20 +114,20 @@ export class ContatoService {
       throw new ConflictException('Telefone informado já existe.');
     }
 
-    return await this.prismaService.contato.create({
+    const contato = await this.prismaService.contato.create({
       data: {
         nome,
         telefones,
         account: account ? { create: novoUsuario } : undefined,
         categorias,
       },
-      include: account
-        ? { account: { select: this.usuarioSelect } }
-        : undefined,
+      include: account ? { account: true } : undefined,
     });
+
+    return ContatoEntity.fromPrisma(contato);
   }
 
-  private async telefoneExiste(telefones: string[]) {
+  private async telefoneExiste(telefones: string[]): Promise<boolean> {
     for (const telefone of telefones) {
       const existe = await this.findByTelefone(telefone);
       if (existe) return true;
@@ -127,7 +135,10 @@ export class ContatoService {
     return false;
   }
 
-  async adicionarTelefones(uid: string, telefones: string[]) {
+  async adicionarTelefones(
+    uid: string,
+    telefones: string[],
+  ): Promise<ContatoEntity> {
     const contato = await this.findContatoByUid(uid);
 
     if (!contato)
@@ -136,13 +147,18 @@ export class ContatoService {
     if (await this.telefoneExiste(telefones))
       throw new ConflictException('Telefone informado já está cadastrado.');
 
-    return await this.prismaService.contato.update({
+    const updatedContato = await this.prismaService.contato.update({
       where: { uid },
       data: { telefones: { push: telefones } },
     });
+
+    return ContatoEntity.fromPrisma(updatedContato);
   }
 
-  async updateContato(uid: string, atualizarContatoDto: UpdateContatoDto) {
+  async updateContato(
+    uid: string,
+    atualizarContatoDto: UpdateContatoDto,
+  ): Promise<ContatoEntity> {
     const contato = await this.findContatoByUid(uid);
     if (!contato) {
       throw new NotFoundException('Contato não encontrado.');
@@ -167,29 +183,24 @@ export class ContatoService {
     });
   }
 
-  async findAccountByContatoUid(uid: string) {
+  async findAccountByContatoUid(uid: string): Promise<AccountEntity> {
     return await this.prismaService.account.findUnique({
       where: { contatoUid: uid },
     });
   }
 
-  async findAccountByEmail(email: string) {
+  async findAccountByEmail(email: string): Promise<AccountEntity> {
     return await this.prismaService.account.findUnique({
       where: { email },
       include: { contato: true },
     });
   }
 
-  async findContatoByEmail(
-    email: string,
-    options?: { mostrarSenha?: boolean },
-  ): Promise<Contato & { account: Partial<Account> }> {
+  async findContatoByEmail(email: string): Promise<ContatoEntity> {
     return await this.prismaService.contato.findFirst({
       where: { account: { email } },
       include: {
-        account: {
-          select: { ...this.usuarioSelect, senha: options?.mostrarSenha },
-        },
+        account: true,
       },
     });
   }
@@ -197,14 +208,17 @@ export class ContatoService {
   async findUniqueContatoByWhere(
     where: Prisma.ContatoWhereUniqueInput,
     options?: { include?: Prisma.ContatoInclude },
-  ) {
+  ): Promise<ContatoEntity> {
     return await this.prismaService.contato.findUnique({
       where,
       include: options?.include,
     });
   }
 
-  async updateAccount(contatoUid: string, updateAccountDto: UpdateUsuarioDto) {
+  async updateAccount(
+    contatoUid: string,
+    updateAccountDto: UpdateUsuarioDto,
+  ): Promise<AccountEntity> {
     const account = await this.prismaService.account.findUnique({
       where: { contatoUid },
     });
@@ -218,11 +232,13 @@ export class ContatoService {
     return await this.prismaService.account.update({
       where: { contatoUid },
       data: account,
-      select: this.usuarioSelect,
     });
   }
 
-  async createAccount(contatoUid: string, createAccountDto: CreateAccountDto) {
+  async createAccount(
+    contatoUid: string,
+    createAccountDto: CreateAccountDto,
+  ): Promise<AccountEntity> {
     const contato = await this.prismaService.contato.findUnique({
       where: { uid: contatoUid },
       include: { account: true },
@@ -243,7 +259,6 @@ export class ContatoService {
         senha,
         contato: { connect: { uid: contatoUid } },
       },
-      select: this.usuarioSelect,
     });
   }
 

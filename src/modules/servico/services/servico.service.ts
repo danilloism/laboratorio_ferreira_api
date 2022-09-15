@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RoleEnum } from '@prisma/client';
+import ContatoEntity from '../../agenda/entities/contato.entity';
 import { ContatoService } from '../../agenda/services/contato.service';
-import { ContatoType } from '../../agenda/types/contato.type';
 import { Uuid } from '../../common/types/uid';
 import { PrismaService } from '../../data/services/prisma.service';
 import { CreateServicoDto } from '../dtos/create-servico.dto';
@@ -25,7 +25,7 @@ export class ServicoService {
     const dentista = (await this.contatoService.findByRole(
       { uid: dentistaUid, include: { servicosComoDentista: true } },
       RoleEnum.DENTISTA,
-    )) as ContatoType;
+    )) as ContatoEntity;
 
     if (!dentista) {
       throw new NotFoundException('Dentista não encontrado.');
@@ -38,7 +38,7 @@ export class ServicoService {
     const paciente = (await this.contatoService.findByRole(
       { uid: pacienteUid, include: { servicosComoPaciente: true } },
       RoleEnum.PACIENTE,
-    )) as ContatoType;
+    )) as ContatoEntity;
 
     if (!paciente) {
       throw new NotFoundException('Paciente não encontrado.');
@@ -58,7 +58,7 @@ export class ServicoService {
     const dentista = (await this.contatoService.findByRole(
       { uid: dentistaUid },
       RoleEnum.DENTISTA,
-    )) as ContatoType;
+    )) as ContatoEntity;
 
     if (!dentista) {
       throw new NotFoundException('Dentista não encontrado.');
@@ -77,7 +77,7 @@ export class ServicoService {
         const paciente = (await this.contatoService.findByRole(
           { uid: pacienteUid },
           RoleEnum.PACIENTE,
-        )) as ContatoType;
+        )) as ContatoEntity;
 
         if (!paciente)
           throw new NotFoundException(
