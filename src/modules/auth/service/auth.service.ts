@@ -25,7 +25,8 @@ export class AuthService {
     const contato = await this.contatoService.findContatoByEmail(login.email);
 
     if (contato) {
-      const senhaValida = await new PasswordHelper(login.senha).compare(
+      const senhaValida = await PasswordHelper.compare(
+        login.senha,
         contato.account.senha,
       );
 
