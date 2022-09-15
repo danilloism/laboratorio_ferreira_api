@@ -70,7 +70,6 @@ import { NodeEnvironment } from './types';
     ServicoModule,
     FinanceiroModule,
     MailModule,
-    // ChatModule,
   ],
   providers: [
     {
