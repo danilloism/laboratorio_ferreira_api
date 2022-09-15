@@ -38,10 +38,14 @@ async function bootstrap() {
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
 
-  await app.listen(app.get(ConfigService).get('node.port'), async () => {
-    const logger = new NestLogger(AppModule.name);
-    logger.log(`Servidor iniciado em: ${await app.getUrl()}`);
-  });
+  await app.listen(
+    app.get(ConfigService).get('node.port'),
+    '0.0.0.0',
+    async () => {
+      const logger = new NestLogger(AppModule.name);
+      logger.log(`Servidor iniciado em: ${await app.getUrl()}`);
+    },
+  );
 }
 
 bootstrap();
