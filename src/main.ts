@@ -11,7 +11,6 @@ import { HttpExceptionFilter } from './modules/common/filters/http-exception.fil
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.setGlobalPrefix('api');
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.use(helmet());
   app.enableCors();
@@ -32,7 +31,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document, {
+  SwaggerModule.setup('docs', app, document, {
     customSiteTitle: 'Documentação da API RESTful do Laboratório Ferreira.',
   });
 
