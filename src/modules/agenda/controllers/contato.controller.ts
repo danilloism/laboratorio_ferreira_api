@@ -1,6 +1,7 @@
 import {
   Body,
   ClassSerializerInterceptor,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -13,9 +14,12 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { RoleEnum } from '@prisma/client';
+import { RequestWithUser } from 'src/modules/common/types/request-with-user.type';
 import { DentistaEspOdontRoleInterceptor } from '../../auth/interceptors/dentista-esp-odont-role.interceptor';
 import { GerenteRoleInterceptor } from '../../auth/interceptors/gerente-role.interceptor';
 import { ResultDto } from '../../common/dtos/result.dto';
@@ -255,7 +259,26 @@ export class ContatoController {
   @Delete(':id/account')
   async deleteAccount(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() request: RequestWithUser,
   ): Promise<ResultDto> {
+    if (
+      id == request.user.sub &&
+      request.user.roles.find(
+        role =>
+          role == RoleEnum.COLABORADOR ||
+          role == RoleEnum.ADMIN ||
+          role == RoleEnum.GERENTE,
+      )
+    ) {
+      throw new ConflictException(
+        new ResultDto({
+          sucesso: false,
+          mensagem: 'Erro ao deletar conta de usuário',
+          erro: 'Colaboradores, administradores ou gerentes não pode deletar a própria conta.',
+        }),
+      );
+    }
+
     const deletado = await this.contatoService.deleteAccount(id);
 
     if (!deletado) {

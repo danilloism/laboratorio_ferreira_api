@@ -167,7 +167,7 @@ export class ContatoService {
       throw new NotFoundException('Contato não encontrado.');
     }
 
-    return await this.prismaService.contato.update({
+    const contatoAtualizado = await this.prismaService.contato.update({
       where: { uid: uid },
       data: {
         nome:
@@ -185,6 +185,8 @@ export class ContatoService {
       },
       include: { account: true },
     });
+
+    return ContatoEntity.fromPrisma(contatoAtualizado);
   }
 
   async findAccountByContatoUid(uid: string): Promise<AccountEntity> {
