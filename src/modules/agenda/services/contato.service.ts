@@ -183,6 +183,7 @@ export class ContatoService {
             ? atualizarContatoDto.ativo
             : undefined,
       },
+      include: { account: true },
     });
   }
 
