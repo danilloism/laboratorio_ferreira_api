@@ -130,9 +130,16 @@ export class ContatoService {
     return ContatoEntity.fromPrisma(contato);
   }
 
-  private async telefoneExiste(telefones: string[]): Promise<boolean> {
+  private async telefoneExiste(
+    telefones: string[],
+    uidContatoASerAtualizado?: string,
+  ): Promise<boolean> {
     for (const telefone of telefones) {
       const existe = await this.findByTelefone(telefone);
+      if (uidContatoASerAtualizado && existe?.uid == uidContatoASerAtualizado) {
+        continue;
+      }
+
       if (existe) return true;
     }
     return false;
@@ -167,6 +174,10 @@ export class ContatoService {
       throw new NotFoundException('Contato não encontrado.');
     }
 
+    if (await this.telefoneExiste(atualizarContatoDto.telefones)) {
+      throw new ConflictException('Telefone informado já está cadastrado.');
+    }
+
     const contatoAtualizado = await this.prismaService.contato.update({
       where: { uid: uid },
       data: {
@@ -182,8 +193,12 @@ export class ContatoService {
           atualizarContatoDto.ativo != null
             ? atualizarContatoDto.ativo
             : undefined,
+        telefones:
+          atualizarContatoDto.telefones != null
+            ? atualizarContatoDto.telefones
+            : undefined,
       },
-      include: { account: true },
+      include: contato.account ? { account: true } : undefined,
     });
 
     return ContatoEntity.fromPrisma(contatoAtualizado);

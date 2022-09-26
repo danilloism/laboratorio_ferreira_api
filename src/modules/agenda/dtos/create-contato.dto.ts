@@ -17,23 +17,24 @@ import { TelefoneHelper } from '../helpers/telefone.helper';
 import { CreateAccountDto } from './create-account.dto';
 
 export class CreateContatoDto {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Nome não pode ser vazio.' })
   @IsString()
-  @MaxLength(80)
+  @MaxLength(80, { message: 'Nome deve ter no máximo 80 caracteres.' })
   public readonly nome: string;
 
   @IsArray()
-  @ArrayMinSize(1)
+  @ArrayMinSize(1, { message: 'Contato deve possuir pelo menos 1 categoria.' })
   @ArrayUnique()
   @IsEnum(RoleEnum, { each: true })
-  @IsNotEmpty()
   @ApiProperty({ enum: RoleEnum, isArray: true })
   public readonly categorias: RoleEnum[];
 
-  @IsNotEmpty()
   @IsArray()
-  @ArrayMinSize(1)
-  @IsPhoneNumber('BR', { each: true })
+  @ArrayMinSize(1, { message: 'Contato deve possuir pelo menos 1 telefone.' })
+  @IsPhoneNumber('BR', {
+    each: true,
+    message: 'Telefone deve possuir ddd + número de 9 dígitos.',
+  })
   @Transform(({ value }) =>
     value.map(telefone => TelefoneHelper.format(telefone)),
   )

@@ -85,7 +85,7 @@ export class ContatoController {
       .catch(err => {
         const result = new ResultDto({
           sucesso: false,
-          mensagem: 'Erro ao criar agenda.',
+          mensagem: 'Erro ao criar contato.',
           erro: err.message,
         });
 
