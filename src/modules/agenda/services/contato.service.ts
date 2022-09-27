@@ -174,7 +174,7 @@ export class ContatoService {
       throw new NotFoundException('Contato não encontrado.');
     }
 
-    if (await this.telefoneExiste(atualizarContatoDto.telefones)) {
+    if (await this.telefoneExiste(atualizarContatoDto.telefones, contato.uid)) {
       throw new ConflictException('Telefone informado já está cadastrado.');
     }
 
