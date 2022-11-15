@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -170,6 +171,15 @@ export class ContatoService {
     atualizarContatoDto: UpdateContatoDto,
   ): Promise<ContatoEntity> {
     const contato = await this.findContatoByUid(uid);
+    if (
+      !atualizarContatoDto.telefones ||
+      atualizarContatoDto.telefones.length == 0
+    ) {
+      throw new BadRequestException(
+        'Contato deve possuir pelo menos um telefone.',
+      );
+    }
+
     if (!contato) {
       throw new NotFoundException('Contato não encontrado.');
     }

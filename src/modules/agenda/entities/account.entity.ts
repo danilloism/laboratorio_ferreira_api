@@ -9,9 +9,10 @@ export default class AccountEntity {
 
   public criadoEm: Date;
   public atualizadoEm: Date;
-  public contatoUid: string;
   public email: string;
 
+  @Exclude()
+  public contatoUid: string;
   @Exclude()
   public senha: string;
 
