@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, RoleEnum } from '@prisma/client';
 import { PrismaService } from 'src/modules/data/services/prisma.service';
 import { PasswordService } from '../../common/services/password.service';
@@ -221,10 +216,12 @@ export class ContatoService {
   }
 
   async findAccountByEmail(email: string): Promise<AccountEntity> {
-    return await this.prismaService.account.findUnique({
+    const result = await this.prismaService.account.findUnique({
       where: { email },
       include: { contato: true },
     });
+
+    return AccountEntity.fromPrisma(result);
   }
 
   async findContatoByEmail(email: string): Promise<ContatoEntity> {

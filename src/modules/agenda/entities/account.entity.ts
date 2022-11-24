@@ -22,6 +22,7 @@ export default class AccountEntity {
     account?: Account & { contato?: Contato },
   ): AccountEntity | undefined {
     if (!account) return;
+
     return new AccountEntity({
       ...account,
       contato: ContatoEntity.fromPrisma(account.contato),

@@ -1,5 +1,6 @@
-import { Account, Contato, RoleEnum, Servico } from '@prisma/client';
+import { Account, Contato, Servico } from '@prisma/client';
 import { Exclude } from 'class-transformer';
+import { Role } from '../../auth/enums/role.enum';
 import AccountEntity from './account.entity';
 
 export default class ContatoEntity {
@@ -13,7 +14,7 @@ export default class ContatoEntity {
   public ativo: boolean;
   public nome: string;
   public telefones: string[];
-  public categorias: RoleEnum[];
+  public categorias: Role[];
 
   public account?: AccountEntity;
 
@@ -30,8 +31,10 @@ export default class ContatoEntity {
     },
   ): ContatoEntity | undefined {
     if (!contato) return;
+    const roles = contato.categorias.map(role => Role[role]);
     return new ContatoEntity({
       ...contato,
+      categorias: roles,
       account: AccountEntity.fromPrisma(contato.account),
     });
   }
