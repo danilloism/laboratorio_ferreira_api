@@ -1,25 +1,17 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
-import { RoleEnum } from '@prisma/client';
+import { CallHandler, ExecutionContext, HttpException, HttpStatus, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { JwtPayload } from '..';
 import { ResultDto } from '../../common/dtos/result.dto';
 import { RequestWithUser } from '../../common/types/request-with-user.type';
+import { getRoleIndex, Role } from '../enums/role.enum';
 
 @Injectable()
 export class RoleInterceptor implements NestInterceptor {
-  constructor(...roles: RoleEnum[]) {
+  constructor(...roles: Role[]) {
     this.roles = roles;
-    roles.push(RoleEnum.ADMIN);
   }
 
-  private readonly roles: RoleEnum[];
+  private readonly roles: Role[];
 
   intercept(
     context: ExecutionContext,
@@ -28,7 +20,20 @@ export class RoleInterceptor implements NestInterceptor {
     const payload: JwtPayload = context
       .switchToHttp()
       .getRequest<RequestWithUser>().user;
-    const temRole = payload.roles.every(role => this.roles.includes(role));
+    payload.roles = payload.roles.map(role => Role[role.toString()]);
+    const hierarquia = (roles: Role[]): number => {
+      return roles
+        .map(role => getRoleIndex(role))
+        .reduce((value, element) =>
+          value.valueOf() < element.valueOf()
+            ? value.valueOf()
+            : element.valueOf(),
+        );
+    };
+
+    const hierarquiaPayload = hierarquia(payload.roles);
+    const hierarquiaInterceptor = hierarquia(this.roles);
+    const temRole = hierarquiaPayload <= hierarquiaInterceptor;
     if (!temRole) {
       throw new HttpException(
         new ResultDto({

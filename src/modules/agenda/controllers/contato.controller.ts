@@ -18,9 +18,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
-import { RoleEnum } from '@prisma/client';
 import { RequestWithUser } from 'src/modules/common/types/request-with-user.type';
-import { DentistaEspOdontRoleInterceptor } from '../../auth/interceptors/dentista-esp-odont-role.interceptor';
+import { ColaboradorRoleInterceptor } from '../../auth/interceptors/colaborador-role.interceptor';
 import { GerenteRoleInterceptor } from '../../auth/interceptors/gerente-role.interceptor';
 import { ResultDto } from '../../common/dtos/result.dto';
 import { AdicionarTelefonesDto } from '../dtos/add-telefones.dto';
@@ -44,7 +43,7 @@ export class ContatoController {
   @ApiQuery({ name: 'skip', required: false })
   @ApiQuery({ name: 'nome', required: false })
   @Get()
-  @UseInterceptors(GerenteRoleInterceptor, DentistaEspOdontRoleInterceptor)
+  @UseInterceptors(ColaboradorRoleInterceptor)
   async getContatos(
     @Query('take') take?: number,
     @Query('skip') skip?: number,
@@ -77,6 +76,7 @@ export class ContatoController {
   }
 
   @Post()
+  @UseInterceptors(ColaboradorRoleInterceptor)
   async createContato(
     @Body() model: CreateContatoDto,
   ): Promise<ResultDto<ContatoEntity>> {
@@ -199,6 +199,7 @@ export class ContatoController {
   }
 
   @Post(':id/account')
+  @UseInterceptors(GerenteRoleInterceptor)
   async createAccount(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() createAccountDto: CreateAccountDto,
@@ -228,6 +229,7 @@ export class ContatoController {
   }
 
   @Put(':id/account')
+  @UseInterceptors(GerenteRoleInterceptor)
   async updateAccount(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateAccountDto: UpdateUsuarioDto,
@@ -257,19 +259,12 @@ export class ContatoController {
   }
 
   @Delete(':id/account')
+  @UseInterceptors(GerenteRoleInterceptor)
   async deleteAccount(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() request: RequestWithUser,
   ): Promise<ResultDto> {
-    if (
-      id == request.user.sub &&
-      request.user.roles.find(
-        role =>
-          role == RoleEnum.COLABORADOR ||
-          role == RoleEnum.ADMIN ||
-          role == RoleEnum.GERENTE,
-      )
-    ) {
+    if (id == request.user.sub) {
       throw new ConflictException(
         new ResultDto({
           sucesso: false,
