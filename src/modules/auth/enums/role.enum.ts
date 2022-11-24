@@ -1,11 +1,11 @@
 export enum Role {
-  ADMIN,
-  GERENTE,
-  COLABORADOR,
-  DENTISTA,
-  PACIENTE,
-  ENTREGADOR,
-  FORNECEDOR,
+  ADMIN       = 'ADMIN',
+  GERENTE     = 'GERENTE',
+  COLABORADOR = 'COLABORADOR',
+  DENTISTA    = 'DENTISTA',
+  PACIENTE    = 'PACIENTE',
+  ENTREGADOR  = 'ENTREGADOR',
+  FORNECEDOR  = 'FORNECEDOR',
 }
 
 export function getRoleIndex(role: Role) {
