@@ -59,7 +59,7 @@ jobs:
         run: yarn install --frozen-lockfile --prod
 
       - name: zip node_modules folder
-        run: zip modules.zip ./node_modules -r
+        run: zip modules.zip ./node_modules ./package.json yarn.lock -r
 
       - name: Upload zip file for deployment job
         uses: actions/upload-artifact@v3
