@@ -21,23 +21,47 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-          cache: 'yarn'
 
-      - name: yarn install, build, and test
+      - name: apply db migration and build
         run: |
-          yarn install
-          npx prisma migrate deploy
+          yarn install --frozen-lockfile
           yarn run build
+          npx prisma migrate deploy
+
+      - name: Upload artifact for build job
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
+  prod:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: download build folder
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+
+      - name: install prod dependencies
+        run: yarn install --frozen-lockfile --prod
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: .
-
+          path: |
+            dist
+            node_modules
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: prod
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
